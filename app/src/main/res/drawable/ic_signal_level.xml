@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2012-2024 Arne Schwabe
+  ~ Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
+  -->
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@drawable/ic_level_1"
+        android:maxLevel="1" />
+    <item
+        android:drawable="@drawable/ic_level_2"
+        android:maxLevel="2" />
+    <item
+        android:drawable="@drawable/ic_level_3"
+        android:maxLevel="3" />
+    <item
+        android:drawable="@drawable/ic_level_4"
+        android:maxLevel="4" />
+    <item
+        android:drawable="@drawable/ic_level_5"
+        android:maxLevel="5" />
+</level-list>

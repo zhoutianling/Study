@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><!--葡萄牙-->
+<resources>
+    <string name="app_name">ZeroStudy</string>
+    <string name="panel">Painel</string>
+    <string name="tab_home">Início</string>
+    <string name="tab_editor">Editor</string>
+    <string name="tab_free_style">Estilo Livre</string>
+    <string name="tab_setting">Configurações</string>
+    <string name="base_load_success">Carregamento bem-sucedido</string>
+    <string name="base_load_failed">Falha no carregamento</string>
+    <string name="base_loading">Carregando…</string>
+    <string name="base_load_retry">Falha no carregamento. Tente novamente!</string>
+    <string name="base_load_failed_no_network">Ops, a conexão de rede foi perdida! Por favor, tente novamente</string>
+    <string name="base_load_empty">Vazio!</string>
+    <string name="launcher_text">Carregando…</string>
+    <string name="endpoint_list">Lista de endpoints</string>
+    <string name="setting_language">Idioma</string>
+    <string name="next">Próximo</string>
+    <string name="usa">Estados Unidos</string>
+    <string name="find_the_switch_and_turn_it_on">Find the switch and turn it on</string>
+    <string name="not_allowed">Not Allowed</string>
+    <string name="guide_item_one">Guide Title</string>
+</resources>
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><!-- 印地语 -->
+<resources>
+    <string name="app_name">ZeroStudy</string>
+    <string name="panel">पैनल</string>
+    <string name="tab_home">होम</string>
+    <string name="tab_editor">संपादक</string>
+    <string name="tab_free_style">फ्री स्टाइल</string>
+    <string name="tab_setting">सेटिंग्स</string>
+    <string name="base_load_success">सफलतापूर्वक लोड किया गया</string>
+    <string name="base_load_failed">लोड करने में विफल</string>
+    <string name="base_loading">लोड हो रहा है…</string>
+    <string name="base_load_retry">लोड करने में विफल हुआ। पुनः प्रयास करने के लिए क्लिक करें!</string>
+    <string name="base_load_failed_no_network">ओह, नेटवर्क कनेक्शन खो गई है! पुनः प्रयास करने के लिए क्लिक करें</string>
+    <string name="base_load_empty">खाली है!</string>
+    <string name="launcher_text">लोड हो रहा है…</string>
+    <string name="endpoint_list">अंत प्रांच सूची</string>
+    <string name="setting_language">भाषा</string>
+    <string name="next">अगला</string>
+    <string name="usa">संयुक्त राज्य अमेरिका</string>
+    <string name="find_the_switch_and_turn_it_on">Find the switch and turn it on</string>
+    <string name="not_allowed">Not Allowed</string>
+    <string name="guide_item_one">Guide Title</string>
+</resources>

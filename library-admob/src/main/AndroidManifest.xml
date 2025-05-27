@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${MANIFEST_ADMOB_APP_ID}" />
+        <activity
+            android:name="com.toolkit.admob.activity.OpenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.OpenTheme" />
+    </application>
+</manifest>

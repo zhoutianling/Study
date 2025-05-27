@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><!--韩语-->
+<resources>
+    <string name="app_name">ZeroStudy</string>
+    <string name="panel">패널</string>
+    <string name="tab_home">홈</string>
+    <string name="tab_editor">편집기</string>
+    <string name="tab_free_style">자유 형식</string>
+    <string name="tab_setting">설정</string>
+    <string name="base_load_success">로드 성공</string>
+    <string name="base_load_failed">로드 실패</string>
+    <string name="base_loading">로딩 중…</string>
+    <string name="base_load_retry">로드 실패. 다시 시도해보세요!</string>
+    <string name="base_load_failed_no_network">이런, 네트워크 연결이 끊겼습니다! 다시 시도해보세요</string>
+    <string name="base_load_empty">비어 있습니다!</string>
+    <string name="launcher_text">로딩 중…</string>
+    <string name="endpoint_list">엔드포인트 목록</string>
+    <string name="setting_language">언어</string>
+    <string name="next">다음</string>
+    <string name="usa">미국</string>
+    <string name="find_the_switch_and_turn_it_on">Find the switch and turn it on</string>
+    <string name="not_allowed">Not Allowed</string>
+    <string name="guide_item_one">Guide Title</string>
+</resources>
+

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="base_load_success">load success</string>
+    <string name="base_load_failed">load failed</string>
+    <string name="base_loading">Loading…</string>
+    <string name="base_load_retry">Load failed. click to retry!</string>
+    <string name="base_load_failed_no_network">Oops, network is lost!  click to retry</string>
+    <string name="base_load_empty">Empty!</string>
+    <string name="base_progress_text">%d %%</string>
+</resources>

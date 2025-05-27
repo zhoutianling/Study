@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ad_open_color">#2B2A30</color>
+    <color name="ad_open_bg_color">#2B2A30</color>
+    <color name="ad_title_color">#FFFFFF</color>
+    <color name="ad_desc_color">#FFFFFF</color>
+    <color name="ad_button_bg_color">#34CE57</color>
+    <color name="ad_flag_bg_color">#C8FF82</color>
+    <color name="ad_red_color">#FF0000</color>
+    <color name="ad_gray_color">#FFFFFF</color>
+    <color name="ad_white_color">#FFFFFF</color>
+    <color name="ad_black_color">#000000</color>
+    <color name="ad_back_ground_color">#434249</color>
+</resources>

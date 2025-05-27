@@ -1,0 +1,28 @@
+ext {
+    APPLICATION_ID = "com.zero.study"
+    VERSION_NAME = "1.1.0"
+    VERSION_CODE = "240605"
+
+    STORE_PATH = "E:\\WorkSpace\\study.jks"
+    STORE_PASSWORD = "123456"
+    KEY_ALIAS = "study"
+    KEY_PASSWORD = "123456"
+
+    MANIFEST_ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713"
+
+    ADMOB_OPEN = "ca-app-pub-3940256099942544/9257395921"
+
+    ADMOB_INTERSTITIAL_GUIDE = "ca-app-pub-3940256099942544/1033173712"
+    ADMOB_INTERSTITIAL_LANGUAGE = "ca-app-pub-3940256099942544/1033173712"
+    ADMOB_INTERSTITIAL_CONNECT_RESULT = "ca-app-pub-3940256099942544/8691691433"
+
+    NATIVE_BANNER_HOME = "ca-app-pub-3940256099942544/2247696110"
+    NATIVE_BANNER_LANGUAGE = "ca-app-pub-3940256099942544/2247696110"
+
+    NATIVE_BANNER_EDITOR = "ca-app-pub-3940256099942544/9214589741"
+
+    PRIVACY_POLICY_URL = "https://firebase.google.com/docs/remote-config/get-started?hl=zh-cn&platform=android"
+    TERM_URL = "https://firebase.google.com/docs/remote-config/get-started?hl=zh-cn&platform=android"
+
+
+}

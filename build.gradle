@@ -1,0 +1,23 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    dependencies {
+        classpath libs.stringfogGradlePlugin
+        // 选用加解密算法库，默认实现了xor算法，也可以使用自己的加解密库。
+        classpath libs.xor
+        //资源混淆
+        classpath libs.aabresguard.plugin
+    }
+}
+plugins {
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.googleGmsGoogleServices) apply false
+    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.kotlinAndroid) apply false
+    alias(libs.plugins.ksp).apply(false)
+}
+apply from: "app-config.gradle"
+ext {
+    compileSdk = 34
+    minSdk = 24
+    targetSdk = 34
+}

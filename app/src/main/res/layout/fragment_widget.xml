@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragment.HomeFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="10dp"
+            android:text="@string/tab_free_style"
+            android:textColor="@color/colorWhite"
+            android:textSize="22sp" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <com.zero.base.widget.CenterSeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:progressTextSize="14sp" />
+
+    <Button
+        android:id="@+id/btn_00"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-50~50 (30)"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0~100 (80)"
+        app:layout_constraintTop_toBottomOf="@+id/btn_00" />
+
+    <Button
+        android:id="@+id/btn_02"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-100~100 (50)"
+        app:layout_constraintTop_toBottomOf="@+id/btn_01" />
+
+    <Button
+        android:id="@+id/btn_03"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="-0~50 (50)"
+        app:layout_constraintTop_toBottomOf="@+id/btn_02" />
+
+    <com.zero.study.ui.recyclerview.RecyclerBanner
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:autoPlaying="true"
+        app:indicatorGravity="right"
+        app:indicatorMarginBottom="20dp"
+        app:indicatorMarginRight="15dp"
+        app:indicatorSelectedSrc="@drawable/shape_indicator_select"
+        app:indicatorUnselectedSrc="@drawable/shape_indicator_unselect"
+        app:layout_constraintTop_toBottomOf="@+id/btn_03" />
+</androidx.constraintlayout.widget.ConstraintLayout>

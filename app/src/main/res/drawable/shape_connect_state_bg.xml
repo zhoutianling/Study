@@ -1,0 +1,69 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A4A66E0" />
+            <corners android:radius="20dp" />
+            <size
+                android:width="158dp"
+                android:height="158dp" />
+        </shape>
+    </item>
+    <item
+        android:bottom="10dp"
+        android:left="10dp"
+        android:right="10dp"
+        android:top="10dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#334A66E0" />
+            <corners android:radius="20dp" />
+            <size
+                android:width="134dp"
+                android:height="134dp" />
+        </shape>
+    </item>
+    <item
+        android:bottom="20dp"
+        android:left="20dp"
+        android:right="20dp"
+        android:top="20dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#4D4A66E0" />
+            <corners android:radius="20dp" />
+            <size
+                android:width="110dp"
+                android:height="110dp" />
+        </shape>
+    </item>
+    <item
+        android:bottom="40dp"
+        android:left="40dp"
+        android:right="40dp"
+        android:top="40dp">
+        <shape
+            android:shape="oval"
+            android:useLevel="true">
+            <size
+                android:width="84dp"
+                android:height="84dp" />
+            <solid android:color="@color/homeBlueLightColor" />
+            <stroke
+                android:width="1dp"
+                android:color="@android:color/white" />
+        </shape>
+    </item>
+    <item
+        android:bottom="60dp"
+        android:left="60dp"
+        android:right="60dp"
+        android:top="60dp">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="32dp"
+            android:height="32dp"
+            android:viewportWidth="32"
+            android:viewportHeight="32">
+            <path
+                android:fillColor="#ffffff"
+                android:pathData="M26.208,23.988V24.53L19.916,23.262C19.51,24.62 17.88,25.66 15.98,25.66C14.078,25.66 12.448,24.618 12.042,23.216L5.796,24.438V23.896C5.796,20.818 6.656,18.6 8.6,16.744C7.92,7.964 11.858,2.398 15.75,0.134L15.978,0L16.204,0.134C20.098,2.398 23.988,7.964 23.356,16.746C25.348,18.602 26.208,20.82 26.208,23.988ZM17.968,13.036C19.144,11.95 19.234,10.094 18.148,8.916C17.062,7.74 15.208,7.648 14.03,8.734C12.854,9.82 12.764,11.678 13.85,12.854C14.936,14.032 16.792,14.122 17.968,13.036ZM17.45,28.65C17.45,29.962 16,32 16,32C16,32 14.552,29.826 14.552,28.65C14.552,27.654 15.184,26.84 16,26.84C16.816,26.84 17.45,27.654 17.45,28.65Z" />
+        </vector>
+    </item>
+</layer-list>

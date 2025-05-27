@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><!--德语-->
+<resources>
+    <string name="app_name">ZeroStudy</string>
+    <string name="panel">Panel</string>
+    <string name="tab_home">Startseite</string>
+    <string name="tab_editor">Editor</string>
+    <string name="tab_free_style">Freistil</string>
+    <string name="tab_setting">Einstellungen</string>
+    <string name="base_load_success">Laden erfolgreich</string>
+    <string name="base_load_failed">Laden fehlgeschlagen</string>
+    <string name="base_loading">Laden…</string>
+    <string name="base_load_retry">Laden fehlgeschlagen. Klicken Sie zum Wiederholen!</string>
+    <string name="base_load_failed_no_network">Oops, Netzwerkverbindung verloren! Klicken Sie zum Wiederholen</string>
+    <string name="base_load_empty">Leer!</string>
+    <string name="launcher_text">Laden…</string>
+    <string name="endpoint_list">Endpunktliste</string>
+    <string name="setting_language">Sprache</string>
+    <string name="next">Weiter</string>
+    <string name="usa">USA</string>
+    <string name="find_the_switch_and_turn_it_on">Find the switch and turn it on</string>
+    <string name="not_allowed">Not Allowed</string>
+    <string name="guide_item_one">Guide Title</string>
+</resources>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_connect_line"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="15dp"
+    android:background="@drawable/shape_item_selector"
+    app:layout_constraintTop_toBottomOf="@+id/cl_connect_speed">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_connect_icon"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_margin="10dp"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_home_connect_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/circleImageView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_ip"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="15dp"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:textColor="@color/colorWhite"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_delay_time"
+        app:layout_constraintLeft_toRightOf="@+id/iv_connect_icon"
+        app:layout_constraintRight_toLeftOf="@+id/iv_signal_level"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="UK" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_delay_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/tv_ip"
+        app:layout_constraintRight_toLeftOf="@+id/iv_signal_level"
+        app:layout_constraintTop_toBottomOf="@+id/tv_ip"
+        tools:text="51.195.136.107" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_signal_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/tv_connect_state"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_signal_level" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_connect_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/shape_background_gradient"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="5dp"
+        android:text="Connect"
+        android:textColor="@color/color_connect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "645365061148",
+    "project_id": "aniremoteconfig",
+    "storage_bucket": "aniremoteconfig.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645365061148:android:ffacb0035692f614c3b1d9",
+        "android_client_info": {
+          "package_name": "com.zero.study"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDuw-z3pvrKzOt8xB7d7fPyau3cpM84Vo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

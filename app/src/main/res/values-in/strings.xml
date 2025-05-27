@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><!-- 印尼语 -->
+<resources>
+    <string name="app_name">ZeroStudy</string>
+    <string name="panel">Panel</string>
+    <string name="tab_home">Beranda</string>
+    <string name="tab_editor">Editor</string>
+    <string name="tab_free_style">Gaya Bebas</string>
+    <string name="tab_setting">Pengaturan</string>
+    <string name="base_load_success">Berhasil dimuat</string>
+    <string name="base_load_failed">Gagal memuat</string>
+    <string name="base_loading">Memuat…</string>
+    <string name="base_load_retry">Gagal memuat. Klik untuk mencoba lagi!</string>
+    <string name="base_load_failed_no_network">Ups, koneksi jaringan terputus! Klik untuk mencoba lagi</string>
+    <string name="base_load_empty">Kosong!</string>
+    <string name="launcher_text">Memuat…</string>
+    <string name="endpoint_list">Daftar titik akhir</string>
+    <string name="setting_language">Bahasa</string>
+    <string name="next">Selanjutnya</string>
+    <string name="usa">Amerika Serikat</string>
+    <string name="find_the_switch_and_turn_it_on">Find the switch and turn it on</string>
+    <string name="not_allowed">Not Allowed</string>
+    <string name="guide_item_one">Guide Title</string>
+</resources>

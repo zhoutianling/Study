@@ -1,0 +1,120 @@
+plugins {
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.ksp)
+    id 'stringfog'
+    id 'com.bytedance.android.aabResGuard'
+    id("kotlin-parcelize")
+
+}
+import com.github.megatronking.stringfog.plugin.StringFogMode
+import com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator
+android {
+    namespace 'com.zero.study'
+    compileSdk rootProject.ext.compileSdk
+    defaultConfig {
+        applicationId "com.zero.study"
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        versionCode 2
+        versionName "1.1"
+        buildConfigField("String", "COUNTRY_API_URL", "\"https://ipinfo.io/json/\"")
+        buildConfigField("String", "METRICA_KEY", "\"63fd3c51-0d53-44c9-aba4-e0136520346b\"")
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        debug {
+            storeFile file(STORE_PATH)
+            storePassword STORE_PASSWORD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+            v2SigningEnabled true
+        }
+
+        release {
+            storeFile file(STORE_PATH)
+            storePassword STORE_PASSWORD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+            v2SigningEnabled true
+        }
+    }
+    buildTypes {
+        debug {
+            // 设置调试时包名后添加debug以防止与正式版安装冲突
+            // applicationIdSuffix '.debug'
+            signingConfig signingConfigs.release
+            debuggable true
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            signingConfig signingConfigs.release
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            android.applicationVariants.configureEach { variant ->
+                variant.outputs.configureEach {
+                    def createTime = new Date().format("YYYYMMddHHmm", TimeZone.getTimeZone("GMT+08:00"))
+                    def fileName = "Study_${buildType.name}_V${defaultConfig.versionName}_${createTime}.apk"
+                    outputFileName = fileName
+                }
+            }
+        }
+    }
+
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+        aidl = true
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+stringfog {
+    implementation 'com.github.megatronking.stringfog.xor.StringFogImpl'
+    packageName 'com.github.megatronking.stringfog.app'
+    enable true
+    fogPackages = ["com.zero.study"]
+    kg new RandomKeyGenerator()
+    mode StringFogMode.bytes
+}
+aabResGuard {
+    mappingFile = file("mapping.txt").toPath()
+    whiteList = ["*.R.raw.*",
+                 "*.R.drawable.icon",
+                 "*.R.string.default_web_client_id",
+                 "*.R.string.firebase_database_url",
+                 "*.R.string.gcm_defaultSenderId",
+                 "*.R.string.google_api_key",
+                 "*.R.string.google_app_id",
+                 "*.R.string.google_crash_reporting_api_key",
+                 "*.R.string.google_storage_bucket",
+                 "*.R.string.project_id",
+                 "*.R.string.com.crashlytics.android.build_id"]
+    obfuscatedBundleFileName = "app_build.aab"
+    mergeDuplicatedRes = true
+    enableFilterFiles = true
+    filterList = ["BUNDLE-METADATA/*"]
+    enableFilterStrings = false
+    unusedStringPath = file("unused.txt").toPath()
+    languageWhiteList = ["en", "ar", "de", "es", "fr", "hi", "in", "ja", "ko","pt","ru"]
+}
+dependencies {
+    //StringFog
+    implementation libs.xor
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    implementation project(path: ':library-admob')
+    implementation project(path: ':library-base')
+    ksp libs.androidx.room.compiler
+}

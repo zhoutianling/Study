@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <!-- Devices running Android 13 (API level 33) or higher -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- To handle the reselection within the app on Android 14 (API level 34) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <!-- Devices running Android 12L (API level 32) or lower  -->
+    <!--读取-->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <!--写入-->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />
+    <!--相机-->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!--录音-->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 悬浮窗权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <!--Metrica（可选）位置检测可帮助您了解用户的地理位置-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!--打开其他应用的自定义权限（其他应用需要使用uses-permission 方式注册该权限，且与被打开页面的宿主中android:permission保持一致）-->
+    <permission android:name="zero.permission.main" />
+
+    <application
+        android:name=".AppStudy"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppTheme"
+        android:usesCleartextTraffic="true">
+        <!--Activity-->
+        <activity
+            android:name=".ui.activity.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.OverlayApply">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:permission="zero.permission.main">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="study.intent.action.main" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activity.RecyclerViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.RxActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.AnimationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.SecondActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.LanguageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.InterstitialActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.AccessPerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.TakePhotoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.PermissionManagerActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity=":overlay"
+            android:theme="@style/Theme.OverlayApply" />
+        <activity
+            android:name=".ui.activity.PermissionOverlayHelpActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity=":overlay"
+            android:theme="@style/Theme.OverlayApply" />
+        <activity
+            android:name=".ui.activity.GuideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.OkioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.RoomActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.PagingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.NotificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.SelectorActivity"
+            android:exported="false" />
+        <!--Activity-->
+        <!--Service-->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+        <service
+            android:name=".service.BookManagerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":study" />
+        <!--Service-->
+        <!--Receiver-->
+        <receiver android:name=".receiver.ReplyMessageReceiver" />
+        <!--Receiver-->
+        <!--Provider-->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <!--Provider-->
+    </application>
+
+</manifest>
