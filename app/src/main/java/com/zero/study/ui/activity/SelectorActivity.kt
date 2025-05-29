@@ -1,17 +1,14 @@
 package com.zero.study.ui.activity
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.zero.base.activity.BaseActivity
-import com.zero.base.ext.dp
 import com.zero.study.R
 import com.zero.study.bean.Album
 import com.zero.study.databinding.ActivitySelectorBinding
@@ -21,15 +18,15 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
     private val mAdapter: AlbumAdapter by lazy {
         AlbumAdapter()
     }
-    private lateinit var commentPanel: ConstraintLayout
-    private lateinit var imageView: AppCompatImageView
+    private lateinit var bottomView: ConstraintLayout
+    private lateinit var workView: AppCompatImageView
     private lateinit var toolbar: View
-    private var isPanelExpanded = false
-    private val maxImageScale = 0.5f
+    private var isSelectMode = false
+    private val maxImageScale = 0.7f
 
     override fun initView() {
-        imageView = binding.ivHeader
-        commentPanel = binding.bottomLayout
+        workView = binding.ivHeader
+        bottomView = binding.bottomLayout
         toolbar = binding.toolbarLayout.clToolbar
 
         // 初始化RecyclerView
@@ -52,77 +49,73 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
 
     private fun setupInitialState() {
         // 设置初始状态
-        commentPanel.layoutParams.height = 0
-        commentPanel.requestLayout()
+        bottomView.layoutParams.height = 0
+        bottomView.requestLayout()
         toolbar.alpha = 1f
 
         // 延迟一帧执行进入动画，确保布局已完成
-        imageView.post {
+        workView.post {
             startEnterAnimation()
         }
     }
 
     private fun startEnterAnimation() {
-        val screenHeight = resources.displayMetrics.heightPixels.toFloat()
-        val imageHeight = imageView.height.toFloat()
+        val imageHeight = workView.height.toFloat()
+        val toolbarHeight = toolbar.height.toFloat()
 
-        // 图片缩放动画
         val scaleAnimator = ValueAnimator.ofFloat(1f, maxImageScale)
-        scaleAnimator.duration = 500
+        scaleAnimator.duration = 300
         scaleAnimator.interpolator = AccelerateDecelerateInterpolator()
         scaleAnimator.addUpdateListener { animation ->
             val scale = animation.animatedValue as Float
-            imageView.scaleX = scale
-            imageView.scaleY = scale
-            imageView.translationY = -(imageHeight * (1f - scale)) / 2
-
-            // 导航栏透明度跟随缩放进度
-            toolbar.alpha = 1f - (1f - scale) / (1f - maxImageScale)
+            val progress = (1f - scale) / (1f - maxImageScale)
+            workView.scaleX = scale
+            workView.scaleY = scale
+            val translateY = -(toolbarHeight + (imageHeight * (1f - scale)) / 2)
+            workView.translationY = translateY * progress
+            toolbar.translationY = translateY * progress
+            toolbar.alpha = 1f - progress
         }
 
-        // 底部面板高度动画
-        val panelHeightAnimator = ValueAnimator.ofInt(0, (screenHeight * 0.5f).toInt())
+        val panelHeightAnimator = ValueAnimator.ofInt(0, calculateBottomViewHeight())
         panelHeightAnimator.duration = 200
         panelHeightAnimator.interpolator = AccelerateDecelerateInterpolator()
         panelHeightAnimator.addUpdateListener { animation ->
             val height = animation.animatedValue as Int
-            commentPanel.layoutParams.height = height
-            commentPanel.requestLayout()
+            bottomView.layoutParams.height = height
+            bottomView.requestLayout()
         }
-        // 先执行图片动画
         scaleAnimator.start()
-        // 图片动画结束后执行面板动画
-        scaleAnimator.doOnEnd{
+        scaleAnimator.doOnEnd {
             panelHeightAnimator.start()
         }
-
-        // 面板动画结束后更新状态
         panelHeightAnimator.doOnEnd {
-            isPanelExpanded = true
+            isSelectMode = true
         }
     }
 
     private fun showCommentPanel() {
-        if (isPanelExpanded) return
-        isPanelExpanded = true
+        if (isSelectMode) return
+        isSelectMode = true
 
-        val targetHeight = (resources.displayMetrics.heightPixels * 0.5f).toInt()
-        val animator = ValueAnimator.ofInt(commentPanel.height, targetHeight)
+        val targetHeight = calculateBottomViewHeight()
+        val animator = ValueAnimator.ofInt(bottomView.height, targetHeight)
         animator.duration = 300
         animator.interpolator = AccelerateDecelerateInterpolator()
         animator.addUpdateListener { animation ->
             val height = animation.animatedValue as Int
-            commentPanel.layoutParams.height = height
-            commentPanel.requestLayout()
+            bottomView.layoutParams.height = height
+            bottomView.requestLayout()
         }
         animator.start()
     }
 
     private fun hideCommentPanel() {
-        if (!isPanelExpanded) return
-        isPanelExpanded = false
+        if (!isSelectMode) return
+        isSelectMode = false
 
-        val imageHeight = imageView.height.toFloat()
+        val imageHeight = workView.height.toFloat()
+        val toolbarHeight = toolbar.height.toFloat()
 
         // 图片还原动画
         val scaleAnimator = ValueAnimator.ofFloat(maxImageScale, 1f)
@@ -130,28 +123,47 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
         scaleAnimator.interpolator = AccelerateDecelerateInterpolator()
         scaleAnimator.addUpdateListener { animation ->
             val scale = animation.animatedValue as Float
-            imageView.scaleX = scale
-            imageView.scaleY = scale
-            imageView.translationY = -(imageHeight * (1f - scale)) / 2
+            val progress = (1f - scale) / (1f - maxImageScale)
 
-            // 导航栏透明度跟随缩放进度
-            toolbar.alpha = 1f - (1f - scale) / (1f - maxImageScale)
+            // 图片缩放
+            workView.scaleX = scale
+            workView.scaleY = scale
+
+            // 图片向下移动，带动导航栏
+            val translateY = -(toolbarHeight + (imageHeight * (1f - scale)) / 2)
+            workView.translationY = translateY * progress
+            toolbar.translationY = translateY * progress
+
+            // 导航栏淡入
+            toolbar.alpha = 1f - progress
         }
 
         // 面板收起动画
-        val panelAnimator = ValueAnimator.ofInt(commentPanel.height, 0)
+        val panelAnimator = ValueAnimator.ofInt(bottomView.height, 0)
         panelAnimator.duration = 300
         panelAnimator.interpolator = AccelerateDecelerateInterpolator()
         panelAnimator.addUpdateListener { animation ->
             val height = animation.animatedValue as Int
-            commentPanel.layoutParams.height = height
-            commentPanel.requestLayout()
+            bottomView.layoutParams.height = height
+            bottomView.requestLayout()
         }
 
         // 同时执行两个动画
         scaleAnimator.start()
         panelAnimator.start()
+    }
 
+    private fun calculateBottomViewHeight(): Int {
+
+        val screenHeight = resources.displayMetrics.heightPixels.toFloat()
+        Log.d("TAG", "calculateBottomViewHeight: ${binding.root.height}")
+        Log.d("TAG", "calculateBottomViewHeight: $screenHeight")
+        Log.d("TAG", "calculateBottomViewHeight: $stateBarHeight")
+        Log.d("TAG", "calculateBottomViewHeight: $navigationBarHeight")
+        val imageHeight = workView.height.toFloat()
+        val toolbarHeight = toolbar.height.toFloat()
+
+     return  (screenHeight -  (workView.height * maxImageScale)).toInt()
     }
 
     override fun initData() {
@@ -160,7 +172,7 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
 
     override fun addListener() {
         binding.toolbarLayout.tvNext.setOnClickListener {
-            showCommentPanel()
+            startEnterAnimation()
         }
         binding.toolbarLayout.ivBack.setOnClickListener {
             finish()

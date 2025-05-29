@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.view.LayoutInflater
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -57,6 +56,9 @@ abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflat
         StorageUtils.putString(THEME_KEY, theme.name)
     }
 
+    var stateBarHeight = 0
+    var navigationBarHeight = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -67,10 +69,12 @@ abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflat
         binding = inflate(layoutInflater)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            stateBarHeight = systemBars.top
+            navigationBarHeight = systemBars.bottom
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        hideSystemBars(WindowInsetsCompat.Type.systemBars())
+        hideSystemBars(WindowInsetsCompat.Type.statusBars())
 
         setContentView(binding.root)
         initData()
