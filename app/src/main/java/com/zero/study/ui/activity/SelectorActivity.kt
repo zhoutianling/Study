@@ -7,6 +7,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.zero.base.activity.BaseActivity
@@ -24,7 +25,7 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
     private lateinit var imageView: AppCompatImageView
     private lateinit var toolbar: View
     private var isPanelExpanded = false
-    private val maxImageScale = 0.3f
+    private val maxImageScale = 0.5f
 
     override fun initView() {
         imageView = binding.ivHeader
@@ -67,7 +68,7 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
 
         // 图片缩放动画
         val scaleAnimator = ValueAnimator.ofFloat(1f, maxImageScale)
-        scaleAnimator.duration = 300
+        scaleAnimator.duration = 500
         scaleAnimator.interpolator = AccelerateDecelerateInterpolator()
         scaleAnimator.addUpdateListener { animation ->
             val scale = animation.animatedValue as Float
@@ -80,38 +81,32 @@ class SelectorActivity : BaseActivity<ActivitySelectorBinding>(ActivitySelectorB
         }
 
         // 底部面板高度动画
-        val panelHeightAnimator = ValueAnimator.ofInt(0, (screenHeight * 0.7f).toInt())
-        panelHeightAnimator.duration = 300
+        val panelHeightAnimator = ValueAnimator.ofInt(0, (screenHeight * 0.5f).toInt())
+        panelHeightAnimator.duration = 200
         panelHeightAnimator.interpolator = AccelerateDecelerateInterpolator()
         panelHeightAnimator.addUpdateListener { animation ->
             val height = animation.animatedValue as Int
             commentPanel.layoutParams.height = height
             commentPanel.requestLayout()
         }
-
         // 先执行图片动画
         scaleAnimator.start()
-
         // 图片动画结束后执行面板动画
-        scaleAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                panelHeightAnimator.start()
-            }
-        })
+        scaleAnimator.doOnEnd{
+            panelHeightAnimator.start()
+        }
 
         // 面板动画结束后更新状态
-        panelHeightAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                isPanelExpanded = true
-            }
-        })
+        panelHeightAnimator.doOnEnd {
+            isPanelExpanded = true
+        }
     }
 
     private fun showCommentPanel() {
         if (isPanelExpanded) return
         isPanelExpanded = true
 
-        val targetHeight = (resources.displayMetrics.heightPixels * 0.7f).toInt()
+        val targetHeight = (resources.displayMetrics.heightPixels * 0.5f).toInt()
         val animator = ValueAnimator.ofInt(commentPanel.height, targetHeight)
         animator.duration = 300
         animator.interpolator = AccelerateDecelerateInterpolator()
