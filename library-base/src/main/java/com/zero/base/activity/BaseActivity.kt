@@ -110,11 +110,6 @@ abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflat
      * 使用 WindowInsetsCompat.Type.statusBars() 仅隐藏状态栏。
      * 使用 WindowInsetsCompat.Type.navigationBars() 仅隐藏导航栏。
      * 使用 WindowInsetsCompat.Type.systemBars() 可隐藏这两个系统栏。
-     *
-     * 作者：iSuperRed
-     * 链接：https://juejin.cn/post/7395866692772085800
-     * 来源：稀土掘金
-     * 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
      */
     fun hideSystemBars(type: Int) {
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)

@@ -152,6 +152,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 22 -> context?.startActivity<NotificationActivity>()
                 23 -> {
+
                 }
 
                 24 -> {
