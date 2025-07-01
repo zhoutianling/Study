@@ -74,8 +74,6 @@ abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflat
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        hideSystemBars(WindowInsetsCompat.Type.statusBars())
-
         setContentView(binding.root)
         initData()
         initView()

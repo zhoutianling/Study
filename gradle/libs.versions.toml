@@ -1,34 +1,31 @@
 [versions]
-agp = "8.5.2"
-ksp = "1.9.25-1.0.20"
-converterGsonVersion = "2.11.0"
-retrofitVersion = "2.11.0"
-coreKtx = "1.13.1"
-firebaseBomVersion = "31.2.0"
+converterGsonVersion = "3.0.0"
+gson ="2.13.1"
+retrofitVersion = "3.0.0"
+coreKtx = "1.16.0"
+firebaseBomVersion = "33.16.0"
 flexboxVersion = "3.0.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-appcompat = "1.7.0"
-lifecycleLivedataKtxVersion = "2.8.6"
+appcompat = "1.7.1"
+lifecycleLivedataKtxVersion = "2.9.1"
 loggingInterceptorVersion = "4.12.0"
 material = "1.12.0"
 aabresguardPluginVersion = "0.1.10"
-roomVersion = "2.6.1"
-pagingVersion = "3.3.2"
+roomVersion = "2.7.2"
+pagingVersion = "3.3.6"
 
 rxandroidVersion = "3.0.2"
 rxjavaVersion = "3.1.10"
 xor = "5.0.0"
 stringfogGradlePlugin = "5.2.0"
 glide = "4.16.0"
-kotlin = "1.9.25"
 swiperefresh = "1.1.0"
-googleGmsGoogleServices = "4.4.2"
 adjustAndroidVersion = "4.38.2"
 mmkv = "2.2.2"
-lottieVersion = "6.5.0"
-playServicesAdsVersion = "23.3.0"
-activityVersion = "1.9.2"
+lottieVersion = "6.6.6"
+playServicesAdsVersion = "24.4.0"
+activityVersion = "1.10.1"
 opencvVersion = "4.10.0"
 
 [libraries]
@@ -52,7 +49,7 @@ lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleLivedataKtxVersion" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptorVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "converterGsonVersion" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 rxandroid = { module = "io.reactivex.rxjava3:rxandroid", version.ref = "rxandroidVersion" }
 rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjavaVersion" }
@@ -75,10 +72,4 @@ room = [
     "androidx-room-paging",
     "androidx-paging-runtime",
 ]
-[plugins]
-androidApplication = { id = "com.android.application", version.ref = "agp" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-googleGmsGoogleServices = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

@@ -20,7 +20,7 @@ object DbManager {
     //懒加载创建数据库
     val db: RoomDB by lazy {
         Room.databaseBuilder(AppStudy.appContext, RoomDB::class.java, DATABASE_NAME).addCallback(DbCreateCallBack)//增加回调监听
-            .fallbackToDestructiveMigration().addMigrations(Migration_1_2)//修改表
+            .fallbackToDestructiveMigration(false).addMigrations(Migration_1_2)//修改表
             .addMigrations(Migration_2_3)//增加表T_CAR
             .addMigrations(Migration_3_4)//增加表T_DOG
             .addMigrations(Migration_4_5)//修改表T_DOG

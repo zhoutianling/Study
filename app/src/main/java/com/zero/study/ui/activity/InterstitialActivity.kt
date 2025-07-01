@@ -1,6 +1,7 @@
 package com.zero.study.ui.activity
 
-import android.view.View
+import android.view.KeyEvent
+import android.view.KeyEvent.ACTION_UP
 import com.toolkit.admob.manager.InterstitialAdManager
 import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
@@ -20,13 +21,17 @@ class InterstitialActivity : BaseActivity<ActivityInterstitialBinding>(ActivityI
 
     override fun addListener() {
         binding.ivFinish.setOnClickListener {
-            onBackPressed()
+            onKeyUp(KeyEvent.KEYCODE_BACK, KeyEvent(ACTION_UP, KeyEvent.KEYCODE_BACK))
         }
     }
 
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        InterstitialAdManager.tryShow(this, BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT, { finish() }, true)
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_BACK -> {
+                InterstitialAdManager.tryShow(this, BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT, { finish() }, true)
+                return true
+            }
+        }
+        return super.onKeyUp(keyCode, event)
     }
 }

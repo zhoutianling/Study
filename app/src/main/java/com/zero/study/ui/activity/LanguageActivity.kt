@@ -1,6 +1,8 @@
 package com.zero.study.ui.activity
 
 import android.content.Intent
+import android.view.KeyEvent
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
@@ -43,7 +45,7 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
     }
 
     override fun addListener() {
-        binding.ivBack.setOnClickListener { onBackPressed() }
+        binding.ivBack.setOnClickListener { onKeyUp(KeyEvent.KEYCODE_BACK, KeyEvent(ACTION_UP, KeyEvent.KEYCODE_BACK)) }
         binding.tvNext.setOnClickListener {
             val selectedCode = languageAdapter.getSelectedCode()
             StorageUtils.putString(selectedLanguageKey, selectedCode)
@@ -51,7 +53,7 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
             if (isFistTime) {
                 startActivity(Intent(this, MainActivity::class.java))
             }
-            onBackPressed()
+            onKeyUp(KeyEvent.KEYCODE_BACK, KeyEvent(ACTION_UP, KeyEvent.KEYCODE_BACK))
         }
     }
 
@@ -77,12 +79,17 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (isFistTime) {
-            finish()
-        } else {
-            tryShow(this, BuildConfig.ADMOB_INTERSTITIAL_LANGUAGE, { finish() }, true)
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_BACK -> {
+                if (isFistTime) {
+                    finish()
+                } else {
+                    tryShow(this, BuildConfig.ADMOB_INTERSTITIAL_LANGUAGE, { finish() }, true)
+                }
+                return true
+            }
         }
+        return super.onKeyUp(keyCode, event)
     }
 }

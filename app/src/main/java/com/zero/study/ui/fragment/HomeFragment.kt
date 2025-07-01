@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -40,6 +41,7 @@ import com.zero.study.ui.activity.AnimationActivity
 import com.zero.study.ui.activity.GuideActivity
 import com.zero.study.ui.activity.InterstitialActivity
 import com.zero.study.ui.activity.LanguageActivity
+import com.zero.study.ui.activity.MainActivity
 import com.zero.study.ui.activity.NotificationActivity
 import com.zero.study.ui.activity.OkioActivity
 import com.zero.study.ui.activity.PagingActivity
@@ -152,7 +154,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 22 -> context?.startActivity<NotificationActivity>()
                 23 -> {
-
+                    //setFragmentResult API
+                    parentFragmentManager.setFragmentResult(MainActivity::class.java.simpleName, bundleOf("screenHeight" to resources.displayMetrics.heightPixels))
                 }
 
                 24 -> {

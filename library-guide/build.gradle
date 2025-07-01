@@ -1,16 +1,13 @@
 plugins {
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlinAndroid)
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
 }
 android {
-    compileSdk 34
+    compileSdk rootProject.ext.compileSdk
     namespace 'com.toolkit.guide'
     defaultConfig {
-        minSdk 24
-        targetSdk 34
-        versionCode 22
-        versionName "2.2.0"
-
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
     }
     buildTypes {
         release {

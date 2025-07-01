@@ -2,6 +2,7 @@ package com.zero.study.ui.activity
 
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.animation.addListener
@@ -118,6 +119,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     }
 
     override fun addListener() {
+        supportFragmentManager.setFragmentResultListener(this::class.java.simpleName, this) { requestKey, result ->
+            if (requestKey == this::class.java.simpleName) {
+                val screenHeight = result.getInt("screenHeight")
+                Log.d("zzz", "setFragmentResultListener: $screenHeight")
+            }
+        }
         supportFragmentManager.setFragmentResultListener("changeTheme", this) { _, _ ->
             run {
                 val localNightMode = delegate.localNightMode

@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlinAndroid)
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -9,7 +9,6 @@ android {
     defaultConfig {
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         manifestPlaceholders['MANIFEST_ADMOB_APP_ID'] = MANIFEST_ADMOB_APP_ID
