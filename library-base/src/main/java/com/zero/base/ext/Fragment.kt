@@ -1,27 +1,24 @@
 package com.zero.base.ext
 
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 
 /**
  * 多个Fragment的切换
  */
-fun AppCompatActivity.switchFragment(containerId: Int, fragmentToShow: Fragment, tag: String) {
+fun AppCompatActivity.switchFragment(containerId: Int, fragmentToShow: Fragment) {
     supportFragmentManager.beginTransaction().apply {
-        // 隐藏当前显示的Fragment
         supportFragmentManager.fragments.forEach {
             if (it.isVisible) {
                 hide(it)
             }
         }
-
-        // 显示目标Fragment，如果不存在则添加
         if (fragmentToShow.isAdded) {
             show(fragmentToShow)
         } else {
-            add(containerId, fragmentToShow, tag)
+            add(containerId, fragmentToShow, fragmentToShow.javaClass.simpleName)
         }
-        // 提交事务
         commit()
     }
 }

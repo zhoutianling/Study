@@ -1,8 +1,8 @@
 package com.zero.study.ui.activity
 
-import android.view.View
 import androidx.fragment.app.Fragment
 import com.zero.base.activity.BaseActivity
+import com.zero.base.ext.switchFragment
 import com.zero.study.R
 import com.zero.study.databinding.ActivityNetworkBinding
 import com.zero.study.ui.fragment.ReadFragment
@@ -17,9 +17,9 @@ class OkioActivity : BaseActivity<ActivityNetworkBinding>(ActivityNetworkBinding
     private val mReadFragment by lazy { ReadFragment.newInstance() }
     private val mWriteFragment by lazy { WriteFragment.newInstance() }
 
-    private var mCurrentFragment: Fragment = mWriteFragment
     override fun initView() {
-        supportFragmentManager.beginTransaction().replace(R.id.fl_container, mCurrentFragment).commit()
+        binding.bottomNavigationView.selectedItemId = R.id.menu_write
+        switchFragment(R.id.fl_container, mWriteFragment)
     }
 
     override fun initData() {
@@ -33,33 +33,15 @@ class OkioActivity : BaseActivity<ActivityNetworkBinding>(ActivityNetworkBinding
                 }
 
                 R.id.menu_write -> {
-                    switchFragment(mWriteFragment)
+                    switchFragment(R.id.fl_container, mWriteFragment)
                 }
 
                 R.id.menu_read -> {
-                    switchFragment(mReadFragment)
+                    switchFragment(R.id.fl_container, mReadFragment)
                 }
             }
             true
         }
     }
 
-    /**
-     * 切换Fragment
-     *
-     * @param fragment 要切换的Fragment
-     */
-    private fun switchFragment(fragment: Fragment) {
-        if (fragment !== mCurrentFragment) {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            fragmentTransaction.hide(mCurrentFragment)
-            if (!fragment.isAdded) {
-                fragmentTransaction.add(R.id.fl_container, fragment, fragment.javaClass.simpleName).show(fragment)
-            } else {
-                fragmentTransaction.show(fragment)
-            }
-            fragmentTransaction.commitAllowingStateLoss()
-            mCurrentFragment = fragment
-        }
-    }
 }

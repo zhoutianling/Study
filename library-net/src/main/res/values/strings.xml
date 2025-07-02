@@ -1,0 +1,23 @@
+
+<resources>
+    <string name="app_name">Net</string>
+
+    <!--网络请求异常-->
+    <string name="net_connect_error">Network connection failed</string>
+    <string name="net_url_error">Incorrect resource URL</string>
+    <string name="net_host_error">Unable to find the specified server host</string>
+    <string name="net_connect_timeout_error">Connection to server timed out, %s</string>
+    <string name="net_download_error">An error occurred during the download process</string>
+    <string name="net_no_cache_error">Failed to read cache</string>
+    <string name="net_parse_error">An exception occurred while parsing data</string>
+    <string name="request_failure">Request failed</string>
+    <string name="net_request_error">Request parameter error</string>
+    <string name="net_server_error">Service response error</string>
+    <string name="net_null_error">Null exception occurred</string>
+    <string name="net_error">Unknown network error</string>
+    <string name="net_other_error">Unknown error</string>
+    <string name="no_error_message">No error message</string>
+    <string name="net_dialog_msg">Loading</string>
+
+
+</resources>

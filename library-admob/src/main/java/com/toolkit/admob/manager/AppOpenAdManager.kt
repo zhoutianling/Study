@@ -33,6 +33,9 @@ object AppOpenAdManager {
     var openAdLastShowTime: Long = 0
 
     fun loadAd(context: Context) {
+        if (BuildConfig.DEBUG) {
+            return
+        }
         if (AdMobManager.atomicBoolean.get()) {
             doLoadAd(context)
         }

@@ -14,7 +14,7 @@ android {
     namespace 'com.zero.study'
     compileSdk rootProject.ext.compileSdk
     defaultConfig {
-        applicationId "com.zero.study"
+        applicationId APPLICATION_ID
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
         versionCode 2

@@ -55,5 +55,4 @@ dependencies {
     api project(path: ':third-lib')
     api libs.play.services.ads
     api libs.adjust.android
-    api libs.lottie
 }

@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:background="@color/windowBackground"
         app:labelVisibilityMode="unlabeled"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation_menu" />
 

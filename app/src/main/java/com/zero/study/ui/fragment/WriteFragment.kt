@@ -1,10 +1,21 @@
 package com.zero.study.ui.fragment
 
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
+import com.zero.base.ext.checkPermission
 import com.zero.base.ext.fromJson
 import com.zero.base.ext.readJson
+import com.zero.base.ext.requestPermission
+import com.zero.base.ext.saveImageToGallery
+import com.zero.base.ext.saveImageToPrivateDir
 import com.zero.base.fragment.BaseFragment
 import com.zero.base.util.CordTimer
 import com.zero.base.util.FileUtils
@@ -45,11 +56,7 @@ class WriteFragment : BaseFragment<FragmentWriteBinding>(FragmentWriteBinding::i
                     lifecycleScope.launch {
                         cordTimer.startTimer()
                         for (i in 1..totalSize) {
-                            writeContentToFile(requireContext(), "少儿动画", "喜羊羊与灰太狼第一季.txt", "喜羊羊与灰太狼第一季-第" + i + "集")
-                            writeContentToFile(requireContext(), "少儿动画", "喜羊羊与灰太狼第二季.txt", "喜羊羊与灰太狼第二季-第" + i + "集")
-                            writeContentToFile(requireContext(), "少儿动画", "喜羊羊与灰太狼第三季.txt", "喜羊羊与灰太狼第三季-第" + i + "集")
-                            writeContentToFile(requireContext(), "少儿动画", "喜羊羊与灰太狼第四季.txt", "喜羊羊与灰太狼第四季-第" + i + "集")
-                            writeContentToFile(requireContext(), "少儿动画", "喜羊羊与灰太狼第五季.txt", "喜羊羊与灰太狼第五季-第" + i + "集")
+                            writeContentToFile(requireContext().filesDir, "少儿动画", "喜羊羊与灰太狼第一季.txt", "喜羊羊与灰太狼第一季-第" + i + "集")
                             withContext(Dispatchers.Main) { binding.progressBar1.setProgress(i * 100 / (totalSize)) }
                         }
                         cordTimer.stopTimer()
@@ -112,20 +119,43 @@ class WriteFragment : BaseFragment<FragmentWriteBinding>(FragmentWriteBinding::i
                     MiniDialogFragment.Builder().setTitle("Create Folder").setCancelText("Cancel").setConfirmText("OK").setCancelOnTouchOutSide(false).setOnClickListener { input ->
                         lifecycleScope.launch {
                             val result: Result<String> = createFolder(requireContext(), input)
-                            result.fold(
-                                onSuccess = { msg ->
-                                    withContext(Dispatchers.Main) {
-                                        ToastUtil.showShort(requireContext(), msg)
-                                    }
-                                }, onFailure = { exception ->
-                                    withContext(Dispatchers.Main) {
-                                        ToastUtil.showShort(requireContext(), exception.message!!)
-                                    }
+                            result.fold(onSuccess = { msg ->
+                                withContext(Dispatchers.Main) {
+                                    ToastUtil.showShort(requireContext(), msg)
                                 }
-                            )
+                            }, onFailure = { exception ->
+                                withContext(Dispatchers.Main) {
+                                    ToastUtil.showShort(requireContext(), exception.message!!)
+                                }
+                            })
                         }
 
                     }.build().show(childFragmentManager, "CreateFolderDialog")
+                }
+
+                7 -> {
+                    //外部私有存储
+                    val bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    canvas.drawColor(Color.GREEN)
+                    requireContext().saveImageToPrivateDir(bitmap)
+                }
+
+                8 -> {
+                    // 外部公共存储
+                    if (checkPermission(requireContext())) {
+                        val bitmap = Bitmap.createBitmap(400, 400, Bitmap.Config.ARGB_8888).apply {
+                            val canvas = Canvas(this)
+                            canvas.drawColor(Color.RED)
+                        }
+                        requireContext().saveImageToGallery(bitmap)
+                    } else {
+                        requestPermission(requireActivity())
+                    }
+
+                }
+
+                9 -> {
                 }
             }
         }

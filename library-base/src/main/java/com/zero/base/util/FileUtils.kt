@@ -40,9 +40,9 @@ object FileUtils {
     }
 
     @Throws(IOException::class)
-    suspend fun writeContentToFile(context: Context, folderName: String, fileName: String, content: String) {
+    suspend fun writeContentToFile(fileDir: File, folderName: String, fileName: String, content: String) {
         withContext(Dispatchers.IO) {
-            val folder = File(context.filesDir, folderName)
+            val folder = File(fileDir, folderName)
             if (!folder.exists() && !folder.mkdirs()) {
                 throw IOException("Failed to create directory: ${folder.absolutePath}")
             }
@@ -191,4 +191,6 @@ object FileUtils {
 
         return fileList
     }
+
+
 }

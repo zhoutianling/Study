@@ -3,10 +3,8 @@ package com.zero.study.ui.fragment
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -30,6 +28,7 @@ import com.zero.base.ext.log
 import com.zero.base.ext.readJson
 import com.zero.base.ext.startActivity
 import com.zero.base.fragment.BaseFragment
+import com.zero.base.fragment.LoadingDialog
 import com.zero.base.util.PermissionUtils
 import com.zero.base.util.ThreadPool
 import com.zero.base.util.ToastUtil
@@ -51,13 +50,10 @@ import com.zero.study.ui.activity.RoomActivity
 import com.zero.study.ui.activity.SecondActivity
 import com.zero.study.ui.activity.SelectorActivity
 import com.zero.study.ui.activity.TakePhotoActivity
-import com.zero.study.ui.dialog.LoadingDialog
 import com.zero.study.ui.dialog.MiniDialogFragment
 import com.zero.study.ui.model.AskViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.properties.Delegates
 
@@ -109,11 +105,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 8 -> PermissionManagerActivity.start(requireContext())
                 9 -> {
-                    val loadingDialog = LoadingDialog()
+                    val progressDialog = LoadingDialog()
                     lifecycleScope.launch {
-                        loadingDialog.show(childFragmentManager, "LoadingDialog")
+                        progressDialog.show(childFragmentManager, "LoadingDialog")
                         delay(3000)
-                        loadingDialog.dismissAllowingStateLoss()
+                        progressDialog.dismissAllowingStateLoss()
                     }
                 }
 

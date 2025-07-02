@@ -1,5 +1,6 @@
 package com.zero.study.ui.fragment
 
+import android.os.Environment
 import android.util.Log
 import android.widget.ScrollView
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +24,10 @@ class ReadFragment : BaseFragment<FragmentReadBinding>(FragmentReadBinding::infl
     private val file by lazy {
         File(requireContext().filesDir, "喜羊羊与灰太狼第一季.txt")
     }
+
+    private val externalFile by lazy {
+        File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "喜羊羊与灰太狼第一季.txt")
+    }
     private val cordTimer by lazy {
         CordTimer()
     }
@@ -38,7 +43,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>(FragmentReadBinding::infl
                     lifecycleScope.launch {
                         cordTimer.startTimer()
                         val readLine = StringBuilder()
-                        readLines(requireContext(), file.name) { content ->
+                        readLines(requireContext(), externalFile.name) { content ->
                             readLine.append("$content\n")
                             binding.tvReadContent.text = readLine.toString()
                             binding.nestedScrollView.let {
@@ -53,10 +58,6 @@ class ReadFragment : BaseFragment<FragmentReadBinding>(FragmentReadBinding::infl
                 2 -> lifecycleScope.launch {
                     cordTimer.startTimer()
                     val readLine = StringBuilder()
-                    Log.d("ZZZ", "initView:" + requireContext().applicationInfo.packageName)
-                    Log.d("ZZZ", "initView:" + requireContext().applicationInfo.name)
-                    Log.d("ZZZ", "initView:" + requireContext().applicationInfo.dataDir)
-
                     readLines2(requireContext(), file.name) { content ->
                         readLine.append("$content\n")
                         binding.tvReadContent.text = readLine.toString()

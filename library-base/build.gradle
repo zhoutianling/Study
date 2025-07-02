@@ -57,7 +57,7 @@ dependencies {
     api libs.mmkv
     //room
     api libs.bundles.room
-
+    api libs.lottie
     //FlexLayoutManager
     api libs.flexbox
     //androidx.activity

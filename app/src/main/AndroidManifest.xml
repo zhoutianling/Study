@@ -144,6 +144,7 @@
         <receiver android:name=".receiver.ReplyMessageReceiver" />
         <!--Receiver-->
         <!--Provider-->
+        <!--对内内容提供者-->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
