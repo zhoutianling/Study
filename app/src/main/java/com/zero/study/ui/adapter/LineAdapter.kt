@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2012-2024 Arne Schwabe
- * Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
- */
 package com.zero.study.ui.adapter
 
 import android.view.LayoutInflater
@@ -19,7 +15,7 @@ import com.zero.study.ui.adapter.LineAdapter.LineViewHolder
  * @date:2024/6/6 21:24
  * @path:com.toolkit.openvpn.adapter.LineAdapter
  */
-class LineAdapter : ListAdapter<Article, LineViewHolder>(ItemDiffCallback()) {
+class LineAdapter(val itemClickListener: (item: Article?) -> Unit) : ListAdapter<Article, LineViewHolder>(ItemDiffCallback()) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LineViewHolder {
@@ -27,11 +23,7 @@ class LineAdapter : ListAdapter<Article, LineViewHolder>(ItemDiffCallback()) {
     }
 
     override fun onBindViewHolder(holder: LineViewHolder, position: Int) {
-        val model = getItem(position)
-        holder.binding.ivConnectIcon.setImageResource(R.mipmap.ic_home_connect_logo)
-        holder.binding.tvIp.text = model.title.substring(7)
-        holder.binding.tvDelayTime.text = model.delay
-        holder.binding.tvConnectState.isSelected = true
+        holder.bindItem(getItem(position))
     }
 
     override fun onBindViewHolder(holder: LineViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -53,5 +45,22 @@ class LineAdapter : ListAdapter<Article, LineViewHolder>(ItemDiffCallback()) {
         }
     }
 
-    class LineViewHolder(var binding: ItemLineBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class LineViewHolder(var binding: ItemLineBinding) : RecyclerView.ViewHolder(binding.root) {
+        private var article: Article? = null
+
+        init {
+            binding.root.setOnClickListener {
+                itemClickListener.invoke(article)
+            }
+        }
+
+        fun bindItem(item: Article) {
+            this.article = item
+            binding.ivConnectIcon.setImageResource(R.mipmap.ic_launcher)
+            binding.tvIp.text = item.title.substring(7)
+            binding.tvPraise.text = item.zan.toString()
+            binding.tvDelayTime.text = item.delay
+            binding.tvConnectState.isSelected = true
+        }
+    }
 }

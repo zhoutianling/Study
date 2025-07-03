@@ -67,4 +67,5 @@ dependencies {
     //Rxjava
     api libs.rxjava
     api libs.rxandroid
+    api project(path: ':library-net')
 }
