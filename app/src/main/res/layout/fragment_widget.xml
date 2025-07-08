@@ -65,7 +65,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_02" />
 
     <com.zero.study.ui.recyclerview.RecyclerBanner
-        android:id="@+id/banner"
+        android:id="@+id/banner_normal"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:autoPlaying="true"
@@ -75,4 +75,15 @@
         app:indicatorSelectedSrc="@drawable/shape_indicator_select"
         app:indicatorUnselectedSrc="@drawable/shape_indicator_unselect"
         app:layout_constraintTop_toBottomOf="@+id/btn_03" />
+
+    <com.zero.base.widget.banner.BannerLayout
+        android:id="@+id/banner_3D"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:autoPlaying="true"
+        android:layout_marginTop="15dp"
+        app:centerScale="1.3"
+        app:itemSpace="20"
+        app:layout_constraintTop_toBottomOf="@+id/banner_normal"
+        app:moveSpeed="1.8" />
 </androidx.constraintlayout.widget.ConstraintLayout>

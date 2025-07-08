@@ -1,10 +1,15 @@
 package com.zero.study.ui.fragment
 
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import com.zero.base.ext.copyAssetsToFileDir
 import com.zero.base.fragment.BaseFragment
 import com.zero.base.widget.CenterSeekBar
 import com.zero.base.widget.CenterSeekBar.OnSeekBarChangeListener
 import com.zero.study.databinding.FragmentWidgetBinding
+import com.zero.study.ui.adapter.BannerAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ThirdFragment : BaseFragment<FragmentWidgetBinding>(FragmentWidgetBinding::inflate) {
     companion object {
@@ -12,6 +17,9 @@ class ThirdFragment : BaseFragment<FragmentWidgetBinding>(FragmentWidgetBinding:
     }
 
     override fun initView() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            requireContext().copyAssetsToFileDir("banner", true)
+        }
         binding.seekbar.setRange(-50, 50)
         binding.seekbar.setProgress(0)
         binding.seekbar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
@@ -36,7 +44,14 @@ class ThirdFragment : BaseFragment<FragmentWidgetBinding>(FragmentWidgetBinding:
             binding.seekbar.setRange(0, 50)
             binding.seekbar.setProgress(0)
         }
-        binding.banner.initBannerImageView(listOf("https://i.mij.rip/2025/04/15/e590f7632b8263184d026a4c5922b5dc.png","https://i.miji.bid/2025/04/15/93a88977959de47c06569b8ebb677d95.png","https://i.mij.rip/2025/04/15/c881a01cd0cd0814f2df66d01f0839f7.png"))
+        val bannerList = mutableListOf<String>()
+        repeat(3) { i ->
+            val thumbnail = requireContext().filesDir.absolutePath + "/banner/" + "banner_${i + 1}.webp"
+            bannerList.add(thumbnail)
+        }
+        binding.bannerNormal.initBannerImageView(bannerList)
+        val bannerAdapter = BannerAdapter().apply { submitList(bannerList) }
+        binding.banner3D.setAdapter(bannerAdapter)
     }
 
     override fun initData() {

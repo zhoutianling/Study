@@ -1,12 +1,15 @@
 <resources>
+    <!--FlowLayout-->
     <declare-styleable name="FlowLayout">
         <attr name="line_space" format="dimension" />
         <attr name="max_line" format="integer" />
     </declare-styleable>
+    <!--StrokeTextView-->
     <declare-styleable name="StrokeTextView">
         <attr name="stroke_color" format="color" />
         <attr name="stroke_width" format="dimension" />
     </declare-styleable>
+    <!--CenterSeekBar-->
     <declare-styleable name="CenterSeekBar">
         <attr name="max" format="integer" />
         <attr name="min" format="integer" />
@@ -18,15 +21,19 @@
         <attr name="progressTextColor" format="color|reference" />
         <attr name="progressTextPadding" format="dimension|reference" />
     </declare-styleable>
-
+    <!--RecyclerViewBanner-->
+    <attr name="interval" format="integer" />
+    <attr name="showIndicator" format="boolean" />
+    <attr name="orientation" format="enum">
+        <enum name="horizontal" value="0" />
+        <enum name="vertical" value="1" />
+    </attr>
+    <attr name="autoPlaying" format="boolean" />
     <declare-styleable name="RecyclerViewBanner">
-        <attr name="interval" format="integer" />
-        <attr name="showIndicator" format="boolean" />
-        <attr name="autoPlaying" format="boolean" />
-        <attr name="orientation" format="enum">
-            <enum name="horizontal" value="0" />
-            <enum name="vertical" value="1" />
-        </attr>
+        <attr name="interval" />
+        <attr name="showIndicator" />
+        <attr name="orientation" />
+        <attr name="autoPlaying" />
         <attr name="indicatorSelectedSrc" format="color|reference" />
         <attr name="indicatorUnselectedSrc" format="color|reference" />
         <attr name="indicatorSpace" format="dimension|reference" />
@@ -39,7 +46,16 @@
             <enum name="right" value="2" />
         </attr>
     </declare-styleable>
-    
+    <declare-styleable name="BannerLayout">
+        <attr name="interval" />
+        <attr name="showIndicator" />
+        <attr name="orientation" />
+        <attr name="autoPlaying" />
+        <attr name="itemSpace" format="integer" />
+        <attr name="centerScale" format="float" />
+        <attr name="moveSpeed" format="float" />
+    </declare-styleable>
+    <!--ShadowLayout-->
     <declare-styleable name="ShadowLayout">
         <!--阴影的圆角大小-->
         <attr name="hl_cornerRadius" format="dimension" />

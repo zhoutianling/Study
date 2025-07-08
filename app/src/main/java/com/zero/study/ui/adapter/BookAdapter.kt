@@ -33,5 +33,5 @@ class BookAdapter : ListAdapter<Book, BookAdapter.BookViewHolder>(ItemDiffCallba
         }
     }
 
-    class BookViewHolder(var binding: ItemBookLayoutBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class BookViewHolder(var binding: ItemBookLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 }
