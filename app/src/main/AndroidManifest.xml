@@ -5,7 +5,9 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
     <!-- Devices running Android 13 (API level 33) or higher -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
@@ -123,6 +125,9 @@
             android:exported="false" />
         <activity
             android:name=".ui.activity.SelectorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.HeartRateActivity"
             android:exported="false" />
         <!--Activity-->
         <!--Service-->

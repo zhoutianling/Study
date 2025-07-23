@@ -36,6 +36,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun initView() {
         StorageUtils.putBoolean(SplashActivity.TIME_START, false)
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

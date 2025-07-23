@@ -1,4 +1,5 @@
 [versions]
+cameraVersion = "1.4.2"
 converterGsonVersion = "3.0.0"
 gson ="2.13.1"
 retrofitVersion = "3.0.0"
@@ -8,7 +9,7 @@ flexboxVersion = "3.0.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 appcompat = "1.7.1"
-lifecycleLivedataKtxVersion = "2.9.1"
+lifecycleLivedataKtxVersion = "2.9.2"
 loggingInterceptorVersion = "4.12.0"
 material = "1.12.0"
 aabresguardPluginVersion = "0.1.10"
@@ -30,6 +31,10 @@ activityVersion = "1.10.1"
 opencvVersion = "4.10.0"
 
 [libraries]
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraVersion" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraVersion" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraVersion" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }

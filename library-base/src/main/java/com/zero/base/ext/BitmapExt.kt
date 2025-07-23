@@ -84,7 +84,7 @@ fun Context.saveImageToPrivateDir(bitmap: Bitmap): Boolean {
 
 // 检查是否有保存图片的权限
 fun checkPermission(context: Context): Boolean {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         // Android 11及以上无需WRITE_EXTERNAL_STORAGE权限
         true
     } else {
@@ -94,7 +94,7 @@ fun checkPermission(context: Context): Boolean {
 
 // 请求保存图片的权限
 fun requestPermission(activity: FragmentActivity) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         // Android 11及以上无需WRITE_EXTERNAL_STORAGE权限
         Log.d(TAG, "Android 11+ 无需存储权限")
     } else {
@@ -150,6 +150,13 @@ private fun saveImageWithMediaStore(context: Context, bitmap: Bitmap, displayNam
 private fun saveImageToPublicDirectory(context: Context, bitmap: Bitmap, displayName: String): Boolean {
     // 创建保存图片的目录
     val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+
+    // 构建 ZERO 文件夹对象
+    val zeroDir = File(picturesDir, "ZERO")
+
+    // 新建文件夹（若不存在）
+    val isCreated = zeroDir.mkdirs()
+
     val imageFile = File(picturesDir, displayName)
 
     return try {

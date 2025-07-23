@@ -83,6 +83,7 @@
         app:autoPlaying="true"
         android:layout_marginTop="15dp"
         app:centerScale="1.3"
+        app:showIndicator="true"
         app:itemSpace="20"
         app:layout_constraintTop_toBottomOf="@+id/banner_normal"
         app:moveSpeed="1.8" />

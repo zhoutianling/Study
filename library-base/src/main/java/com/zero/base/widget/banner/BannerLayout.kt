@@ -21,6 +21,7 @@ import android.widget.ImageView
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.zero.base.ext.dp
 import com.zero.base.layoutmanager.BannerLayoutManager
 import com.zero.base.layoutmanager.CenterSnapHelper
 import com.zero.library_base.R
@@ -96,10 +97,10 @@ class BannerLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
         if (mSelectedDrawable == null) {
             //绘制默认选中状态图形
             val selectedGradientDrawable = GradientDrawable()
-            selectedGradientDrawable.shape = GradientDrawable.OVAL
+            selectedGradientDrawable.shape = GradientDrawable.RECTANGLE
             selectedGradientDrawable.setColor(Color.RED)
-            selectedGradientDrawable.setSize(dp2px(5), dp2px(5))
-            selectedGradientDrawable.cornerRadius = (dp2px(5) / 2).toFloat()
+            selectedGradientDrawable.setSize(8.dp, 4.dp)
+            selectedGradientDrawable.cornerRadius = 2f.dp
             mSelectedDrawable = LayerDrawable(arrayOf<Drawable>(selectedGradientDrawable))
         }
         if (mUnselectedDrawable == null) {
@@ -107,8 +108,8 @@ class BannerLayout @JvmOverloads constructor(context: Context, attrs: AttributeS
             val unSelectedGradientDrawable = GradientDrawable()
             unSelectedGradientDrawable.shape = GradientDrawable.OVAL
             unSelectedGradientDrawable.setColor(Color.GRAY)
-            unSelectedGradientDrawable.setSize(dp2px(5), dp2px(5))
-            unSelectedGradientDrawable.cornerRadius = (dp2px(5) / 2).toFloat()
+            unSelectedGradientDrawable.setSize(4.dp, 4.dp)
+            unSelectedGradientDrawable.cornerRadius = 2f.dp
             mUnselectedDrawable = LayerDrawable(arrayOf<Drawable>(unSelectedGradientDrawable))
         }
 

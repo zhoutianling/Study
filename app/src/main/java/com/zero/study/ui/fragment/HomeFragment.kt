@@ -38,6 +38,7 @@ import com.zero.study.event.MsgEvent
 import com.zero.study.ui.activity.AccessPerActivity
 import com.zero.study.ui.activity.AnimationActivity
 import com.zero.study.ui.activity.GuideActivity
+import com.zero.study.ui.activity.HeartRateActivity
 import com.zero.study.ui.activity.InterstitialActivity
 import com.zero.study.ui.activity.LanguageActivity
 import com.zero.study.ui.activity.MainActivity
@@ -155,7 +156,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 }
 
                 24 -> {
-                    context?.startActivity<SelectorActivity>()
+                    context?.startActivity<HeartRateActivity>()
                 }
 
                 25 -> {
