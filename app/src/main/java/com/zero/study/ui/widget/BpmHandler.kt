@@ -599,66 +599,71 @@ class BpmHandler(private val listener: BpmListener?) {
     }
 
     private fun decodeRgb(yuv420sp: ByteArray?, width: Int, height: Int): IntArray {
-        var i6 = 3
         if (yuv420sp == null) {
             return intArrayOf(0, 0, 0)
         }
         val totalSize = width * height
-        var row = 0
         var redSum = 0
         var greenSum = 0
         var blueSum = 0
-        var i12 = 0
-        while (row < height) {
-            var i13 = ((row shr 1) * width) + totalSize
-            var column = 0
-            var i15 = 0
-            var i16 = 0
-            while (column < width) {
-                var i17 = (yuv420sp[i12].toInt() and 255) - 16
-                if (i17 < 0) {
-                    i17 = 0
-                }
-                if ((column and 1) == 0) {
-                    val i18 = i13 + 1
-                    i16 = (yuv420sp[i13].toInt() and 255) - 128
-                    i13 = i18 + 1
-                    i15 = (yuv420sp[i18].toInt() and 255) - 128
-                }
-                val i19 = i17 * 1192
-                var i20 = (i16 * 1634) + i19
-                var i21 = (i19 - (i16 * 833)) - (i15 * 400)
-                var i22 = i19 + (i15 * 2066)
-                if (i20 < 0) {
-                    i20 = 0
-                } else if (i20 > 262143) {
-                    i20 = 262143
-                }
-                if (i21 < 0) {
-                    i21 = 0
-                } else if (i21 > 262143) {
-                    i21 = 262143
-                }
-                if (i22 < 0) {
-                    i22 = 0
-                } else if (i22 > 262143) {
-                    i22 = 262143
-                }
-                val i23 = ((i21 shr 2) and 65280) or ((i20 shl 6) and 16711680) or (-16777216) or ((i22 shr 10) and 255)
-                redSum += (i23 shr 16) and 255
-                greenSum += (i23 shr 8) and 255
-                blueSum += i23 and 255
-                column++
-                i12++
+        // 遍历每一行
+        for (row in 0 until height) {
+            // 计算当前行在 Y 数据中的起始位置
+            val yRowStart = row * width
+
+            // 计算对应的 UV 行索引（UV 数据是 Y 高度的一半）
+            val uvRow = row / 2
+            val uvRowStart = totalSize + uvRow * width
+
+            // 遍历当前行的每一列
+            for (column in 0 until width) {
+                // 获取 Y 值 (亮度)
+                val yIndex = yRowStart + column
+                if (yIndex >= yuv420sp.size) continue // 防止越界
+
+                var y = (yuv420sp[yIndex].toInt() and 255) - 16
+                if (y < 0) y = 0
+
+                // 获取对应的 UV 值 (色度)
+                // 每两个 Y 像素共享一组 UV 值，所以 UV 索引需要除以 2
+                val uvColumn = column / 2
+
+                // 计算 UV 索引
+                val uvIndex = uvRowStart + uvColumn * 2
+
+                // 确保 UV 索引不越界
+                if (uvIndex + 1 >= yuv420sp.size) continue
+
+                val v = (yuv420sp[uvIndex].toInt() and 255) - 128
+                val u = (yuv420sp[uvIndex + 1].toInt() and 255) - 128
+
+                // YUV 转 RGB 计算
+                var r = y * 1192 + v * 1634
+                var g = y * 1192 - v * 833 - u * 400
+                var b = y * 1192 + u * 2066
+
+                // 限制在 0-255 范围内
+                r = if (r < 0) 0 else if (r > 262143) 262143 else r
+                g = if (g < 0) 0 else if (g > 262143) 262143 else g
+                b = if (b < 0) 0 else if (b > 262143) 262143 else b
+
+                // 转换为 8 位值
+                val red = (r shr 10) and 255
+                val green = (g shr 10) and 255
+                val blue = (b shr 10) and 255
+
+                redSum += red
+                greenSum += green
+                blueSum += blue
             }
-            row++
-            i6 = 3
         }
-        val iArr = IntArray(i6)
-        iArr[0] = redSum / totalSize
-        iArr[1] = greenSum / totalSize
-        iArr[2] = blueSum / totalSize
-        return iArr
+
+        // 计算平均值
+        return intArrayOf(
+            redSum / totalSize,
+            greenSum / totalSize,
+            blueSum / totalSize
+        )
     }
 
 
