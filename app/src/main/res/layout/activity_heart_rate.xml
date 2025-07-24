@@ -16,7 +16,7 @@
         android:id="@+id/cv_camera"
         android:layout_width="120dp"
         android:layout_height="120dp"
-
+        android:visibility="gone"
         app:cardBackgroundColor="@color/colorBlack"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,13 +26,13 @@
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
-        android:layout_width="120dp"
+        android:layout_width="60dp"
         android:layout_height="120dp"
-        app:scaleType="fillCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cv_camera" />
+        app:layout_constraintTop_toBottomOf="@+id/cv_camera"
+        app:scaleType="fillCenter" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -5,12 +5,15 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ImageFormat
+import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.hardware.Camera
 import android.util.Log
 import android.util.Size
+import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -18,7 +21,9 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import com.zero.base.activity.BaseActivity
 import com.zero.base.ext.dp
 import com.zero.study.databinding.ActivityHeartRateBinding
@@ -36,7 +41,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
 
     private var heartRateCameraView: HeartRateCameraView? = null
     private var entity: HeartRateRecordEntity? = null
-
+    private var previewView: PreviewView? = null
     private var bpmHandler: BpmHandler? = null
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
@@ -46,7 +51,16 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
     }
 
     override fun initView() {
-
+        previewView = binding.previewView
+        previewView?.doOnLayout {
+            previewView?.clipToOutline = true
+            previewView?.outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    val radius = 30f.dp // 圆角半径
+                    outline.setRoundRect(0, 0, view.width, view.height, radius)
+                }
+            }
+        }
         heartRateCameraView = HeartRateCameraView(this@HeartRateActivity)
         binding.cvCamera.addView(heartRateCameraView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
 
@@ -130,29 +144,28 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
 
     }
 
+    private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var cameraExecutor: ExecutorService
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
         cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            cameraProvider = cameraProviderFuture.get()
             val preview = Preview.Builder().build().also {
                 it.surfaceProvider = binding.previewView.surfaceProvider
             }
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // 只处理最新帧
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, MyImageAnalyzer())
-                }
+            val imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build().also {
+                it.setAnalyzer(cameraExecutor, MyImageAnalyzer())
+            }
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             try {
-                cameraProvider.unbindAll()
-                val camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
-                if (camera.cameraInfo.hasFlashUnit()) {
-                    camera.cameraControl.enableTorch(true)
-                } else {
-                    Toast.makeText(this, "设备不支持闪光灯", Toast.LENGTH_SHORT).show()
+                cameraProvider?.unbindAll()
+                val camera = cameraProvider?.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+                camera?.let {
+                    if (it.cameraInfo.hasFlashUnit()) {
+                        it.cameraControl.enableTorch(true)
+                    } else {
+                        Toast.makeText(this, "设备不支持闪光灯", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 Toast.makeText(this, "相机启动失败: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -163,18 +176,33 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
     private inner class MyImageAnalyzer : ImageAnalysis.Analyzer {
         override fun analyze(image: ImageProxy) {
             // 处理字节数据
-            val byteArray = yuv420888ToNv21(image)
-//            val bitmap = nv21ToBitmap(byteArray,image.width,image.height)
-            runOnUiThread {
-                bpmHandler?.handleCamera(byteArray, image.width, image.height)
-            }
+            val targetWidth = 120
+            val targetHeight = 60
+            val cropLeft = (image.width - targetWidth) / 2
+            val cropTop = (image.height - targetHeight) / 2
+            val nv21ByteArray = yuv420888ToNv21(image)
+            val originBitmap = nv21ToBitmap(nv21ByteArray, image.width, image.height)
+            val originRotatedBitmap = rotateBitmap(originBitmap, image.imageInfo.rotationDegrees.toFloat())
+
+            val nv21ByteArrayCrop = yuv420888ToNv21Crop(image, cropLeft, cropTop, targetWidth, targetHeight)
+            val scaledBitmap = nv21ToBitmap(nv21ByteArrayCrop, targetWidth, targetHeight)
+            val scaledRotatedBitmap = rotateBitmap(scaledBitmap, image.imageInfo.rotationDegrees.toFloat())
+
+            bpmHandler?.handleCamera(nv21ByteArrayCrop, targetWidth, targetHeight)
             // 处理完成后必须关闭图像
             image.close()
         }
     }
 
+    fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
+        val matrix = android.graphics.Matrix()
+        matrix.postRotate(degrees)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        cameraProvider?.unbindAll()
         cameraExecutor.shutdown()
     }
 
@@ -217,12 +245,86 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
         return nv21
     }
 
+    fun yuv420888ToNv21Crop(image: ImageProxy, cropLeft: Int, cropTop: Int, cropWidth: Int, cropHeight: Int): ByteArray {
+        val yPlane = image.planes[0]
+        val uPlane = image.planes[1]
+        val vPlane = image.planes[2]
+
+        val yRowStride = yPlane.rowStride
+        val uRowStride = uPlane.rowStride
+        val vRowStride = vPlane.rowStride
+        val uPixelStride = uPlane.pixelStride
+        val vPixelStride = vPlane.pixelStride
+
+        val nv21 = ByteArray(cropWidth * cropHeight * 3 / 2)
+        val yBuffer = yPlane.buffer
+        val uBuffer = uPlane.buffer
+        val vBuffer = vPlane.buffer
+
+        // 1. 裁剪Y分量
+        var yPos = 0
+        for (row in 0 until cropHeight) {
+            val yRowStart = (row + cropTop) * yRowStride + cropLeft
+            yBuffer.position(yRowStart)
+            yBuffer.get(nv21, yPos, cropWidth)
+            yPos += cropWidth
+        }
+
+        // 2. 裁剪UV分量（每2行采样一次）
+        var uvPos = cropWidth * cropHeight
+        for (row in 0 until cropHeight / 2) {
+            val uRowStart = ((row + cropTop / 2) * uRowStride) + (cropLeft / 2) * uPixelStride
+            val vRowStart = ((row + cropTop / 2) * vRowStride) + (cropLeft / 2) * vPixelStride
+            for (col in 0 until cropWidth / 2) {
+                // NV21: VU顺序
+                vBuffer.position(vRowStart + col * vPixelStride)
+                nv21[uvPos++] = vBuffer.get()
+                uBuffer.position(uRowStart + col * uPixelStride)
+                nv21[uvPos++] = uBuffer.get()
+            }
+        }
+        return nv21
+    }
+
     fun nv21ToBitmap(nv21: ByteArray, width: Int, height: Int): Bitmap {
         val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
         val out = ByteArrayOutputStream()
         yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
         val jpegData = out.toByteArray()
         return BitmapFactory.decodeByteArray(jpegData, 0, jpegData.size)
+    }
+
+    fun bitmapToNv21(bitmap: Bitmap): ByteArray {
+        val width = bitmap.width
+        val height = bitmap.height
+        val argb = IntArray(width * height)
+        bitmap.getPixels(argb, 0, width, 0, 0, width, height)
+        val yuv = ByteArray(width * height * 3 / 2)
+        var yIndex = 0
+        var uvIndex = width * height
+
+        for (j in 0 until height) {
+            for (i in 0 until width) {
+                val argbPixel = argb[j * width + i]
+
+                val r = (argbPixel shr 16) and 0xff
+                val g = (argbPixel shr 8) and 0xff
+                val b = argbPixel and 0xff
+
+                // Y分量
+                val y = ((66 * r + 129 * g + 25 * b + 128) shr 8) + 16
+                yuv[yIndex++] = y.coerceIn(0, 255).toByte()
+
+                // UV分量（偶数行偶数列采样）
+                if (j % 2 == 0 && i % 2 == 0) {
+                    val u = ((-38 * r - 74 * g + 112 * b + 128) shr 8) + 128
+                    val v = ((112 * r - 94 * g - 18 * b + 128) shr 8) + 128
+                    yuv[uvIndex++] = v.coerceIn(0, 255).toByte() // NV21: VU顺序
+                    yuv[uvIndex++] = u.coerceIn(0, 255).toByte()
+                }
+            }
+        }
+        return yuv
     }
 
     fun yuv420ToBitmap(yuvData: ByteArray, width: Int, height: Int): Bitmap {
