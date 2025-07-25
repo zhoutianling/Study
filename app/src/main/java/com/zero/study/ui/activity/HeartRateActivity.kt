@@ -8,11 +8,8 @@ import android.graphics.ImageFormat
 import android.graphics.Outline
 import android.graphics.Rect
 import android.graphics.YuvImage
-import android.hardware.Camera
 import android.util.Log
-import android.util.Size
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,22 +27,19 @@ import com.zero.study.databinding.ActivityHeartRateBinding
 import com.zero.study.listener.BpmListener
 import com.zero.study.model.HeartRateRecordEntity
 import com.zero.study.ui.widget.BpmHandler
-import com.zero.study.ui.widget.HeartRateCameraView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRateBinding::inflate) {
 
-    private var heartRateCameraView: HeartRateCameraView? = null
     private var entity: HeartRateRecordEntity? = null
     private var previewView: PreviewView? = null
     private var bpmHandler: BpmHandler? = null
+    private var cameraProvider: ProcessCameraProvider? = null
+    private lateinit var cameraExecutor: ExecutorService
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
-//            measureHeartRate(true)
             startCamera()
         }
     }
@@ -61,21 +55,24 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
                 }
             }
         }
-        heartRateCameraView = HeartRateCameraView(this@HeartRateActivity)
-        binding.cvCamera.addView(heartRateCameraView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-
         bpmHandler = BpmHandler(object : BpmListener {
             override fun onProgress(progress: Int) {
                 if (isFinishing) {
                     return
                 }
                 Log.e("zzz", "onProgress ---> $progress")
+                runOnUiThread {
+                    binding.progressBar.progress = progress
+                }
             }
 
             override fun onBpm(bpm: Int, stress: Int) {
 //                Log.e("zzz", "onBpm ---> $bpm")
                 if (isFinishing) {
                     return
+                }
+                runOnUiThread {
+                    binding.progressBar.heartRate = bpm
                 }
             }
 
@@ -104,36 +101,8 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
             }
 
         })
-        heartRateCameraView?.listener = object : HeartRateCameraView.OnHeartRateCameraListener {
-            override fun onError(str: String?) {
-            }
-
-            override fun onOpenCamera() {
-                bpmHandler?.startHandle()
-            }
-
-            override fun onStopCamera() {
-                bpmHandler?.stopHandle()
-            }
-
-
-            override fun onPreviewCamera(data: ByteArray?, camera: Camera?) {
-                val size = camera!!.parameters.previewSize
-//                val bitmap = data?.let { yuv420ToBitmap(it, size.width, size.height) }
-                bpmHandler?.handleCamera(data, size.width, size.height)
-            }
-        }
         cameraLauncher.launch(Manifest.permission.CAMERA)
     }
-
-    private fun measureHeartRate(enabled: Boolean) {
-        if (enabled) {
-            heartRateCameraView?.onResume()
-        } else {
-            heartRateCameraView?.onPause()
-        }
-    }
-
 
     override fun initData() {
         // 初始化数据
@@ -144,8 +113,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
 
     }
 
-    private var cameraProvider: ProcessCameraProvider? = null
-    private lateinit var cameraExecutor: ExecutorService
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -180,24 +148,11 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
             val targetHeight = 60
             val cropLeft = (image.width - targetWidth) / 2
             val cropTop = (image.height - targetHeight) / 2
-            val nv21ByteArray = yuv420888ToNv21(image)
-            val originBitmap = nv21ToBitmap(nv21ByteArray, image.width, image.height)
-            val originRotatedBitmap = rotateBitmap(originBitmap, image.imageInfo.rotationDegrees.toFloat())
-
             val nv21ByteArrayCrop = yuv420888ToNv21Crop(image, cropLeft, cropTop, targetWidth, targetHeight)
-            val scaledBitmap = nv21ToBitmap(nv21ByteArrayCrop, targetWidth, targetHeight)
-            val scaledRotatedBitmap = rotateBitmap(scaledBitmap, image.imageInfo.rotationDegrees.toFloat())
-
             bpmHandler?.handleCamera(nv21ByteArrayCrop, targetWidth, targetHeight)
             // 处理完成后必须关闭图像
             image.close()
         }
-    }
-
-    fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
-        val matrix = android.graphics.Matrix()
-        matrix.postRotate(degrees)
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
     override fun onDestroy() {

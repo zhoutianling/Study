@@ -24,6 +24,25 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar_layout"
         app:layout_constraintVertical_bias="0.3" />
 
+    <com.zero.base.widget.CircleProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_layout"
+        app:progress_background_color="@color/colorDefText"
+        app:progress_end_color="@color/colorPurple"
+        app:progress_shader="sweep"
+        app:progress_start_color="@color/colorPurple"
+        app:progress_stroke_cap="round"
+        app:progress_stroke_width="15dp"
+        app:drawBackgroundOutsideProgress="true"
+        app:progress_style="solid_line"
+        app:progress_text_color="@color/colorBlack"
+        app:progress_text_size="25sp" />
+
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="60dp"
