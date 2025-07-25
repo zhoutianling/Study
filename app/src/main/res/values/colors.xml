@@ -7,7 +7,7 @@
     <color name="themeColor">#FFFFFF</color>
     <color name="windowBackground">#2B2A30</color>
     <color name="launchBackground">#F5F5F5</color>
-    <color name="colorBlack">#80000000</color>
+    <color name="colorBlack">#000000</color>
     <color name="appThemeColor">#2B2A30</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="homeBlueLightColor">#804A66E0</color>

@@ -40,4 +40,5 @@
     <string name="lying_down">Lying down</string>
     <string name="running">Running</string>
     <string name="swimming">Swimming</string>
+    <string name="measure_progress">Measuring…(%d%%)</string>
 </resources>

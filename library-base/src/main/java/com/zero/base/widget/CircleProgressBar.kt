@@ -2,6 +2,8 @@ package com.zero.base.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.BlurMaskFilter
 import android.graphics.BlurMaskFilter.Blur
 import android.graphics.Canvas
@@ -15,6 +17,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.SweepGradient
+import android.graphics.Typeface
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.Creator
@@ -23,6 +26,8 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.IntDef
+import com.zero.base.ext.dp
+import com.zero.base.ext.px
 import com.zero.library_base.R
 import kotlin.math.cos
 import kotlin.math.min
@@ -42,7 +47,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     private var mCenterX = 0f
     private var mCenterY = 0f
 
-    private var mProgress = 0
+    private var mProgress = 1
     private var mHeardRate = 0
     private var mMax = DEFAULT_MAX
 
@@ -96,6 +101,17 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     // The blur style of mProgressPaint
     private var mBlurStyle: Blur? = null
 
+    private val bpmText = "BPM"
+    private val bpmTextRect = Rect()
+    private var bpmBaseY: Float = 0f
+    private var heartBitmap: Bitmap? = null
+    private var heartBitmapDrawLeft: Float = 0f
+    private var heartBitmapDrawTop: Float = 0f
+    private var heartBitmapHeight: Int = 30.dp
+    private var heartBitmapWidth: Int = 30.dp
+    private val margin = 10.dp
+    private var heartCacheBitmap: Bitmap? = null
+
     init {
         initFromAttributes(context, attrs)
         initPaint()
@@ -106,16 +122,18 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
      */
     private fun initFromAttributes(context: Context, attrs: AttributeSet?) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.CircleProgressBar)
-
+        val originalBitmap = BitmapFactory.decodeResource(resources, R.drawable.heart)
+        val scale = heartBitmapHeight.toFloat() / originalBitmap.height
+        heartBitmapWidth = (originalBitmap.width * scale).toInt()
+        heartBitmap = Bitmap.createScaledBitmap(originalBitmap, heartBitmapWidth, heartBitmapHeight, true)
         mLineCount = a.getInt(R.styleable.CircleProgressBar_line_count, DEFAULT_LINE_COUNT)
-
         mStyle = a.getInt(R.styleable.CircleProgressBar_progress_style, LINE)
         mShader = a.getInt(R.styleable.CircleProgressBar_progress_shader, LINEAR)
         mCap = if (a.hasValue(R.styleable.CircleProgressBar_progress_stroke_cap)) Cap.entries.toTypedArray()[a.getInt(R.styleable.CircleProgressBar_progress_stroke_cap, 0)] else Cap.BUTT
 
-        mLineWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_line_width, dip2px(getContext(), DEFAULT_LINE_WIDTH)).toFloat()
-        mProgressTextSize = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_text_size, dip2px(getContext(), DEFAULT_PROGRESS_TEXT_SIZE)).toFloat()
-        mProgressStrokeWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_stroke_width, dip2px(getContext(), DEFAULT_PROGRESS_STROKE_WIDTH)).toFloat()
+        mLineWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_line_width, DEFAULT_LINE_WIDTH.px).toFloat()
+        mProgressTextSize = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_text_size, DEFAULT_PROGRESS_TEXT_SIZE.px).toFloat()
+        mProgressStrokeWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_stroke_width, DEFAULT_PROGRESS_STROKE_WIDTH.px).toFloat()
 
         mProgressStartColor = a.getColor(R.styleable.CircleProgressBar_progress_start_color, Color.parseColor(COLOR_FFF2A670))
         mProgressEndColor = a.getColor(R.styleable.CircleProgressBar_progress_end_color, Color.parseColor(COLOR_FFF2A670))
@@ -142,6 +160,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     private fun initPaint() {
         mProgressTextPaint.textAlign = Paint.Align.CENTER
         mProgressTextPaint.textSize = mProgressTextSize
+        mProgressTextPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
 
         mProgressPaint.style = if (mStyle == SOLID) Paint.Style.FILL else Paint.Style.STROKE
         mProgressPaint.strokeWidth = mProgressStrokeWidth
@@ -206,12 +225,10 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         canvas.save()
         canvas.rotate(mStartDegree.toFloat(), mCenterX, mCenterY)
         drawProgress(canvas)
         canvas.restore()
-
         drawProgressText(canvas)
     }
 
@@ -219,19 +236,31 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         if (mProgressFormatter == null) {
             return
         }
-
-//        val progressText = mProgressFormatter!!.format(mProgress, mMax)
         val progressText = mHeardRate.toString()
-
         if (TextUtils.isEmpty(progressText)) {
             return
         }
-
         mProgressTextPaint.textSize = mProgressTextSize
         mProgressTextPaint.color = mProgressTextColor
-
         mProgressTextPaint.getTextBounds(progressText, 0, progressText.length, mProgressTextRect)
-        canvas.drawText(progressText, 0, progressText.length, mCenterX, mCenterY + mProgressTextRect.height() / 2, mProgressTextPaint)
+        val textBaseY = mCenterY + mProgressTextRect.height() / 2
+
+        // 只绘制缓存图片
+        heartCacheBitmap?.let {
+            canvas.drawBitmap(it, 0f, 0f, null)
+        }
+
+        // 再绘制进度文本
+        canvas.drawText(progressText, 0, progressText.length, mCenterX, textBaseY, mProgressTextPaint)
+
+        // 绘制 BPM（只用 onSizeChanged 计算好的位置和边界）
+        val oldTextSize = mProgressTextPaint.textSize
+        val oldTextColor = mProgressTextPaint.color
+        mProgressTextPaint.textSize = mProgressTextSize * 0.6f
+        mProgressTextPaint.color = Color.parseColor("#8A8A91")
+        canvas.drawText(bpmText, 0, bpmText.length, mCenterX, bpmBaseY, mProgressTextPaint)
+        mProgressTextPaint.textSize = oldTextSize
+        mProgressTextPaint.color = oldTextColor
     }
 
 
@@ -325,17 +354,34 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         updateProgressShader()
 
         mProgressRectF.inset(mProgressStrokeWidth / 2, mProgressStrokeWidth / 2)
+
+        // 计算 BPM 位置
+        mProgressTextPaint.textSize = mProgressTextSize
+        mProgressTextPaint.getTextBounds(mHeardRate.toString(), 0, mHeardRate.toString().length, mProgressTextRect)
+        val textBaseY = mCenterY + mProgressTextRect.height() / 2
+        mProgressTextPaint.textSize = mProgressTextSize * 0.6f
+        mProgressTextPaint.getTextBounds(bpmText, 0, bpmText.length, bpmTextRect)
+        bpmBaseY = textBaseY + margin + bpmTextRect.height()
+
+        val progressTextTop = textBaseY - mProgressTextRect.height()
+        heartBitmapDrawLeft = mCenterX - heartBitmapWidth / 2f
+        heartBitmapDrawTop = progressTextTop - margin - heartBitmapHeight
+
+        // 生成缓存 Bitmap，只绘制一次图片
+        if (heartBitmap != null && width > 0 && height > 0) {
+            heartCacheBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val cacheCanvas = Canvas(heartCacheBitmap!!)
+            cacheCanvas.drawBitmap(heartBitmap!!, heartBitmapDrawLeft, heartBitmapDrawTop, null)
+        }
     }
 
 
     public override fun onSaveInstanceState(): Parcelable {
         // Force our ancestor class to save its state
         val superState = super.onSaveInstanceState()
-        val ss = SavedState(superState)
-
-        ss.progress = mProgress
-
-        return ss
+        val savedState = SavedState(superState)
+        savedState.progress = mProgress
+        return savedState
     }
 
     public override fun onRestoreInstanceState(state: Parcelable) {
@@ -539,9 +585,5 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         private const val COLOR_FFF2A670 = "#fff2a670"
         private const val COLOR_FFD3D3D5 = "#ffe3e3e5"
 
-        private fun dip2px(context: Context, dpValue: Float): Int {
-            val scale = context.resources.displayMetrics.density
-            return (dpValue * scale + 0.5f).toInt()
-        }
     }
 }

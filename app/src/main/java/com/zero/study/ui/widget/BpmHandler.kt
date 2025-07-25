@@ -659,11 +659,7 @@ class BpmHandler(private val listener: BpmListener?) {
         }
 
         // 计算平均值
-        return intArrayOf(
-            redSum / totalSize,
-            greenSum / totalSize,
-            blueSum / totalSize
-        )
+        return intArrayOf(redSum / totalSize, greenSum / totalSize, blueSum / totalSize)
     }
 
 

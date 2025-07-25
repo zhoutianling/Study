@@ -23,11 +23,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnLayout
 import com.zero.base.activity.BaseActivity
 import com.zero.base.ext.dp
+import com.zero.study.R
 import com.zero.study.databinding.ActivityHeartRateBinding
 import com.zero.study.listener.BpmListener
 import com.zero.study.model.HeartRateRecordEntity
+import com.zero.study.service.VibratorService
 import com.zero.study.ui.widget.BpmHandler
 import java.io.ByteArrayOutputStream
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -38,6 +41,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
     private var bpmHandler: BpmHandler? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var vibratorService: VibratorService
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
             startCamera()
@@ -46,6 +50,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
 
     override fun initView() {
         previewView = binding.previewView
+        binding.tvProgress.text = String.format(Locale.getDefault(), getString(R.string.measure_progress), 0)
         previewView?.doOnLayout {
             previewView?.clipToOutline = true
             previewView?.outlineProvider = object : ViewOutlineProvider() {
@@ -62,7 +67,13 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
                 }
                 Log.e("zzz", "onProgress ---> $progress")
                 runOnUiThread {
-                    binding.progressBar.progress = progress
+                    if (progress > 1) {
+                        binding.progressBar.progress = progress
+                        binding.tvProgress.text = String.format(Locale.getDefault(), getString(R.string.measure_progress), progress)
+//                        vibratorService.start(duration = 80, strength = 180)
+                    }else{
+                        binding.tvProgress.text = String.format(Locale.getDefault(), getString(R.string.measure_progress), 0)
+                    }
                 }
             }
 
@@ -79,6 +90,9 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
 
             override fun onFingerOut(scene: Int) {
                 Log.e("zzz", "onFingerOut ---> $scene")
+                runOnUiThread {
+//                    vibratorService.stop()
+                }
             }
 
             override fun onFinish(intervals: ArrayList<Long>) {
@@ -107,6 +121,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
     override fun initData() {
         // 初始化数据
         cameraExecutor = Executors.newSingleThreadExecutor()
+        vibratorService = VibratorService(this)
     }
 
     override fun addListener() {
@@ -159,6 +174,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
         super.onDestroy()
         cameraProvider?.unbindAll()
         cameraExecutor.shutdown()
+        vibratorService.destroy()
     }
 
     /**
