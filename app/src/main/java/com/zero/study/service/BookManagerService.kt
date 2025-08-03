@@ -20,12 +20,9 @@ import kotlin.random.Random
 open class BookManagerService : Service() {
     private val mBookList = CopyOnWriteArrayList<Book>()
     private val mListenerList = CopyOnWriteArrayList<IOnNewBookCallback>()
-    private val bookDao: BookDao by lazy {
-        DbManager.db.bookDao()
-    }
 
     /**
-     *  当 Service 第一次创建时调用。在这里，您可以执行一些初始化操作。
+     *  当 Service 第一次创建时调用。可以执行一些初始化操作。
      */
     override fun onCreate() {
         super.onCreate()
@@ -88,7 +85,6 @@ open class BookManagerService : Service() {
             for (i in 0..99) {
                 val book = Book(name = randomString())
                 mBookList.add(book)
-                bookDao.addBook(book)
                 //第一种方式
                 for (listener in mListenerList) {
                     try {
@@ -97,7 +93,7 @@ open class BookManagerService : Service() {
                         e.printStackTrace()
                     }
                 }
-                SystemClock.sleep(1000)
+                SystemClock.sleep(2000)
             }
         }
     }

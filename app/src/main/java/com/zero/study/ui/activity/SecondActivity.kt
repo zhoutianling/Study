@@ -74,7 +74,6 @@ class SecondActivity : BaseActivity<ActivitySecondBinding>(ActivitySecondBinding
             bookManager = IBookManager.Stub.asInterface(iBinder)
             try {
                 bookManager?.registerListener(listener)
-                bookManager?.autoAdd()
                 Toast.makeText(this@SecondActivity, "服务已启动", Toast.LENGTH_SHORT).show()
                 binding.group.visibility = View.VISIBLE
             } catch (e: RemoteException) {
@@ -92,7 +91,6 @@ class SecondActivity : BaseActivity<ActivitySecondBinding>(ActivitySecondBinding
     private val listener: IOnNewBookCallback = object : IOnNewBookCallback.Stub() {
         override fun callback(newBook: Book) {
             Log.i("zzz", "NewBookArrived--->" + newBook.name)
-//            bookDao.addBook(newBook)
             notifyDataChange(newBook)
         }
     }
@@ -132,9 +130,9 @@ class SecondActivity : BaseActivity<ActivitySecondBinding>(ActivitySecondBinding
     override fun addListener() {
         binding.start.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
-                checkNotificationAndStartService();
+//                checkNotificationAndStartService();
 //                checkNotificationAndLaunchIntent();
-//                bindService(Intent(this@SecondActivity, BookManagerService::class.java), mConnection, BIND_AUTO_CREATE)
+                bindService(Intent(this@SecondActivity, BookManagerService::class.java), mConnection, BIND_AUTO_CREATE)
             } else {
                 try {
                     unbindService(mConnection)

@@ -11,5 +11,4 @@ public interface BpmListener {
 
     void onProgress(int f);
 
-    void onStop();
 }

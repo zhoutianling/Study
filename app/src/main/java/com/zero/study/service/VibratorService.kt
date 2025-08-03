@@ -6,7 +6,6 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
-import androidx.lifecycle.LifecycleObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,8 +18,7 @@ import kotlin.coroutines.CoroutineContext
  * @date:2025/7/25 16:57
  * @path:com.zero.study.service.Vibrator
  */
-class VibratorService(context: Context) : CoroutineScope, LifecycleObserver {
-    // 协程相关
+class VibratorService(context: Context) : CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext = Dispatchers.Main + job
 
@@ -31,16 +29,12 @@ class VibratorService(context: Context) : CoroutineScope, LifecycleObserver {
         @Suppress("DEPRECATION") context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
-    // 震动状态
-    private var isVibrating = false
     private var vibrationJob: Job? = null
 
     // 开始周期性震动
     fun start(duration: Long = 100L, interval: Long = 1000L, strength: Int = 255) {
-        if (isVibrating) return
         if (!vibrator.hasVibrator()) return
         Log.d("zzz", "start: job")
-        isVibrating = true
         vibrationJob = launch {
             while (isActive) {
                 vibrate(duration, strength)
@@ -52,9 +46,7 @@ class VibratorService(context: Context) : CoroutineScope, LifecycleObserver {
 
     // 停止震动
     fun stop() {
-        if (!isVibrating) return
         Log.d("zzz", "stop: job")
-        isVibrating = false
         vibrationJob?.cancel()
         vibrationJob = null
         vibrator.cancel()
@@ -78,9 +70,13 @@ class VibratorService(context: Context) : CoroutineScope, LifecycleObserver {
         if (!vibrator.hasVibrator()) {
             return
         }
-        val amplitude = if (strength in 1..255) strength else VibrationEffect.DEFAULT_AMPLITUDE
-        val effect = VibrationEffect.createOneShot(mills, amplitude)
-        vibrator.vibrate(effect)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val amplitude = if (strength in 1..255) strength else VibrationEffect.DEFAULT_AMPLITUDE
+            val effect = VibrationEffect.createOneShot(mills, amplitude)
+            vibrator.vibrate(effect)
+        } else {
+            vibrator.vibrate(mills)
+        }
     }
 
     fun destroy() {

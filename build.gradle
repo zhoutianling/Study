@@ -15,6 +15,6 @@ plugins {
 apply from: "app-config.gradle"
 ext {
     compileSdk = 35
-    minSdk = 26
+    minSdk = 24
     targetSdk = 35
 }

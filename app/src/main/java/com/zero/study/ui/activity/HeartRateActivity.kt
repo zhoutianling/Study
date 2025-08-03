@@ -25,11 +25,13 @@ import com.zero.base.activity.BaseActivity
 import com.zero.base.ext.dp
 import com.zero.study.R
 import com.zero.study.databinding.ActivityHeartRateBinding
+import com.zero.study.helper.ProgressAnimationHelper
 import com.zero.study.listener.BpmListener
 import com.zero.study.model.HeartRateRecordEntity
 import com.zero.study.service.VibratorService
 import com.zero.study.ui.widget.BpmHandler
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -42,6 +44,9 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var vibratorService: VibratorService
+    private var progressAnimationHelper: ProgressAnimationHelper? = null
+    private var processing: Boolean = false
+
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
             startCamera()
@@ -67,12 +72,18 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
                 }
                 Log.e("zzz", "onProgress ---> $progress")
                 runOnUiThread {
-                    if (progress > 1) {
-                        binding.progressBar.progress = progress
-                        binding.tvProgress.text = String.format(Locale.getDefault(), getString(R.string.measure_progress), progress)
-//                        vibratorService.start(duration = 80, strength = 180)
-                    }else{
+                    if (progress > 0.1f) {
+                        if (!processing) {
+                            processing = true
+                            progressAnimationHelper?.start()
+                            vibratorService.start(duration = 60, strength = 180)
+                            binding.animalHeart.playAnimation()
+                        }
+                    } else {
+                        processing = false
                         binding.tvProgress.text = String.format(Locale.getDefault(), getString(R.string.measure_progress), 0)
+                        vibratorService.stop()
+                        binding.animalHeart.cancelAnimation()
                     }
                 }
             }
@@ -90,17 +101,23 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
 
             override fun onFingerOut(scene: Int) {
                 Log.e("zzz", "onFingerOut ---> $scene")
+                processing = false
                 runOnUiThread {
-//                    vibratorService.stop()
+                    vibratorService.stop()
+                    progressAnimationHelper?.stop()
+                    binding.animalHeart.cancelAnimation()
                 }
             }
 
             override fun onFinish(intervals: ArrayList<Long>) {
+                processing = false
                 if (isFinishing) {
                     return
                 }
-
                 runOnUiThread {
+                    vibratorService.stop()
+                    progressAnimationHelper?.stop()
+                    binding.animalHeart.cancelAnimation()
                     val values = FloatArray(intervals.size)
                     for (i in intervals.indices) {
                         values[i] = intervals[i].toFloat()
@@ -108,10 +125,6 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
                     entity = bpmHandler?.getMeasureResult(values)
                     Log.e("zzz", "onFinish ---> $entity")
                 }
-            }
-
-            override fun onStop() {
-                Log.e("zzz", "onStop ---> ")
             }
 
         })
@@ -122,10 +135,14 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
         // 初始化数据
         cameraExecutor = Executors.newSingleThreadExecutor()
         vibratorService = VibratorService(this)
+        progressAnimationHelper = ProgressAnimationHelper { progress ->
+            Log.d("zzz", "progress: $progress")
+            binding.progressBar.progress = progress
+            binding.tvProgress.text = String.format(Locale.getDefault(), getString(R.string.measure_progress), progress.toInt())
+        }
     }
 
     override fun addListener() {
-
     }
 
 
@@ -214,6 +231,62 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
             }
         }
         return nv21
+    }
+
+    fun YUV420toNV21(image: ImageProxy): ByteArray {
+        val crop: Rect = image.cropRect
+        val format: Int = image.format
+        val width = crop.width()
+        val height = crop.height()
+        val planes: Array<ImageProxy.PlaneProxy> = image.planes
+        val data = ByteArray(width * height * ImageFormat.getBitsPerPixel(format) / 8)
+        val rowData = ByteArray(planes[0].rowStride)
+        var channelOffset = 0
+        var outputStride = 1
+        for (i in planes.indices) {
+            when (i) {
+                0 -> {
+                    channelOffset = 0
+                    outputStride = 1
+                }
+
+                1 -> {
+                    channelOffset = width * height + 1
+                    outputStride = 2
+                }
+
+                2 -> {
+                    channelOffset = width * height
+                    outputStride = 2
+                }
+            }
+            val buffer: ByteBuffer = planes[i].buffer
+            val rowStride: Int = planes[i].rowStride
+            val pixelStride: Int = planes[i].pixelStride
+            val shift = if (i == 0) 0 else 1
+            val w = width shr shift
+            val h = height shr shift
+            buffer.position(rowStride * (crop.top shr shift) + pixelStride * (crop.left shr shift))
+            for (row in 0 until h) {
+                var length: Int
+                if (pixelStride == 1 && outputStride == 1) {
+                    length = w
+                    buffer[data, channelOffset, length]
+                    channelOffset += length
+                } else {
+                    length = (w - 1) * pixelStride + 1
+                    buffer[rowData, 0, length]
+                    for (col in 0 until w) {
+                        data[channelOffset] = rowData[col * pixelStride]
+                        channelOffset += outputStride
+                    }
+                }
+                if (row < h - 1) {
+                    buffer.position(buffer.position() + rowStride - length)
+                }
+            }
+        }
+        return data
     }
 
     fun yuv420888ToNv21Crop(image: ImageProxy, cropLeft: Int, cropTop: Int, cropWidth: Int, cropHeight: Int): ByteArray {

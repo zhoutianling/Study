@@ -66,6 +66,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_progress"
         app:scaleType="fillCenter" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animal_heart"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_cacheComposition="true"
+        app:lottie_fileName="heart_rate.zip"
+        app:lottie_loop="true"
+        app:lottie_repeatMode="restart" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

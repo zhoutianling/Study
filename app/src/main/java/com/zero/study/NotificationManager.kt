@@ -105,7 +105,7 @@ object NotificationManager {
         } else {
             NotificationCompat.Builder(service, "permanentChannelId")
         }.apply {
-            setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_DEFAULT)
+            setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             setFullScreenIntent(pendingIntent, true)
             setSmallIcon(R.drawable.ic_level_5)//小图标（显示在状态栏）
             setContentTitle(title)//标题

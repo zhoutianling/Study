@@ -2,25 +2,9 @@ package com.zero.base.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.BlurMaskFilter
-import android.graphics.BlurMaskFilter.Blur
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.Paint.Cap
-import android.graphics.RadialGradient
-import android.graphics.Rect
-import android.graphics.RectF
-import android.graphics.Shader
-import android.graphics.SweepGradient
-import android.graphics.Typeface
+import android.graphics.*
 import android.os.Parcel
 import android.os.Parcelable
-import android.os.Parcelable.Creator
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
@@ -47,7 +31,8 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     private var mCenterX = 0f
     private var mCenterY = 0f
 
-    private var mProgress = 1
+    // 核心修改：进度值改为 Float 类型
+    private var mProgress = 0.1f
     private var mHeardRate = 0
     private var mMax = DEFAULT_MAX
 
@@ -93,13 +78,13 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     private var mShader = 0
 
     // The Stroke Cap of mProgressPaint and mProgressBackgroundPaint
-    private var mCap: Cap? = null
+    private var mCap: Paint.Cap? = null
 
     // The blur radius of mProgressPaint
     private var mBlurRadius = 0
 
     // The blur style of mProgressPaint
-    private var mBlurStyle: Blur? = null
+    private var mBlurStyle: BlurMaskFilter.Blur? = null
 
     private val bpmText = "BPM"
     private val bpmTextRect = Rect()
@@ -129,7 +114,11 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         mLineCount = a.getInt(R.styleable.CircleProgressBar_line_count, DEFAULT_LINE_COUNT)
         mStyle = a.getInt(R.styleable.CircleProgressBar_progress_style, LINE)
         mShader = a.getInt(R.styleable.CircleProgressBar_progress_shader, LINEAR)
-        mCap = if (a.hasValue(R.styleable.CircleProgressBar_progress_stroke_cap)) Cap.entries.toTypedArray()[a.getInt(R.styleable.CircleProgressBar_progress_stroke_cap, 0)] else Cap.BUTT
+        mCap = if (a.hasValue(R.styleable.CircleProgressBar_progress_stroke_cap)) {
+            Paint.Cap.entries.toTypedArray()[a.getInt(R.styleable.CircleProgressBar_progress_stroke_cap, 0)]
+        } else {
+            Paint.Cap.BUTT
+        }
 
         mLineWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_line_width, DEFAULT_LINE_WIDTH.px).toFloat()
         mProgressTextSize = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_text_size, DEFAULT_PROGRESS_TEXT_SIZE.px).toFloat()
@@ -146,10 +135,10 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         mBlurRadius = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_blur_radius, 0)
         val blurStyle = a.getInt(R.styleable.CircleProgressBar_progress_blur_style, 0)
         mBlurStyle = when (blurStyle) {
-            1 -> Blur.SOLID
-            2 -> Blur.OUTER
-            3 -> Blur.INNER
-            else -> Blur.NORMAL
+            1 -> BlurMaskFilter.Blur.SOLID
+            2 -> BlurMaskFilter.Blur.OUTER
+            3 -> BlurMaskFilter.Blur.INNER
+            else -> BlurMaskFilter.Blur.NORMAL
         }
         a.recycle()
     }
@@ -178,9 +167,9 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     private fun updateMaskBlurFilter() {
         if (mBlurStyle != null && mBlurRadius > 0) {
             setLayerType(LAYER_TYPE_SOFTWARE, mProgressPaint)
-            mProgressPaint.setMaskFilter(BlurMaskFilter(mBlurRadius.toFloat(), mBlurStyle))
+            mProgressPaint.maskFilter = BlurMaskFilter(mBlurRadius.toFloat(), mBlurStyle)
         } else {
-            mProgressPaint.setMaskFilter(null)
+            mProgressPaint.maskFilter = null
         }
     }
 
@@ -193,22 +182,35 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
             var shader: Shader? = null
             when (mShader) {
                 LINEAR -> {
-                    shader = LinearGradient(mProgressRectF.left, mProgressRectF.top, mProgressRectF.left, mProgressRectF.bottom, mProgressStartColor, mProgressEndColor, Shader.TileMode.CLAMP)
+                    shader = LinearGradient(
+                        mProgressRectF.left, mProgressRectF.top,
+                        mProgressRectF.left, mProgressRectF.bottom,
+                        mProgressStartColor, mProgressEndColor,
+                        Shader.TileMode.CLAMP
+                    )
                     val matrix = Matrix()
                     matrix.setRotate(LINEAR_START_DEGREE, mCenterX, mCenterY)
                     shader.setLocalMatrix(matrix)
                 }
 
                 RADIAL -> {
-                    shader = RadialGradient(mCenterX, mCenterY, mRadius, mProgressStartColor, mProgressEndColor, Shader.TileMode.CLAMP)
+                    shader = RadialGradient(
+                        mCenterX, mCenterY, mRadius,
+                        mProgressStartColor, mProgressEndColor,
+                        Shader.TileMode.CLAMP
+                    )
                 }
 
                 SWEEP -> {
-                    //arc = radian * radius
+                    // 核心修改：使用浮点计算弧度
                     val radian = (mProgressStrokeWidth / Math.PI * 2.0f / mRadius).toFloat()
-                    val rotateDegrees = (-(if (mCap == Cap.BUTT && mStyle == SOLID_LINE) 0.0 else Math.toDegrees(radian.toDouble()))).toFloat()
+                    val rotateDegrees = (-(if (mCap == Paint.Cap.BUTT && mStyle == SOLID_LINE) 0.0 else Math.toDegrees(radian.toDouble()))).toFloat()
 
-                    shader = SweepGradient(mCenterX, mCenterY, intArrayOf(mProgressStartColor, mProgressEndColor), floatArrayOf(0.0f, 1.0f))
+                    shader = SweepGradient(
+                        mCenterX, mCenterY,
+                        intArrayOf(mProgressStartColor, mProgressEndColor),
+                        floatArrayOf(0.0f, 1.0f)
+                    )
                     val matrix = Matrix()
                     matrix.setRotate(rotateDegrees, mCenterX, mCenterY)
                     shader.setLocalMatrix(matrix)
@@ -216,9 +218,9 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
 
                 else -> {}
             }
-            mProgressPaint.setShader(shader)
+            mProgressPaint.shader = shader
         } else {
-            mProgressPaint.setShader(null)
+            mProgressPaint.shader = null
             mProgressPaint.color = mProgressStartColor
         }
     }
@@ -253,7 +255,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         // 再绘制进度文本
         canvas.drawText(progressText, 0, progressText.length, mCenterX, textBaseY, mProgressTextPaint)
 
-        // 绘制 BPM（只用 onSizeChanged 计算好的位置和边界）
+        // 绘制 BPM
         val oldTextSize = mProgressTextPaint.textSize
         val oldTextColor = mProgressTextPaint.color
         mProgressTextPaint.textSize = mProgressTextSize * 0.6f
@@ -274,14 +276,16 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     /**
-     * In the center of the drawing area as a reference point , rotate the canvas
+     * 绘制线条式进度（核心修改：支持浮点进度计算线条数量）
      */
     private fun drawLineProgress(canvas: Canvas) {
         val unitDegrees = (2.0f * Math.PI / mLineCount).toFloat()
         val outerCircleRadius = mRadius
         val interCircleRadius = mRadius - mLineWidth
 
-        val progressLineCount = (mProgress.toFloat() / mMax.toFloat() * mLineCount).toInt()
+        // 核心修改：用浮点进度计算线条数量（保留小数精度）
+        val progressRatio = mProgress / mMax
+        val progressLineCount = (progressRatio * mLineCount).toInt()
 
         for (i in 0 until mLineCount) {
             val rotateDegrees = i * -unitDegrees
@@ -307,36 +311,41 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     /**
-     * Just draw arc
+     * 绘制实心进度（核心修改：浮点进度计算角度）
      */
     private fun drawSolidProgress(canvas: Canvas) {
+        // 核心修改：用浮点进度计算角度
+        val progressRatio = mProgress / mMax
+        val progressAngle = MAX_DEGREE * progressRatio
+
         if (mDrawBackgroundOutsideProgress) {
-            val startAngle = MAX_DEGREE * mProgress / mMax
+            val startAngle = progressAngle
             val sweepAngle = MAX_DEGREE - startAngle
             canvas.drawArc(mProgressRectF, startAngle, sweepAngle, true, mProgressBackgroundPaint)
         } else {
             canvas.drawArc(mProgressRectF, 0.0f, MAX_DEGREE, true, mProgressBackgroundPaint)
         }
-        canvas.drawArc(mProgressRectF, 0.0f, MAX_DEGREE * mProgress / mMax, true, mProgressPaint)
+        canvas.drawArc(mProgressRectF, 0.0f, progressAngle, true, mProgressPaint)
     }
 
     /**
-     * Just draw arc
+     * 绘制线条式圆弧进度（核心修改：浮点进度计算角度）
      */
     private fun drawSolidLineProgress(canvas: Canvas) {
+        // 核心修改：用浮点进度计算角度
+        val progressRatio = mProgress / mMax
+        val progressAngle = MAX_DEGREE * progressRatio
+
         if (mDrawBackgroundOutsideProgress) {
-            val startAngle = MAX_DEGREE * mProgress / mMax
+            val startAngle = progressAngle
             val sweepAngle = MAX_DEGREE - startAngle
             canvas.drawArc(mProgressRectF, startAngle, sweepAngle, false, mProgressBackgroundPaint)
         } else {
             canvas.drawArc(mProgressRectF, 0.0f, MAX_DEGREE, false, mProgressBackgroundPaint)
         }
-        canvas.drawArc(mProgressRectF, 0.0f, MAX_DEGREE * mProgress / mMax, false, mProgressPaint)
+        canvas.drawArc(mProgressRectF, 0.0f, progressAngle, false, mProgressPaint)
     }
 
-    /**
-     * When the size of CircleProgressBar changed, need to re-adjust the drawing area
-     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         mBoundsRectF.left = paddingLeft.toFloat()
@@ -377,18 +386,16 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
 
 
     public override fun onSaveInstanceState(): Parcelable {
-        // Force our ancestor class to save its state
         val superState = super.onSaveInstanceState()
         val savedState = SavedState(superState)
-        savedState.progress = mProgress
+        savedState.progress = mProgress // 保存浮点进度
         return savedState
     }
 
     public override fun onRestoreInstanceState(state: Parcelable) {
         val ss = state as SavedState
         super.onRestoreInstanceState(ss.superState)
-
-        progress = ss.progress
+        progress = ss.progress // 恢复浮点进度
     }
 
 
@@ -399,13 +406,9 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
 
     fun setProgressStrokeWidth(progressStrokeWidth: Float) {
         mProgressStrokeWidth = progressStrokeWidth
-
         mProgressRectF.set(mBoundsRectF)
-
         updateProgressShader()
-
         mProgressRectF.inset(mProgressStrokeWidth / 2, mProgressStrokeWidth / 2)
-
         invalidate()
     }
 
@@ -460,7 +463,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         invalidate()
     }
 
-    fun setBlurStyle(blurStyle: Blur?) {
+    fun setBlurStyle(blurStyle: BlurMaskFilter.Blur?) {
         mBlurStyle = blurStyle
         updateMaskBlurFilter()
         invalidate()
@@ -472,7 +475,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         invalidate()
     }
 
-    fun setCap(cap: Cap?) {
+    fun setCap(cap: Paint.Cap?) {
         mCap = cap
         mProgressPaint.strokeCap = cap
         mProgressBackgroundPaint.strokeCap = cap
@@ -489,12 +492,19 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         invalidate()
     }
 
-    var progress: Int
+    // 核心修改：支持 Float 类型的进度值
+    var progress: Float
         get() = mProgress
         set(progress) {
-            mProgress = progress
+            // 限制进度在 0~max 范围内
+            mProgress = progress.coerceIn(0f, mMax)
             invalidate()
         }
+
+    // 重载：支持传入 Int 类型（兼容旧调用）
+    fun setProgress(progress: Int) {
+        this.progress = progress.toFloat()
+    }
 
     var heartRate: Int
         get() = mHeardRate
@@ -503,12 +513,17 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
             invalidate()
         }
 
-    var max: Int
+    var max: Float
         get() = mMax
         set(max) {
             mMax = max
             invalidate()
         }
+
+    // 重载：支持传入 Int 类型的 max（兼容旧调用）
+    fun setMax(max: Int) {
+        this.max = max.toFloat()
+    }
 
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(LINE, SOLID, SOLID_LINE)
@@ -518,14 +533,16 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     @IntDef(LINEAR, RADIAL, SWEEP)
     private annotation class ShaderMode
 
+    // 核心修改：进度格式化器支持 Float 进度
     interface ProgressFormatter {
-        fun format(progress: Int, max: Int): CharSequence
+        fun format(progress: Float, max: Float): CharSequence
     }
 
+    // 核心修改：默认格式化器适配 Float 进度
     private class DefaultProgressFormatter : ProgressFormatter {
         @SuppressLint("DefaultLocale")
-        override fun format(progress: Int, max: Int): CharSequence {
-            return String.format(DEFAULT_PATTERN, (progress.toFloat() / max.toFloat() * 100).toInt())
+        override fun format(progress: Float, max: Float): CharSequence {
+            return String.format(DEFAULT_PATTERN, (progress / max * 100).toInt())
         }
 
         companion object {
@@ -534,22 +551,22 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private class SavedState : BaseSavedState {
-        var progress: Int = 0
+        var progress: Float = 0f // 保存浮点进度
 
         constructor(superState: Parcelable?) : super(superState)
 
         private constructor(parcel: Parcel) : super(parcel) {
-            progress = parcel.readInt()
+            progress = parcel.readFloat() // 读取浮点进度
         }
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
-            out.writeInt(progress)
+            out.writeFloat(progress) // 写入浮点进度
         }
 
         companion object {
             @JvmField
-            val CREATOR: Creator<SavedState> = object : Creator<SavedState> {
+            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
                 override fun createFromParcel(parcel: Parcel): SavedState {
                     return SavedState(parcel)
                 }
@@ -570,7 +587,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         const val RADIAL: Int = 1
         const val SWEEP: Int = 2
 
-        private const val DEFAULT_MAX = 100
+        private const val DEFAULT_MAX = 100f // 改为 Float
         private const val MAX_DEGREE = 360.0f
         private const val LINEAR_START_DEGREE = 90.0f
 
@@ -584,6 +601,5 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
 
         private const val COLOR_FFF2A670 = "#fff2a670"
         private const val COLOR_FFD3D3D5 = "#ffe3e3e5"
-
     }
 }
