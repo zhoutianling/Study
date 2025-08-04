@@ -1,10 +1,8 @@
 package com.zero.study.ui.widget
 
 import android.graphics.Color
-import android.hardware.Camera
 import android.os.SystemClock
 import android.util.Log
-import androidx.camera.core.CameraX
 import androidx.core.util.Pair
 import com.zero.study.listener.BpmListener
 import com.zero.study.model.HeartRateRecordEntity
@@ -46,6 +44,7 @@ class BpmHandler(private val listener: BpmListener?) {
 
     // 心跳时间间隔
     private val intervals = ArrayList<Long>()
+
     private val bpms = ArrayList<Int>()
 
     private var roundStartTime: Long = 0
@@ -59,12 +58,27 @@ class BpmHandler(private val listener: BpmListener?) {
 
     private var lastDynamicSignalTime: Long = 0 // 上次检测到动态信号的时间戳
 
+    // 新增：连续无效帧计数器
+    private var consecutiveInvalidFrames = 0
+    private val MAX_CONSECUTIVE_INVALID_FRAMES = 10 // 连续10帧无效就认为手指离开
+    
+    // 新增：超时检测
+    private var lastValidSignalTime: Long = 0
+    private val FINGER_OUT_TIMEOUT_MS: Long = 3000 // 3秒没有有效信号就认为手指离开
+
     fun handleCamera(data: ByteArray?, width: Int, height: Int) {
         if (data == null) throw NullPointerException()
         if (!processing.compareAndSet(false, true)) return
         val currentTime = SystemClock.elapsedRealtime()
 
-        if (currentTime - lastHandleTime < 50) {
+        // 新增：超时检测
+        if (lastValidSignalTime > 0 && currentTime - lastValidSignalTime > FINGER_OUT_TIMEOUT_MS) {
+            onFingerOut(3) // 3表示超时
+            processing.set(false)
+            return
+        }
+
+        if (currentTime - lastHandleTime < 30) { // 从50ms减少到30ms
             processing.set(false)
             return
         }
@@ -73,7 +87,10 @@ class BpmHandler(private val listener: BpmListener?) {
         //图像处理
         val rgb = decodeRgb(data.clone(), width, height)
         if (rgb[0] < 120) {
-            onFingerOut(1)
+            consecutiveInvalidFrames++
+            if (consecutiveInvalidFrames >= MAX_CONSECUTIVE_INVALID_FRAMES) {
+                onFingerOut(1)
+            }
             processing.set(false)
             return
         }
@@ -111,9 +128,19 @@ class BpmHandler(private val listener: BpmListener?) {
 
         // 只有同时满足 isRedInRange 和 isBrightnessAndSaturationValid，才认为是有效信号
         if (!isRedInRange || !isBrightnessAndSaturationValid) {
+            consecutiveInvalidFrames++
+            if (consecutiveInvalidFrames >= MAX_CONSECUTIVE_INVALID_FRAMES) {
+                onFingerOut(1)
+            }
             processing.set(false)
             return
         }
+
+        // 重置连续无效帧计数器
+        consecutiveInvalidFrames = 0
+
+        // 更新最后有效信号时间
+        lastValidSignalTime = currentTime
 
 
         //计算平均值
@@ -230,6 +257,12 @@ class BpmHandler(private val listener: BpmListener?) {
         error = 0
         beatStamps.clear()
         intervals.clear()
+
+        // 重置连续无效帧计数器
+        consecutiveInvalidFrames = 0
+
+        // 重置超时检测
+        lastValidSignalTime = 0
 
         if (listener != null) {
             listener.onBpm(0, 0)

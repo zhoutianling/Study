@@ -506,6 +506,10 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         this.progress = progress.toFloat()
     }
 
+    fun reset() {
+        this.progress = 0.1f
+    }
+
     var heartRate: Int
         get() = mHeardRate
         set(heartRate) {

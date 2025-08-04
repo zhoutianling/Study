@@ -104,7 +104,9 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
                 processing = false
                 runOnUiThread {
                     vibratorService.stop()
+                    binding.progressBar.reset()
                     progressAnimationHelper?.stop()
+                    binding.animalHeart.progress = 0f
                     binding.animalHeart.cancelAnimation()
                 }
             }
