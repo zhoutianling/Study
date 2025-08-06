@@ -180,7 +180,6 @@ object NotificationManager {
         notificationManager.notify(BANNER_NOTIFICATION_ID, bannerNotification)
     }
 
-    @SuppressLint("RemoteViewLayout")
     fun showCustomNotification(context: Context) {
         val notificationManager = NotificationManagerCompat.from(context)
         val remoteViews = RemoteViews(context.packageName, R.layout.layout_custom_notification)
@@ -191,7 +190,7 @@ object NotificationManager {
         } else {
             NotificationCompat.Builder(context, "customChannelId")
         }.apply {
-            setSmallIcon(R.mipmap.ic_launcher)//小图标（显示在状态栏）
+            setSmallIcon(R.mipmap.ic_launcher)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setCustomContentView(remoteViews)
             setCustomBigContentView(bigRemoteViews)

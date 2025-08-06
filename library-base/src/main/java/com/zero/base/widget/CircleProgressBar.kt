@@ -1,5 +1,6 @@
 package com.zero.base.widget
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
@@ -95,11 +96,82 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
     private var heartBitmapHeight: Int = 30.dp
     private var heartBitmapWidth: Int = 30.dp
     private val margin = 10.dp
-    private var heartCacheBitmap: Bitmap? = null
+
+    // 心跳动画相关
+    private var heartBeatAnimator: ValueAnimator? = null
+    private var heartScale = 1.0f
+    private var isHeartBeating = false
+    private var heartBeatDuration = 800L // 心跳周期，根据心率动态调整
 
     init {
         initFromAttributes(context, attrs)
         initPaint()
+        startHeartBeatAnimation()
+    }
+
+    /**
+     * 开始心跳动画
+     */
+    private fun startHeartBeatAnimation() {
+        stopHeartBeatAnimation()
+        
+        heartBeatAnimator = ValueAnimator.ofFloat(1.0f, 1.3f, 1.0f).apply {
+            duration = heartBeatDuration
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.RESTART
+            
+            addUpdateListener { animator ->
+                heartScale = animator.animatedValue as Float
+                invalidate()
+            }
+        }
+        heartBeatAnimator?.start()
+        isHeartBeating = true
+    }
+
+    /**
+     * 停止心跳动画
+     */
+    private fun stopHeartBeatAnimation() {
+        heartBeatAnimator?.let {
+            it.cancel()
+            it.removeAllUpdateListeners()
+        }
+        heartBeatAnimator = null
+        isHeartBeating = false
+        heartScale = 1.0f
+    }
+
+    /**
+     * 根据心率更新心跳动画速度
+     */
+    fun updateHeartBeatSpeed(heartRate: Int) {
+        if (heartRate > 0) {
+            // 根据心率计算心跳周期，心率越高周期越短
+            heartBeatDuration = (60000L / heartRate).coerceIn(400L, 1200L)
+            
+            // 如果动画正在运行，重新启动以应用新的速度
+            if (isHeartBeating) {
+                startHeartBeatAnimation()
+            }
+        }
+    }
+
+    /**
+     * 开始心跳动画
+     */
+    fun startHeartBeat() {
+        if (!isHeartBeating) {
+            startHeartBeatAnimation()
+        }
+    }
+
+    /**
+     * 停止心跳动画
+     */
+    fun stopHeartBeat() {
+        stopHeartBeatAnimation()
+        invalidate()
     }
 
     /**
@@ -247,9 +319,23 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         mProgressTextPaint.getTextBounds(progressText, 0, progressText.length, mProgressTextRect)
         val textBaseY = mCenterY + mProgressTextRect.height() / 2
 
-        // 只绘制缓存图片
-        heartCacheBitmap?.let {
-            canvas.drawBitmap(it, 0f, 0f, null)
+        // 绘制带心跳动画的爱心图片
+        heartBitmap?.let { bitmap ->
+            canvas.save()
+            // 计算缩放后的位置，保持居中
+            val scaledWidth = heartBitmapWidth * heartScale
+            val scaledHeight = heartBitmapHeight * heartScale
+            val offsetX = (scaledWidth - heartBitmapWidth) / 2
+            val offsetY = (scaledHeight - heartBitmapHeight) / 2
+            
+            // 应用缩放变换
+            canvas.translate(heartBitmapDrawLeft - offsetX, heartBitmapDrawTop - offsetY)
+            canvas.scale(heartScale, heartScale)
+            
+            // 绘制爱心图片
+            canvas.drawBitmap(bitmap, 0f, 0f, null)
+            
+            canvas.restore()
         }
 
         // 再绘制进度文本
@@ -375,13 +461,6 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         val progressTextTop = textBaseY - mProgressTextRect.height()
         heartBitmapDrawLeft = mCenterX - heartBitmapWidth / 2f
         heartBitmapDrawTop = progressTextTop - margin - heartBitmapHeight
-
-        // 生成缓存 Bitmap，只绘制一次图片
-        if (heartBitmap != null && width > 0 && height > 0) {
-            heartCacheBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val cacheCanvas = Canvas(heartCacheBitmap!!)
-            cacheCanvas.drawBitmap(heartBitmap!!, heartBitmapDrawLeft, heartBitmapDrawTop, null)
-        }
     }
 
 
@@ -396,6 +475,20 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         val ss = state as SavedState
         super.onRestoreInstanceState(ss.superState)
         progress = ss.progress // 恢复浮点进度
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        // 当View附加到窗口时，如果心率大于0则开始心跳动画
+        if (mHeardRate > 0) {
+            startHeartBeat()
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        // 当View从窗口分离时，停止心跳动画
+        stopHeartBeat()
     }
 
 
@@ -514,6 +607,7 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
         get() = mHeardRate
         set(heartRate) {
             mHeardRate = heartRate
+            updateHeartBeatSpeed(heartRate)
             invalidate()
         }
 

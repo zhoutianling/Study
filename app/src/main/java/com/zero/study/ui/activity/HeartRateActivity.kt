@@ -94,7 +94,7 @@ class HeartRateActivity : BaseActivity<ActivityHeartRateBinding>(ActivityHeartRa
                     return
                 }
                 runOnUiThread {
-                    binding.progressBar.heartRate = bpm
+//                    binding.progressBar.heartRate = bpm
                 }
             }
 

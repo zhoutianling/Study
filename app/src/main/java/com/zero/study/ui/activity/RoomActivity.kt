@@ -1,7 +1,6 @@
 package com.zero.study.ui.activity
 
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -17,11 +16,9 @@ import com.zero.study.db.UserDao
 import com.zero.study.db.entity.Dog
 import com.zero.study.db.entity.User
 import com.zero.study.ui.adapter.UserAdapter
-import com.zero.study.ui.dialog.MiniDialogFragment
-import com.zero.study.ui.model.AskViewModel
+import com.zero.study.ui.dialog.Dialog
 import com.zero.study.ui.model.UserViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -61,7 +58,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
             singleDel(user)
         }
         binding.queryFuzzy.setOnClickListener {
-            MiniDialogFragment.Builder().setTitle("Fuzzy Query").setCancelText("Cancel").setConfirmText("OK").setCancelOnTouchOutSide(false).setOnClickListener { input ->
+            Dialog.Builder().setTitle("Fuzzy Query").setCancelText("Cancel").setConfirmText("OK").setCancelOnTouchOutSide(false).setOnClickListener { input ->
                 query(keyWord = input)
             }.build().show(supportFragmentManager, "CreateFolderDialog")
         }

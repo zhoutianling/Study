@@ -49,9 +49,9 @@ import com.zero.study.ui.activity.PermissionManagerActivity
 import com.zero.study.ui.activity.RecyclerViewActivity
 import com.zero.study.ui.activity.RoomActivity
 import com.zero.study.ui.activity.SecondActivity
-import com.zero.study.ui.activity.SelectorActivity
 import com.zero.study.ui.activity.TakePhotoActivity
-import com.zero.study.ui.dialog.MiniDialogFragment
+import com.zero.study.ui.dialog.BottomSheetDialog
+import com.zero.study.ui.dialog.Dialog
 import com.zero.study.ui.model.AskViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -118,7 +118,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 11 -> context?.startActivity<LanguageActivity>()
                 12 -> context?.startActivity<AccessPerActivity>()
                 13 -> {
-                    MiniDialogFragment.Builder().setTitle("Custom Title").setCancelText("Exit").setConfirmText("Confirm").setCancelOnTouchOutSide(false).setOnClickListener { input ->
+                    Dialog.Builder().setTitle("Custom Title").setCancelText("Exit").setConfirmText("Confirm").setCancelOnTouchOutSide(false).setOnClickListener { input ->
                         Toast.makeText(requireContext(), input, Toast.LENGTH_SHORT).show()
                     }.build().show(childFragmentManager, "Dialog")
                 }
@@ -162,6 +162,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 25 -> {
                     "EventBus post".log("zzz")
                     RxBus.getInstance().post(MsgEvent("time:${System.currentTimeMillis()}"))
+                    BottomSheetDialog.Builder().setTitle(getString(R.string.dialog_title)).setCancelText(getString(R.string.dialog_cancel)).setConfirmText(getString(R.string.dialog_confirm)).build().show(childFragmentManager, "BottomSheetDialog")
                 }
 
                 else -> ThreadPool.execute { Log.i("zzz", "ThreadName:" + Thread.currentThread().name) }

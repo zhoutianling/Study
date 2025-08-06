@@ -41,4 +41,7 @@
     <string name="running">Running</string>
     <string name="swimming">Swimming</string>
     <string name="measure_progress">Measuring…(%d%%)</string>
+    <string name="dialog_title">Exist App?</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_confirm">Confirm</string>
 </resources>

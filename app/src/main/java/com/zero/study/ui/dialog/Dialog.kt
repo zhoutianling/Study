@@ -19,7 +19,7 @@ import com.zero.study.databinding.DialogFragmentBinding
  * @date:2024/9/3 18:53
  * @path:com.zero.study.ui.dialog.DialogFragment
  */
-class MiniDialogFragment : DialogFragment() {
+class Dialog : DialogFragment() {
 
     private var _binding: DialogFragmentBinding? = null
     private val binding get() = _binding!!
@@ -68,7 +68,7 @@ class MiniDialogFragment : DialogFragment() {
     }
 
     class Builder {
-        private val dialogFragment = MiniDialogFragment()
+        private val dialogFragment = Dialog()
 
         fun setTitle(title: String): Builder {
             dialogFragment.title = title

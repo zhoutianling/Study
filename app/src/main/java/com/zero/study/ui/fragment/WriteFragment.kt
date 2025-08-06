@@ -1,13 +1,9 @@
 package com.zero.study.ui.fragment
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.os.Environment
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.zero.base.ext.checkPermission
@@ -25,7 +21,7 @@ import com.zero.base.util.FileUtils.listFilesByFolderName
 import com.zero.base.util.FileUtils.writeContentToFile
 import com.zero.base.util.ToastUtil
 import com.zero.study.databinding.FragmentWriteBinding
-import com.zero.study.ui.dialog.MiniDialogFragment
+import com.zero.study.ui.dialog.Dialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -116,7 +112,7 @@ class WriteFragment : BaseFragment<FragmentWriteBinding>(FragmentWriteBinding::i
                 }
 
                 6 -> {
-                    MiniDialogFragment.Builder().setTitle("Create Folder").setCancelText("Cancel").setConfirmText("OK").setCancelOnTouchOutSide(false).setOnClickListener { input ->
+                    Dialog.Builder().setTitle("Create Folder").setCancelText("Cancel").setConfirmText("OK").setCancelOnTouchOutSide(false).setOnClickListener { input ->
                         lifecycleScope.launch {
                             val result: Result<String> = createFolder(requireContext(), input)
                             result.fold(onSuccess = { msg ->
