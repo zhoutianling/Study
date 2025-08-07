@@ -9,7 +9,7 @@ class HealthService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        NotifyHelper.showMainNotification(this)
+        NotifyHelper.showToolsNotification(this)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {

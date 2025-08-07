@@ -24,14 +24,15 @@
         android:orientation="vertical"
         android:padding="6dp">
 
-        <!-- 时间 -->
-        <TextView
-            android:id="@+id/tv_remind_title"
+        <TextClock
+            android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:format12Hour="hh:mm"
+            android:format24Hour="HH:mm"
+            android:gravity="center"
             android:textColor="@color/health_notification_title"
-            android:textStyle="bold"
-            tools:text="15:00" />
+            android:textStyle="bold" />
 
         <!-- 提醒文字 -->
         <TextView

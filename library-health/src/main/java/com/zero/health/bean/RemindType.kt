@@ -11,34 +11,53 @@ import com.zero.health.R
  */
 
 object RemindType {
-    // 常量值
-    const val HEALTH_MAIN = 0
+    /**
+     * 工具栏
+     */
+    const val HEALTH_TOOLS = 0
+
+    /**
+     * 血压
+     */
     const val BLOOD_PRESSURE = 1
+
+    /**
+     * 心率
+     */
     const val HEART_RATE = 2
+
+    /**
+     * 血糖
+     */
     const val BLOOD_GLUCOSE = 3
 
-    private const val MAIN_NOTIFICATION_ID = 0x10011
-    private const val REMIND_BLOOD_PRESSURE_NOTIFICATION_ID = 0x10012
-    private const val REMIND_HEART_RATE_NOTIFICATION_ID = 0x10013
-    private const val REMIND_BLOOD_GLUCOSE_NOTIFICATION_ID = 0x10014
+    private const val TOOLS_NOTIFICATION_ID = 0x10011
+    private const val ALARM_BLOOD_PRESSURE_NOTIFICATION_ID = 0x10012
+    private const val ALARM_HEART_RATE_NOTIFICATION_ID = 0x10013
+    private const val ALARM_BLOOD_GLUCOSE_NOTIFICATION_ID = 0x10014
 
-    private const val CHANNEL_ID_MAIN = "com.oasis.health.reminder.main"
-    private const val CHANNEL_ID_BLOOD_PRESSURE = "com.oasis.health.reminder.blood_pressure"
-    private const val CHANNEL_ID_HEART_RATE = "com.oasis.health.reminder.heart_rate"
-    private const val CHANNEL_ID_BLOOD_GLUCOSE = "com.oasis.health.reminder.blood_glucose"
+    private const val CHANNEL_ID_TOOLS = "com.oasis.health.tools"
+    private const val CHANNEL_ID_ALARM = "com.oasis.health.alarm"
 
     // 注解限制参数只能是以上常量
-    @IntDef(HEALTH_MAIN, BLOOD_PRESSURE, HEART_RATE, BLOOD_GLUCOSE)
+    @IntDef(HEALTH_TOOLS, BLOOD_PRESSURE, HEART_RATE, BLOOD_GLUCOSE)
     @Retention(AnnotationRetention.SOURCE)
     annotation class Type
 
-    @StringRes
-    fun getTypeName(@Type type: Int): Int {
+
+    fun getChannelId(@Type type: Int): String {
         return when (type) {
-            BLOOD_PRESSURE -> R.string.blood_pressure
-            HEART_RATE -> R.string.heart_rate
-            BLOOD_GLUCOSE -> R.string.blood_glucose
-            HEALTH_MAIN -> R.string.health_main
+            BLOOD_PRESSURE, HEART_RATE, BLOOD_GLUCOSE -> CHANNEL_ID_ALARM
+            HEALTH_TOOLS -> CHANNEL_ID_TOOLS
+            else -> throw IllegalArgumentException("Invalid reminder type")
+        }
+    }
+
+    @StringRes
+    fun getChannelName(@Type type: Int): Int {
+        return when (type) {
+            BLOOD_PRESSURE, HEART_RATE, BLOOD_GLUCOSE -> R.string.health_alarm
+            HEALTH_TOOLS -> R.string.health_tools
             else -> throw IllegalArgumentException("Invalid reminder type")
         }
     }
@@ -49,27 +68,34 @@ object RemindType {
             BLOOD_PRESSURE -> R.drawable.ic_blood_pressure
             HEART_RATE -> R.drawable.ic_heart_rate
             BLOOD_GLUCOSE -> R.drawable.ic_blood_glucose
-            HEALTH_MAIN -> R.drawable.ic_alarm_clock
+            HEALTH_TOOLS -> R.drawable.ic_alarm_clock
             else -> throw IllegalArgumentException("Invalid reminder type")
         }
     }
 
-    fun getNotificationChannelId(@Type type: Int): String {
+    @DrawableRes
+    fun getSmallIcon(@Type type: Int): Int {
         return when (type) {
-            BLOOD_PRESSURE -> CHANNEL_ID_BLOOD_PRESSURE
-            HEART_RATE -> CHANNEL_ID_HEART_RATE
-            BLOOD_GLUCOSE -> CHANNEL_ID_BLOOD_GLUCOSE
-            HEALTH_MAIN -> CHANNEL_ID_MAIN
+            BLOOD_PRESSURE, HEART_RATE, BLOOD_GLUCOSE, HEALTH_TOOLS -> R.drawable.ic_heart_rate
+            else -> throw IllegalArgumentException("Invalid reminder type")
+        }
+    }
+
+
+    fun getGroupKey(@Type type: Int): String {
+        return when (type) {
+            BLOOD_PRESSURE, HEART_RATE, BLOOD_GLUCOSE -> "TOOLS_GROUP"
+            HEALTH_TOOLS -> "ALARM_GROUP"
             else -> throw IllegalArgumentException("Invalid reminder type")
         }
     }
 
     fun getNotificationId(@Type type: Int): Int {
         return when (type) {
-            BLOOD_PRESSURE -> REMIND_BLOOD_PRESSURE_NOTIFICATION_ID
-            HEART_RATE -> REMIND_HEART_RATE_NOTIFICATION_ID
-            BLOOD_GLUCOSE -> REMIND_BLOOD_GLUCOSE_NOTIFICATION_ID
-            HEALTH_MAIN -> MAIN_NOTIFICATION_ID
+            BLOOD_PRESSURE -> ALARM_BLOOD_PRESSURE_NOTIFICATION_ID
+            HEART_RATE -> ALARM_HEART_RATE_NOTIFICATION_ID
+            BLOOD_GLUCOSE -> ALARM_BLOOD_GLUCOSE_NOTIFICATION_ID
+            HEALTH_TOOLS -> TOOLS_NOTIFICATION_ID
             else -> throw IllegalArgumentException("Invalid reminder type")
         }
     }

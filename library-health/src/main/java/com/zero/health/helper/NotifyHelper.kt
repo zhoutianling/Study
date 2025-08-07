@@ -23,13 +23,17 @@ import java.util.Date
  * @path:com.zero.health.helper.NotifyHelper
  */
 object NotifyHelper {
-    //自定义通知Id
-    fun showMainNotification(context: Service) {
+    /**
+     * 常驻通知(静音，无悬浮，不能自动取消也无法手动删除)
+     */
+    fun showToolsNotification(context: Service) {
         val mainNotification = context.createNotification {
             isPermanent = true
-            iconRes = RemindType.getTypeIcon(RemindType.HEALTH_MAIN)
-            channelId = RemindType.getNotificationChannelId(RemindType.HEALTH_MAIN)
-            channelName = context.getString(RemindType.getTypeName(RemindType.HEALTH_MAIN))
+            smallIcon = RemindType.getSmallIcon(RemindType.HEALTH_TOOLS)
+            importance = NotificationManagerCompat.IMPORTANCE_LOW
+            iconRes = RemindType.getTypeIcon(RemindType.HEALTH_TOOLS)
+            channelId = RemindType.getChannelId(RemindType.HEALTH_TOOLS)
+            channelName = context.getString(RemindType.getChannelName(RemindType.HEALTH_TOOLS))
             remoteViews = RemoteViews(context.packageName, R.layout.notification_main_normal).apply {
                 remoteViews?.setTextViewText(R.id.tv_blood_pressure_value, "No Record")
                 val flag = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
@@ -40,17 +44,22 @@ object NotifyHelper {
 
             }
         }
-        context.startForeground(RemindType.getNotificationId(RemindType.HEALTH_MAIN), mainNotification)
+        context.startForeground(RemindType.getNotificationId(RemindType.HEALTH_TOOLS), mainNotification)
     }
 
-    fun showRemindNotification(context: Context, @RemindType.Type type: Int) {
+    /**
+     * 闹钟通知(立即弹出，有声音，可以自动取消)
+     *
+     */
+    fun showAlarmNotification(context: Context, @RemindType.Type type: Int) {
         val remindNotification = context.createNotification {
             iconRes = RemindType.getTypeIcon(type)
-            channelId = RemindType.getNotificationChannelId(type)
-            channelName = context.getString(RemindType.getTypeName(type))
+            smallIcon = RemindType.getSmallIcon(type)
+            channelId = RemindType.getChannelId(type)
+            importance = NotificationManagerCompat.IMPORTANCE_HIGH
+            channelName = context.getString(RemindType.getChannelName(type))
             remoteViews = RemoteViews(context.packageName, R.layout.notification_remind_normal).apply {
                 setImageViewResource(R.id.iv_remind_logo, iconRes)
-                setTextViewText(R.id.tv_remind_title, Date().formatHourMinute)
                 setTextViewText(R.id.tv_remind_content, channelName)
                 setTextViewText(R.id.tv_record, context.getString(R.string.health_record))
             }
