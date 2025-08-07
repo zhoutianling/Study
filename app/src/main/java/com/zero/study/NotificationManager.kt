@@ -1,7 +1,6 @@
 package com.zero.study
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -180,7 +179,7 @@ object NotificationManager {
         notificationManager.notify(BANNER_NOTIFICATION_ID, bannerNotification)
     }
 
-    fun showCustomNotification(context: Context) {
+    fun showMainNotification(context: Context) {
         val notificationManager = NotificationManagerCompat.from(context)
         val remoteViews = RemoteViews(context.packageName, R.layout.layout_custom_notification)
         val bigRemoteViews = RemoteViews(context.packageName, R.layout.layout_custom_notification_big)
@@ -202,4 +201,5 @@ object NotificationManager {
         }
         notificationManager.notify(CUSTOM_NOTIFICATION_ID, customNotification)
     }
+
 }

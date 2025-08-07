@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="health_1dp">1dp</dimen>
+    <dimen name="health_2dp">2dp</dimen>
+    <dimen name="health_5dp">5dp</dimen>
+    <dimen name="health_6dp">6dp</dimen>
+    <dimen name="health_7dp">7dp</dimen>
+    <dimen name="health_8dp">8dp</dimen>
+    <dimen name="health_10dp">10dp</dimen>
+    <dimen name="health_15dp">15dp</dimen>
+    <dimen name="health_20dp">20dp</dimen>
+    <dimen name="health_30dp">30dp</dimen>
+    <dimen name="health_32dp">32dp</dimen>
+    <dimen name="health_40dp">40dp</dimen>
+    <dimen name="health_48dp">48dp</dimen>
+    <dimen name="health_50dp">50dp</dimen>
+    <dimen name="health_60dp">60dp</dimen>
+    <dimen name="health_61dp">61dp</dimen>
+    <dimen name="health_62dp">62dp</dimen>
+    <dimen name="health_65dp">65dp</dimen>
+    <dimen name="health_80dp">80dp</dimen>
+    <dimen name="health_150dp">150dp</dimen>
+    <dimen name="health_160dp">160dp</dimen>
+    <dimen name="health_180dp">180dp</dimen>
+    <dimen name="health_200dp">200dp</dimen>
+    <dimen name="health_240dp">240dp</dimen>
+    <dimen name="health_250dp">250dp</dimen>
+</resources>

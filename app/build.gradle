@@ -117,8 +117,6 @@ dependencies {
     androidTestImplementation libs.ext.junit
     implementation project(path: ':library-admob')
     implementation project(path: ':library-base')
+    implementation project(path: ':library-health')
     ksp libs.androidx.room.compiler
-    implementation libs.androidx.camera.camera2
-    implementation libs.androidx.camera.lifecycle
-    implementation libs.androidx.camera.view
 }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <!-- 血压计图标 -->
+    <ImageView
+        android:id="@+id/iv_remind_logo"
+        android:layout_width="@dimen/health_48dp"
+        android:layout_height="@dimen/health_48dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/app_name"
+        tools:src="@drawable/ic_blood_pressure" />
+
+    <!-- 时间和提醒内容 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <!-- 时间 -->
+        <TextView
+            android:id="@+id/tv_remind_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/health_notification_title"
+            android:textStyle="bold"
+            tools:text="15:00" />
+
+        <!-- 提醒文字 -->
+        <TextView
+            android:id="@+id/tv_remind_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/health_notification_content"
+            android:textSize="12sp"
+            tools:text="是时候记录您的血压了!" />
+
+    </LinearLayout>
+
+    <!-- 记录按钮 -->
+    <TextView
+        android:id="@+id/tv_record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/green_button_bg"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="@string/health_record" />
+
+</LinearLayout>
+

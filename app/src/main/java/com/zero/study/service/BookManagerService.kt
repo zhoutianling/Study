@@ -8,9 +8,6 @@ import android.os.RemoteException
 import android.os.SystemClock
 import android.util.Log
 import com.zero.study.NotificationManager
-import com.zero.study.R
-import com.zero.study.db.BookDao
-import com.zero.study.db.DbManager
 import com.zero.study.ipc.Book
 import com.zero.study.ipc.IBookManager
 import com.zero.study.ipc.IOnNewBookCallback
@@ -28,7 +25,7 @@ open class BookManagerService : Service() {
         super.onCreate()
         mBookList.add(Book(name = "android群英传"))
         mBookList.add(Book(name = "android开发艺术探索"))
-        NotificationManager.showBackgroundNotification(this@BookManagerService, getString(R.string.app_name), "后台运行中，请勿退出...")
+        NotificationManager.showMainNotification(this@BookManagerService)
     }
 
 

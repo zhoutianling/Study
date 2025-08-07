@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="health_notification_title">#FFFFFF</color>
+    <color name="health_notification_content">#FFFFFF</color>
+    <color name="health_notification_background">#FF000000</color>
+    <color name="health_notification_black">#FF000000</color>
+    <color name="health_notification_gray">#B9BBBE</color>
+</resources>

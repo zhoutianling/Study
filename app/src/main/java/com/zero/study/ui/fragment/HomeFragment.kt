@@ -32,13 +32,13 @@ import com.zero.base.fragment.LoadingDialog
 import com.zero.base.util.PermissionUtils
 import com.zero.base.util.ThreadPool
 import com.zero.base.util.ToastUtil
+import com.zero.health.ui.activity.HeartRateActivity
 import com.zero.study.R
 import com.zero.study.databinding.FragmentHomeBinding
 import com.zero.study.event.MsgEvent
 import com.zero.study.ui.activity.AccessPerActivity
 import com.zero.study.ui.activity.AnimationActivity
 import com.zero.study.ui.activity.GuideActivity
-import com.zero.study.ui.activity.HeartRateActivity
 import com.zero.study.ui.activity.InterstitialActivity
 import com.zero.study.ui.activity.LanguageActivity
 import com.zero.study.ui.activity.MainActivity

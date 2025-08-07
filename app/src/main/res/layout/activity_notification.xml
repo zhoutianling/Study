@@ -39,8 +39,38 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/appThemeColor"
-        android:text="显示自定义通知"
+        android:text="常驻通知"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_show_banner" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_blood_pressure"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/appThemeColor"
+        android:text="血压提醒"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_show_custom" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_heart_rate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/appThemeColor"
+        android:text="心率提醒"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_blood_pressure" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_blood_glucose"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/appThemeColor"
+        android:text="血糖提醒"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_heart_rate" />
 </androidx.constraintlayout.widget.ConstraintLayout>

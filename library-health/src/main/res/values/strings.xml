@@ -1,0 +1,16 @@
+<resources>
+    <string name="health_record">Record</string>
+    <string name="sitting">Sitting</string>
+    <string name="walking">Walking</string>
+    <string name="lying_down">Lying down</string>
+    <string name="running">Running</string>
+    <string name="swimming">Swimming</string>
+    <string name="measure_progress">Measuring…(%d%%)</string>
+    <string name="health_main">Health</string>
+    <string name="blood_pressure">Blood Pressure</string>
+    <string name="heart_rate">Heart Rate</string>
+    <string name="blood_glucose">Blood Glucose</string>
+    <string name="notification_channel_blood_pressure">Blood Pressure Remind</string>
+    <string name="notification_channel_blood_glucose">Blood Glucose Remind</string>
+    <string name="notification_channel_heart_rate">Heart Rate Remind</string>
+</resources>

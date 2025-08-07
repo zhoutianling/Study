@@ -35,12 +35,6 @@
         但是材料他都有人工费可以不算；索大保养刀用的毛巾和油，这个不能省但是便宜；布鲁克每天都要喝的牛奶，这个也便宜；
         还有山治的厨具，也很便宜。罗宾娜美不怎么花钱，穷人的孩子早当家\n\n
     </string>
-    <string name="sitting">Sitting</string>
-    <string name="walking">Walking</string>
-    <string name="lying_down">Lying down</string>
-    <string name="running">Running</string>
-    <string name="swimming">Swimming</string>
-    <string name="measure_progress">Measuring…(%d%%)</string>
     <string name="dialog_title">Exist App?</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_confirm">Confirm</string>
