@@ -12,6 +12,7 @@ import com.zero.base.ext.readJson
 import com.zero.base.ext.requestPermission
 import com.zero.base.ext.saveImageToGallery
 import com.zero.base.ext.saveImageToPrivateDir
+import com.zero.base.ext.toast
 import com.zero.base.fragment.BaseFragment
 import com.zero.base.util.CordTimer
 import com.zero.base.util.FileUtils
@@ -19,7 +20,6 @@ import com.zero.base.util.FileUtils.createFolder
 import com.zero.base.util.FileUtils.deleteFilesByFolder
 import com.zero.base.util.FileUtils.listFilesByFolderName
 import com.zero.base.util.FileUtils.writeContentToFile
-import com.zero.base.util.ToastUtil
 import com.zero.study.databinding.FragmentWriteBinding
 import com.zero.study.ui.dialog.Dialog
 import kotlinx.coroutines.Dispatchers
@@ -85,11 +85,11 @@ class WriteFragment : BaseFragment<FragmentWriteBinding>(FragmentWriteBinding::i
                         results.forEach { result ->
                             result.fold(onSuccess = { msg ->
                                 withContext(Dispatchers.Main) {
-                                    ToastUtil.showShort(requireContext(), msg)
+                                    requireContext().toast(msg)
                                 }
                             }, onFailure = { exception ->
                                 withContext(Dispatchers.Main) {
-                                    ToastUtil.showShort(requireContext(), exception.message!!)
+                                    requireContext().toast(exception.message)
                                 }
                             })
                         }
@@ -99,7 +99,7 @@ class WriteFragment : BaseFragment<FragmentWriteBinding>(FragmentWriteBinding::i
                 3 -> {
                     lifecycleScope.launch {
                         val deleteCount = deleteFilesByFolder(requireContext(), "少儿动画")
-                        ToastUtil.showShort(requireContext(), "$deleteCount files deleted")
+                        requireContext().toast("$deleteCount files deleted")
                     }
 
                 }
@@ -117,11 +117,11 @@ class WriteFragment : BaseFragment<FragmentWriteBinding>(FragmentWriteBinding::i
                             val result: Result<String> = createFolder(requireContext(), input)
                             result.fold(onSuccess = { msg ->
                                 withContext(Dispatchers.Main) {
-                                    ToastUtil.showShort(requireContext(), msg)
+                                    requireContext().toast(msg)
                                 }
                             }, onFailure = { exception ->
                                 withContext(Dispatchers.Main) {
-                                    ToastUtil.showShort(requireContext(), exception.message!!)
+                                    requireContext().toast(exception.message)
                                 }
                             })
                         }

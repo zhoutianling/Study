@@ -1,14 +1,13 @@
 package com.zero.study.ui.activity
 
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.zero.base.activity.BaseActivity
-import com.zero.base.util.ToastUtil
+import com.zero.base.ext.toast
 import com.zero.study.databinding.ActivityRoomBinding
 import com.zero.study.db.DbManager
 import com.zero.study.db.UserDao
@@ -75,7 +74,7 @@ class PagingActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::in
             lifecycleScope.launch(Dispatchers.IO) {
                 userDao.deleteSingle(user)
                 withContext(Dispatchers.Main) {
-                    ToastUtil.showShort(this@PagingActivity, "删除单条数据成功")
+                    this@PagingActivity.toast("删除单条数据成功")
                 }
             }
         }
@@ -95,7 +94,7 @@ class PagingActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::in
                 }
                 val count = userDao.insertUserList(mutableList)
                 withContext(Dispatchers.Main) {
-                    ToastUtil.showShort(this@PagingActivity, "批量新增${count}条数据")
+                    this@PagingActivity.toast("批量新增${count}条数据")
                 }
             }
         }

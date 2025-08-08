@@ -1,8 +1,5 @@
 package com.zero.study.ui.dialog
 
-import android.app.Dialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -14,7 +11,7 @@ import android.view.Window
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.zero.base.util.ToastUtil
+import com.zero.base.ext.toast
 import com.zero.study.R
 import com.zero.study.databinding.BottomDialogFragmentBinding
 
@@ -57,7 +54,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         binding.tvConfirm.setOnClickListener {
             val inputContent = binding.etInput.text.toString().trim()
             if (TextUtils.isEmpty(inputContent)) {
-                ToastUtil.showShort(view.context, "Input content is empty!")
+                view.context.toast("Input content is empty!")
                 return@setOnClickListener
             }
             onClickListener.invoke(inputContent)

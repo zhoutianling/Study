@@ -5,4 +5,8 @@
     <color name="health_notification_background">#FF000000</color>
     <color name="health_notification_black">#FF000000</color>
     <color name="health_notification_gray">#B9BBBE</color>
+    <color name="health_progress_color">#F37168</color>
+    <color name="health_black_color">#000000</color>
+    <color name="health_white_color">#FFFFFF</color>
+    <color name="health_progress_background_color">#FEF1F0</color>
 </resources>

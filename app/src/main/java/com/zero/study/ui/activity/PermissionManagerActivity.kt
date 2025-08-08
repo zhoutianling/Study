@@ -7,8 +7,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.zero.base.util.PermissionUtils.applyOverlay
-import com.zero.base.util.PermissionUtils.hasOverlayPermission
+import com.zero.base.ext.applyOverlay
+import com.zero.base.ext.hasOverlayPermission
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,11 +22,11 @@ class PermissionManagerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (hasOverlayPermission(this@PermissionManagerActivity)) {
+        if (this@PermissionManagerActivity.hasOverlayPermission()) {
             Toast.makeText(this@PermissionManagerActivity, "Overlay Access", Toast.LENGTH_SHORT).show()
             finishAndRemoveTask()
         } else {
-            applyOverlay(this@PermissionManagerActivity)
+            this@PermissionManagerActivity.applyOverlay()
             lifecycleScope.launch {
                 delay(200)
                 PermissionOverlayHelpActivity.start(this@PermissionManagerActivity)
@@ -41,7 +41,7 @@ class PermissionManagerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             while (!hasOverlay) {
                 Log.d("ZZZ", "checkPermission: false")
-                if (hasOverlayPermission(this@PermissionManagerActivity)) {
+                if (this@PermissionManagerActivity.hasOverlayPermission()) {
                     Log.d("ZZZ", "checkPermission: true")
                     finishAndRemoveTask()
                     lifecycleScope.cancel()

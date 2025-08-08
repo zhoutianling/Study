@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.os.Process
+import android.util.Log
 import com.toolkit.admob.manager.AdMobManager.initLifecycle
 import com.zero.base.net.RetrofitManager
 import com.zero.base.util.StorageUtils

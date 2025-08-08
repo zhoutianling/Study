@@ -23,15 +23,16 @@ import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.zero.base.activity.BaseActivity
 import com.zero.base.bus.RxBus
+import com.zero.base.ext.appFileManager
 import com.zero.base.ext.fromJson
 import com.zero.base.ext.log
 import com.zero.base.ext.readJson
 import com.zero.base.ext.startActivity
+import com.zero.base.ext.toast
 import com.zero.base.fragment.BaseFragment
 import com.zero.base.fragment.LoadingDialog
-import com.zero.base.util.PermissionUtils
 import com.zero.base.util.ThreadPool
-import com.zero.base.util.ToastUtil
+import com.zero.health.ui.activity.AlarmRemindActivity
 import com.zero.health.ui.activity.HeartRateActivity
 import com.zero.study.R
 import com.zero.study.databinding.FragmentHomeBinding
@@ -136,7 +137,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     viewModel.fetchAskPageList()
                     viewModel.apply {
                         viewModel.articlePageListLiveData.observe(this@HomeFragment) {
-                            ToastUtil.showShort(requireContext(), it?.datas.toString())
+                            requireContext().toast(it?.datas.toString())
                         }
                     }
                 }
@@ -144,7 +145,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 17 -> context?.startActivity<RoomActivity>()
                 18 -> context?.startActivity<PagingActivity>()
                 19 -> context?.startActivity<OkioActivity>()
-                20 -> PermissionUtils.appFileManager(requireContext())
+                20 -> context?.appFileManager()
                 21 -> {
                     parentFragmentManager.setFragmentResult("changeTheme", bundleOf())
                 }
@@ -164,6 +165,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     RxBus.getInstance().post(MsgEvent("time:${System.currentTimeMillis()}"))
                     BottomSheetDialog.Builder().setTitle(getString(R.string.dialog_title)).setCancelText(getString(R.string.dialog_cancel)).setConfirmText(getString(R.string.dialog_confirm)).build().show(childFragmentManager, "BottomSheetDialog")
                 }
+
+                26 -> context?.startActivity<AlarmRemindActivity>()
 
                 else -> ThreadPool.execute { Log.i("zzz", "ThreadName:" + Thread.currentThread().name) }
             }
@@ -217,7 +220,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         if (granted) {
             deleteFile()
         } else {
-            ToastUtil.showShort(requireContext(), "Permission denied")
+            requireContext().toast("Permission denied")
         }
     }
 
@@ -238,7 +241,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         if (granted) {
             selectSinglePhotoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         } else {
-            ToastUtil.showShort(requireContext(), "Permission denied")
+            requireContext().toast("Permission denied")
         }
     }
 

@@ -15,4 +15,10 @@
     <string name="notification_channel_blood_pressure">Blood Pressure Remind</string>
     <string name="notification_channel_blood_glucose">Blood Glucose Remind</string>
     <string name="notification_channel_heart_rate">Heart Rate Remind</string>
+    <string name="set_exact_alarm_permission_title">Permission to set exact alarm time</string>
+    <string name="set_exact_alarm_permission_text">To set an alarm at the exact time, permission to set exact alarm time is required.</string>
+    <string name="health_dialog_confirm">OK</string>
+    <string name="every_day">Every day</string>
+    <string name="never">Never</string>
+    <string name="day_concat">", "</string>
 </resources>

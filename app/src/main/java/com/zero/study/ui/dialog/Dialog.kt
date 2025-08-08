@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.Window
 import androidx.fragment.app.DialogFragment
-import com.zero.base.util.ToastUtil
+import com.zero.base.ext.toast
 import com.zero.study.databinding.DialogFragmentBinding
 
 
@@ -48,7 +48,7 @@ class Dialog : DialogFragment() {
         binding.tvConfirm.setOnClickListener {
             val inputContent = binding.etInput.text.toString().trim()
             if (TextUtils.isEmpty(inputContent)) {
-                ToastUtil.showShort(view.context, "Input content is empty!")
+                view.context.toast("Input content is empty!")
                 return@setOnClickListener
             }
             onClickListener.invoke(inputContent)

@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorWhite">
+    android:layout_height="match_parent">
 
 
     <com.zero.base.widget.CircleProgressBar
@@ -15,14 +14,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:progress_background_color="@color/colorProgressbarBackground"
-        app:progress_end_color="@color/colorPurple"
+        app:progress_background_color="@color/health_progress_background_color"
+        app:progress_end_color="@color/health_progress_color"
         app:progress_shader="sweep"
-        app:progress_start_color="@color/colorPurple"
+        app:progress_start_color="@color/health_progress_color"
         app:progress_stroke_cap="round"
         app:progress_stroke_width="15dp"
         app:progress_style="solid_line"
-        app:progress_text_color="@color/colorBlack"
+        app:progress_text_color="@color/health_black_color"
         app:progress_text_size="25sp" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -31,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:text="@string/measure_progress"
-        android:textColor="@color/colorBlack"
+        android:textColor="@color/health_black_color"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

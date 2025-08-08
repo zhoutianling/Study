@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.zero.base.activity.BaseActivity
-import com.zero.base.util.ToastUtil
+import com.zero.base.ext.toast
 import com.zero.study.databinding.ActivityRoomBinding
 import com.zero.study.db.DbManager
 import com.zero.study.db.DogDao
@@ -106,7 +106,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
                 }
                 val count = userDao.insertUserList(mutableList)
                 withContext(Dispatchers.Main) {
-                    ToastUtil.showShort(this@RoomActivity, "批量新增${count}条数据")
+                    this@RoomActivity.toast("批量新增${count}条数据")
                 }
             }
 
@@ -126,7 +126,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
             val dog = Dog(ownId = 2, age = 50, name = "汪汪队")
             dogDao.insertDog(dog, dog)
             withContext(Dispatchers.Main) {
-                ToastUtil.showShort(this@RoomActivity, "新增${count}条数据成功")
+                this@RoomActivity.toast("新增${count}条数据成功")
             }
         }
     }
@@ -138,7 +138,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
         lifecycleScope.launch(Dispatchers.IO) {
             val count = userDao.deleteAllUser()
             withContext(Dispatchers.Main) {
-                ToastUtil.showShort(this@RoomActivity, "删除${count}条数据")
+                this@RoomActivity.toast("删除${count}条数据")
             }
             query()
         }
@@ -151,7 +151,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
         lifecycleScope.launch(Dispatchers.IO) {
             val count = userDao.updateAll()
             withContext(Dispatchers.Main) {
-                ToastUtil.showShort(this@RoomActivity, "更新${count}条数据")
+                this@RoomActivity.toast("更新${count}条数据")
             }
             query()
         }
@@ -164,7 +164,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
         lifecycleScope.launch(Dispatchers.IO) {
             userDao.deleteSingle(singleUser)
             withContext(Dispatchers.Main) {
-                ToastUtil.showShort(this@RoomActivity, "删除单条数据成功")
+                this@RoomActivity.toast("删除单条数据成功")
             }
             query()
         }
@@ -182,7 +182,7 @@ class RoomActivity : BaseActivity<ActivityRoomBinding>(ActivityRoomBinding::infl
             user.address = "修改的地址白云区"
             userDao.updateUser(user)
             withContext(Dispatchers.Main) {
-                ToastUtil.showShort(this@RoomActivity, "更新单条数据成功")
+                this@RoomActivity.toast("更新单条数据成功")
             }
             list.clear()
             query()

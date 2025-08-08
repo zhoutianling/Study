@@ -24,7 +24,7 @@ import com.zero.base.annotation.ViewBinding
 import com.zero.base.ext.animateHeart
 import com.zero.base.ext.dp
 import com.zero.base.ext.onClick
-import com.zero.base.ext.toastShort
+import com.zero.base.ext.toast
 import com.zero.study.R
 import com.zero.study.databinding.ActivityAnimationBinding
 import com.zero.study.ui.fragment.HomeFragment
@@ -116,7 +116,7 @@ class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimati
     override fun addListener() {
         binding.btnDownload.onClick {
             Log.d("zzz", "setOnClickListener:${System.currentTimeMillis()} ")
-            this.toastShort("500后可点击")
+            this.toast("500后可点击")
         }
     }
 
