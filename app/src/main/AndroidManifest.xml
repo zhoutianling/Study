@@ -38,7 +38,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!--打开其他应用的自定义权限（其他应用需要使用uses-permission 方式注册该权限，且与被打开页面的宿主中android:permission保持一致）-->
@@ -54,6 +55,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppTheme"
         android:usesCleartextTraffic="true">
+        <!--        定义这是一个xposed模块-->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <!--     xposed 模块描述-->
+        <meta-data
+            android:name="xposeddescription"
+            android:value="Hook Toast" />
+        <!--   xposed 支持最小版本-->
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" />
         <!--Activity-->
         <activity
             android:name=".ui.activity.SplashActivity"
@@ -128,6 +141,9 @@
         <activity
             android:name=".ui.activity.SelectorActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.activity.ContextProviderActivity"
+            android:exported="false" />
         <!--Activity-->
         <!--Service-->
         <service
@@ -158,6 +174,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <provider
+            android:name=".provider.HookSwitchProvider"
+            android:authorities="${applicationId}.HookSwitchProvider"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            tools:ignore="ExportedContentProvider" />
         <!--Provider-->
     </application>
 

@@ -33,7 +33,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogStyle);
+        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogStyle)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

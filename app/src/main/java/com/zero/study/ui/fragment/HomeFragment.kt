@@ -39,6 +39,7 @@ import com.zero.study.databinding.FragmentHomeBinding
 import com.zero.study.event.MsgEvent
 import com.zero.study.ui.activity.AccessPerActivity
 import com.zero.study.ui.activity.AnimationActivity
+import com.zero.study.ui.activity.ContextProviderActivity
 import com.zero.study.ui.activity.GuideActivity
 import com.zero.study.ui.activity.InterstitialActivity
 import com.zero.study.ui.activity.LanguageActivity
@@ -167,6 +168,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 }
 
                 26 -> context?.startActivity<AlarmRemindActivity>()
+                27 -> context?.startActivity<ContextProviderActivity>()
 
                 else -> ThreadPool.execute { Log.i("zzz", "ThreadName:" + Thread.currentThread().name) }
             }

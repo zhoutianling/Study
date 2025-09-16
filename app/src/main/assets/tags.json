@@ -2,7 +2,7 @@
   "1.权限请求",
   "2.引导页",
   "3.Recyclerview",
-  "4.动画特效",
+  "4.动画组件",
   "5.服务启动模式",
   "6.MediaIntentForResult",
   "7.沉浸式",
@@ -24,5 +24,6 @@
   "23.缩放移动",
   "24.心率检测",
   "25.BottomSheetBehavior",
-  "26.闹钟提醒"
+  "26.闹钟提醒",
+  "27.ContextProvider"
 ]
