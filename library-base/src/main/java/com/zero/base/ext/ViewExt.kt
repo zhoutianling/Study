@@ -16,12 +16,8 @@ import java.util.concurrent.TimeUnit
  * @date:2024/12/11 17:01
  * @path:com.zero.base.ext.ViewExt
  */
-inline fun <reified T : Activity> Activity.startActivity(context: Context) {
-    startActivity(Intent(context, T::class.java))
-}
 
 inline fun <reified T : Activity> Context.startActivity() {
-    val intent = Intent(this, T::class.java)
     startActivity( Intent(this, T::class.java))
 }
 

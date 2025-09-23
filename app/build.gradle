@@ -118,6 +118,7 @@ dependencies {
     implementation project(path: ':library-admob')
     implementation project(path: ':library-base')
     implementation project(path: ':library-health')
+    debugImplementation libs.leakcanary.android
     ksp libs.androidx.room.compiler
-    compileOnly "de.robv.android.xposed:api:82"
+    compileOnly libs.xposed
 }

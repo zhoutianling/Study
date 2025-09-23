@@ -19,6 +19,7 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url 'https://raw.githubusercontent.com/martinloren/AabResGuard/mvn-repo' }
         maven { url 'https://api.xposed.info/' }
+        maven { url 'https://jitpack.io' }
     }
 }
 

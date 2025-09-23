@@ -1,8 +1,8 @@
 package com.zero.study.ui.activity
 
-import android.view.KeyEvent
-import android.view.KeyEvent.ACTION_UP
+import androidx.activity.OnBackPressedCallback
 import com.toolkit.admob.manager.InterstitialAdManager
+import com.toolkit.admob.manager.InterstitialAdManager.tryShow
 import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
 import com.zero.study.databinding.ActivityInterstitialBinding
@@ -21,17 +21,12 @@ class InterstitialActivity : BaseActivity<ActivityInterstitialBinding>(ActivityI
 
     override fun addListener() {
         binding.ivFinish.setOnClickListener {
-            onKeyUp(KeyEvent.KEYCODE_BACK, KeyEvent(ACTION_UP, KeyEvent.KEYCODE_BACK))
+            tryShow(this@InterstitialActivity, BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT, { finish() }, true)
         }
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_BACK -> {
-                InterstitialAdManager.tryShow(this, BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT, { finish() }, true)
-                return true
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                tryShow(this@InterstitialActivity, BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT, { finish() }, true)
             }
-        }
-        return super.onKeyUp(keyCode, event)
+        })
     }
 }

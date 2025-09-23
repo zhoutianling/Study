@@ -1,8 +1,10 @@
 package com.zero.study.ui.fragment
 
 import android.Manifest
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -16,6 +18,7 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -37,6 +40,7 @@ import com.zero.health.ui.activity.HeartRateActivity
 import com.zero.study.R
 import com.zero.study.databinding.FragmentHomeBinding
 import com.zero.study.event.MsgEvent
+import com.zero.study.provider.HookSwitchProvider.Companion.PATH_SWITCH
 import com.zero.study.ui.activity.AccessPerActivity
 import com.zero.study.ui.activity.AnimationActivity
 import com.zero.study.ui.activity.ContextProviderActivity
@@ -163,8 +167,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 25 -> {
                     "EventBus post".log("zzz")
+                    isHookEnabled(requireContext())
                     RxBus.getInstance().post(MsgEvent("time:${System.currentTimeMillis()}"))
-                    BottomSheetDialog.Builder().setTitle(getString(R.string.dialog_title)).setCancelText(getString(R.string.dialog_cancel)).setConfirmText(getString(R.string.dialog_confirm)).build().show(childFragmentManager, "BottomSheetDialog")
+                    BottomSheetDialog.Builder().setTitle(getString(R.string.dialog_title)).setCancelText(getString(R.string.dialog_cancel)).setConfirmText(getString(R.string.dialog_confirm)).setOnClickListener {
+
+                    }.build().show(childFragmentManager, "BottomSheetDialog")
                 }
 
                 26 -> context?.startActivity<AlarmRemindActivity>()
@@ -172,6 +179,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 else -> ThreadPool.execute { Log.i("zzz", "ThreadName:" + Thread.currentThread().name) }
             }
+        }
+    }
+
+    private fun isHookEnabled(context: Context): Boolean {
+        return try {
+            val appContext = context.applicationContext
+            val authority = "${appContext.packageName}.HookSwitchProvider"
+            val uri = "content://$authority/$PATH_SWITCH".toUri()
+            val contentResolver: ContentResolver = context.contentResolver
+            val cursor: Cursor? = contentResolver.query(uri, arrayOf("is_enabled"), null, null, null)
+            var enabled = false
+            cursor?.use {
+                if (it.count > 0 && it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndex("is_enabled")
+                    if (columnIndex != -1) {
+                        val value = it.getInt(columnIndex)
+                        enabled = value == 1
+                        Log.d("zzz", "Hook enabled value from provider: $enabled")
+                    }
+                }
+            }
+            enabled
+
+        } catch (e: Exception) {
+            false
         }
     }
 

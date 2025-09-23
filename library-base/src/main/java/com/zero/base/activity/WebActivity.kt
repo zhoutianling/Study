@@ -9,6 +9,7 @@ import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.activity.OnBackPressedCallback
 import com.zero.library_base.databinding.ActivityWebBinding
 
 class WebActivity : BaseActivity<ActivityWebBinding>(ActivityWebBinding::inflate) {
@@ -52,25 +53,20 @@ class WebActivity : BaseActivity<ActivityWebBinding>(ActivityWebBinding::inflate
             binding.webView.loadUrl("https://baidu.com")
         }
         binding.ivBack.setOnClickListener { v: View? -> finish() }
-        binding.webView.webChromeClient = object : WebChromeClient() {
-            override fun onProgressChanged(view: WebView, newProgress: Int) {
-                Log.d("zzz", "onProgressChanged:$newProgress->${view.contentHeight} ->${view.title}  ")
-            }
-        }
-    }
-
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_BACK -> {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
                 if (binding.webView.canGoBack()) {
                     binding.webView.goBack()
                 } else {
                     finish()
                 }
             }
+        })
+        binding.webView.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView, newProgress: Int) {
+                Log.d("zzz", "onProgressChanged:$newProgress->${view.contentHeight} ->${view.title}  ")
+            }
         }
-        return super.onKeyUp(keyCode, event)
     }
 
     override fun onDestroy() {

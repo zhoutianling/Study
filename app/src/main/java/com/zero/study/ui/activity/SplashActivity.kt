@@ -34,7 +34,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
         get() = StorageUtils.getBoolean(TIME_START, true)
 
     override fun initView() {
-        if (BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             doNext(false)
             return
         }

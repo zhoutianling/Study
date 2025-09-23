@@ -31,7 +31,6 @@ object AdMobManager {
     var connected = false
     fun initLifecycle(application: Application, filterClassName: String) {
         appLifecycle = AppLifecycle(application, filterClassName)
-        initAdjust(application)
     }
 
     @JvmStatic
@@ -86,25 +85,6 @@ object AdMobManager {
         }
     }
 
-    fun initAdjust(application: Application) {
-        val appToken = "3ak4l4s32xvk"
-        val environment: String = if (BuildConfig.DEBUG) AdjustConfig.ENVIRONMENT_SANDBOX else AdjustConfig.ENVIRONMENT_PRODUCTION
-        val config = AdjustConfig(application, appToken, environment, true)
-        config.setLogLevel(if (BuildConfig.DEBUG) LogLevel.VERBOSE else LogLevel.SUPRESS)
-        config.setAppSecret(1, 2120404030, 764732859, 2048063523, 614217887)
-        config.isSendInBackground = true
-        Adjust.onCreate(config)
-        application.registerActivityLifecycleCallbacks(object : AbstractLifecycleCallbacks() {
-
-            override fun onActivityResumed(activity: Activity) {
-                Adjust.onResume()
-            }
-
-            override fun onActivityPaused(activity: Activity) {
-                Adjust.onPause()
-            }
-        })
-    }
 
     fun showTips(msg: String) {
         if (BuildConfig.DEBUG) {

@@ -1,17 +1,20 @@
 [versions]
+leakcanaryAndroidVersion = "2.14"
+xposedVersion = "82"
 cameraVersion = "1.4.2"
 converterGsonVersion = "3.0.0"
-gson ="2.13.1"
+gson ="2.13.2"
 retrofitVersion = "3.0.0"
 coreKtx = "1.16.0"
 firebaseBomVersion = "33.16.0"
 flexboxVersion = "3.0.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
+junitVersion = "1.3.0"
 appcompat = "1.7.1"
 lifecycleLivedataKtxVersion = "2.9.2"
-loggingInterceptorVersion = "4.12.0"
-material = "1.12.0"
+loggingInterceptorVersion = "5.1.0"
+#noinspection GradleDependency
+material = "1.6.1"
 aabresguardPluginVersion = "0.1.10"
 roomVersion = "2.7.2"
 pagingVersion = "3.3.6"
@@ -41,6 +44,8 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomVersion" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingVersion" }
 
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
+xposed = { module = "de.robv.android.xposed:api", version.ref = "xposedVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGsonVersion" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexboxVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }

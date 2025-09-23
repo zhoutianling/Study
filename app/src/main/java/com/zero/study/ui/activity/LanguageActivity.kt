@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.KeyEvent
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.toolkit.admob.manager.InterstitialAdManager.loadAd
@@ -12,10 +13,10 @@ import com.toolkit.admob.manager.NativeAdManager
 import com.toolkit.admob_libray.BuildConfig
 import com.toolkit.admob_libray.R
 import com.zero.base.activity.BaseActivity
-import com.zero.study.databinding.ActivityLanguageBinding
-import com.zero.study.ui.adapter.LanguageAdapter
 import com.zero.base.util.StorageUtils
 import com.zero.base.util.StorageUtils.getBoolean
+import com.zero.study.databinding.ActivityLanguageBinding
+import com.zero.study.ui.adapter.LanguageAdapter
 import java.util.Locale
 
 /**
@@ -46,6 +47,15 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
 
     override fun addListener() {
         binding.ivBack.setOnClickListener { onKeyUp(KeyEvent.KEYCODE_BACK, KeyEvent(ACTION_UP, KeyEvent.KEYCODE_BACK)) }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isFistTime) {
+                    finish()
+                } else {
+                    tryShow(this@LanguageActivity, BuildConfig.ADMOB_INTERSTITIAL_LANGUAGE, { finish() }, true)
+                }
+            }
+        })
         binding.tvNext.setOnClickListener {
             val selectedCode = languageAdapter.getSelectedCode()
             StorageUtils.putString(selectedLanguageKey, selectedCode)
@@ -77,19 +87,5 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
         if (nativeAdManager != null) {
             nativeAdManager?.onDestroy()
         }
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_BACK -> {
-                if (isFistTime) {
-                    finish()
-                } else {
-                    tryShow(this, BuildConfig.ADMOB_INTERSTITIAL_LANGUAGE, { finish() }, true)
-                }
-                return true
-            }
-        }
-        return super.onKeyUp(keyCode, event)
     }
 }
