@@ -29,6 +29,7 @@ import com.zero.base.bus.RxBus
 import com.zero.base.ext.appFileManager
 import com.zero.base.ext.fromJson
 import com.zero.base.ext.log
+import com.zero.base.ext.parseInt
 import com.zero.base.ext.readJson
 import com.zero.base.ext.startActivity
 import com.zero.base.ext.toast
@@ -71,7 +72,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         ViewModelProvider(this)[AskViewModel::class.java]
     }
     private var size: Int by Delegates.observable(0) { _, oldValue, newValue ->
-        Log.d("zzz", "${oldValue}->${newValue} ")
+       val number = parseInt("123456").getOrElse { 0 }
+        Log.d("zzz", "${number}->${newValue} ")
     }
 
     override fun onAttach(context: Context) {
@@ -81,9 +83,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         }
     }
 
-    /**
-     * 是否开启沉浸式
-     */
     private var windowIsTranslucent: Boolean = false
     override fun initView() {
         binding.tagFlow.addTag(requireContext(), Gson().fromJson(requireActivity().readJson("tags.json"))) { position, _ ->
