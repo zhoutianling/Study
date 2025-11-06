@@ -2,10 +2,8 @@ package com.zero.study.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.toolkit.admob.listener.OpenAdStatusListener
@@ -14,6 +12,7 @@ import com.toolkit.admob.manager.AdMobManager.initMobileAds
 import com.toolkit.admob.manager.AppOpenAdManager
 import com.zero.base.activity.BaseActivity
 import com.zero.base.util.StorageUtils
+import com.zero.study.AppStudy
 import com.zero.study.BuildConfig
 import com.zero.study.databinding.ActivitySplashBinding
 import com.zero.study.ui.model.SplashViewModel
@@ -43,7 +42,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
 
     override fun initData() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
-        initMobileAds(this, timeFirst)
+        initMobileAds(AppStudy.appContext, timeFirst)
         viewModel.getCountry().observe(this) { country ->
             Toast.makeText(this@SplashActivity, "IP:${country.ip}", Toast.LENGTH_SHORT).show()
             lifecycleScope.launch {

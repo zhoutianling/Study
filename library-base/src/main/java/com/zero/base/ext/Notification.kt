@@ -29,33 +29,41 @@ fun Context.createNotification(configBlock: NotificationConfig.() -> Unit): Noti
     val config = NotificationConfig().apply(configBlock)
     createNotificationChannelIfNeeded(config.channelId, config.channelName, config.importance)
     val pendingIntent = config.clickIntent?.let {
-        PendingIntent.getActivity(this, System.currentTimeMillis().hashCode(), it, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.getActivity(
+            this,
+            System.currentTimeMillis().hashCode(),
+            it,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
     }
-    val notification = NotificationCompat.Builder(this, config.channelId).setSmallIcon(config.smallIcon).setOngoing(config.isPermanent).setContentTitle(config.title).apply {
-        setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-        if (config.isPermanent) {
-            setPriority(NotificationCompat.PRIORITY_LOW)
-        } else {
-            setPriority(NotificationCompat.PRIORITY_HIGH)
-            setAutoCancel(true)
-        }
-        if (config.groupKey.isNotEmpty()) {
-            setGroup(config.groupKey)
-            setGroupSummary(true)
-        }
-        if (config.content.isNotEmpty()) {
-            setContentText(config.content)
-        }
-        if (config.remoteViews != null) {
-            setCustomContentView(config.remoteViews)
-        }
-        if (config.bigRemoteViews != null) {
-            setCustomBigContentView(config.bigRemoteViews)
-        }
-        if (pendingIntent != null) {
-            setContentIntent(pendingIntent)
-        }
-    }.build()
+    val notification =
+        NotificationCompat.Builder(this, config.channelId).setSmallIcon(config.smallIcon)
+            .setOngoing(config.isPermanent).setContentTitle(config.title).apply {
+                setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+                if (config.isPermanent) {
+                    setPriority(NotificationCompat.PRIORITY_LOW)
+                } else {
+                    setPriority(NotificationCompat.PRIORITY_HIGH)
+                    setAutoCancel(true)
+                }
+                if (config.groupKey.isNotEmpty()) {
+                    setGroup(config.groupKey)
+                    setGroupSummary(true)
+                }
+                if (config.content.isNotEmpty()) {
+                    setContentText(config.content)
+                }
+                if (config.remoteViews != null) {
+                    setCustomContentView(config.remoteViews)
+                }
+                if (config.bigRemoteViews != null) {
+                    setCustomBigContentView(config.bigRemoteViews)
+                }
+                if (pendingIntent != null) {
+                    setContentIntent(pendingIntent)
+                }
+                setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            }.build()
     config.notification = notification
     return notification
 

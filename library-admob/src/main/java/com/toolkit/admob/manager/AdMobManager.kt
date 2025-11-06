@@ -33,7 +33,6 @@ object AdMobManager {
         appLifecycle = AppLifecycle(application, filterClassName)
     }
 
-    @JvmStatic
     fun initMobileAds(app: Context, timeFirst: Boolean) {
         if (atomicBoolean.getAndSet(true)) {
             showTips("-->Admob initialized ")
@@ -53,7 +52,6 @@ object AdMobManager {
         }
     }
 
-    @JvmStatic
     fun dealConsentActionThen(activity: Activity, action: Runnable, timeFirst: Boolean) {
         val params: ConsentRequestParameters
         if (BuildConfig.DEBUG) {
