@@ -53,6 +53,9 @@ object NotifyHelper {
      */
     fun showAlarmNotification(context: Context, @RemindType.Type type: Int) {
         val remindNotification = context.createNotification {
+            //添加标题或者内容可以展示桌面原点
+            title = context.getString(RemindType.getChannelName(type))
+            content = Date().formatHourMinute
             iconRes = RemindType.getTypeIcon(type)
             smallIcon = RemindType.getSmallIcon(type)
             channelId = RemindType.getChannelId(type)

@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import coil.load
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -84,7 +85,7 @@ class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimati
         binding.ivCompare.setLineStyle(ContextCompat.getColor(this, R.color.colorPrimaryDark), 1.0f.dp)
         binding.ivCompare.startAnimation(0f, 1f, 2000)
 
-
+        binding.ivFilter.load("https://raw.githubusercontent.com/PAX520520/templates/main/A10.png")
         binding.layoutRight.animateHeart()
         startAlphaAnim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {

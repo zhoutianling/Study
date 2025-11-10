@@ -4,7 +4,8 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.os.Process
-import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import com.toolkit.admob.manager.AdMobManager.initLifecycle
 import com.zero.base.net.RetrofitManager
 import com.zero.base.util.StorageUtils
@@ -12,6 +13,7 @@ import com.zero.base.widget.Gloading
 import com.zero.base.widget.LoadingAdapter
 import com.zero.study.ui.activity.SplashActivity
 import kotlin.properties.Delegates
+
 
 class AppStudy : Application() {
 
@@ -43,5 +45,14 @@ class AppStudy : Application() {
             }
         }
         return false
+    }
+
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level == TRIM_MEMORY_UI_HIDDEN) {
+            Toast.makeText(this@AppStudy, "已进入后台运行,请注意使用安全",
+                Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -17,6 +17,7 @@ import com.zero.library_base.R
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
+import androidx.core.content.withStyledAttributes
 
 class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private val mProgressRectF = RectF()
@@ -178,41 +179,41 @@ class CircleProgressBar @JvmOverloads constructor(context: Context, attrs: Attri
      * Basic data initialization
      */
     private fun initFromAttributes(context: Context, attrs: AttributeSet?) {
-        val a = context.obtainStyledAttributes(attrs, R.styleable.CircleProgressBar)
-        val originalBitmap = BitmapFactory.decodeResource(resources, R.drawable.heart)
-        val scale = heartBitmapHeight.toFloat() / originalBitmap.height
-        heartBitmapWidth = (originalBitmap.width * scale).toInt()
-        heartBitmap = Bitmap.createScaledBitmap(originalBitmap, heartBitmapWidth, heartBitmapHeight, true)
-        mLineCount = a.getInt(R.styleable.CircleProgressBar_line_count, DEFAULT_LINE_COUNT)
-        mStyle = a.getInt(R.styleable.CircleProgressBar_progress_style, LINE)
-        mShader = a.getInt(R.styleable.CircleProgressBar_progress_shader, LINEAR)
-        mCap = if (a.hasValue(R.styleable.CircleProgressBar_progress_stroke_cap)) {
-            Paint.Cap.entries.toTypedArray()[a.getInt(R.styleable.CircleProgressBar_progress_stroke_cap, 0)]
-        } else {
-            Paint.Cap.BUTT
+        context.withStyledAttributes(attrs, R.styleable.CircleProgressBar) {
+            val originalBitmap = BitmapFactory.decodeResource(resources, R.drawable.heart)
+            val scale = heartBitmapHeight.toFloat() / originalBitmap.height
+            heartBitmapWidth = (originalBitmap.width * scale).toInt()
+            heartBitmap = Bitmap.createScaledBitmap(originalBitmap, heartBitmapWidth, heartBitmapHeight, true)
+            mLineCount = getInt(R.styleable.CircleProgressBar_line_count, DEFAULT_LINE_COUNT)
+            mStyle = getInt(R.styleable.CircleProgressBar_progress_style, LINE)
+            mShader = getInt(R.styleable.CircleProgressBar_progress_shader, LINEAR)
+            mCap = if (hasValue(R.styleable.CircleProgressBar_progress_stroke_cap)) {
+                Paint.Cap.entries.toTypedArray()[getInt(R.styleable.CircleProgressBar_progress_stroke_cap, 0)]
+            } else {
+                Paint.Cap.BUTT
+            }
+
+            mLineWidth = getDimensionPixelSize(R.styleable.CircleProgressBar_line_width, DEFAULT_LINE_WIDTH.px).toFloat()
+            mProgressTextSize = getDimensionPixelSize(R.styleable.CircleProgressBar_progress_text_size, DEFAULT_PROGRESS_TEXT_SIZE.px).toFloat()
+            mProgressStrokeWidth = getDimensionPixelSize(R.styleable.CircleProgressBar_progress_stroke_width, DEFAULT_PROGRESS_STROKE_WIDTH.px).toFloat()
+
+            mProgressStartColor = getColor(R.styleable.CircleProgressBar_progress_start_color, Color.parseColor(COLOR_FFF2A670))
+            mProgressEndColor = getColor(R.styleable.CircleProgressBar_progress_end_color, Color.parseColor(COLOR_FFF2A670))
+            mProgressTextColor = getColor(R.styleable.CircleProgressBar_progress_text_color, Color.parseColor(COLOR_FFF2A670))
+            mProgressBackgroundColor = getColor(R.styleable.CircleProgressBar_progress_background_color, Color.parseColor(COLOR_FFD3D3D5))
+
+            mStartDegree = getInt(R.styleable.CircleProgressBar_progress_start_degree, DEFAULT_START_DEGREE)
+            mDrawBackgroundOutsideProgress = getBoolean(R.styleable.CircleProgressBar_drawBackgroundOutsideProgress, false)
+
+            mBlurRadius = getDimensionPixelSize(R.styleable.CircleProgressBar_progress_blur_radius, 0)
+            val blurStyle = getInt(R.styleable.CircleProgressBar_progress_blur_style, 0)
+            mBlurStyle = when (blurStyle) {
+                1 -> BlurMaskFilter.Blur.SOLID
+                2 -> BlurMaskFilter.Blur.OUTER
+                3 -> BlurMaskFilter.Blur.INNER
+                else -> BlurMaskFilter.Blur.NORMAL
+            }
         }
-
-        mLineWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_line_width, DEFAULT_LINE_WIDTH.px).toFloat()
-        mProgressTextSize = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_text_size, DEFAULT_PROGRESS_TEXT_SIZE.px).toFloat()
-        mProgressStrokeWidth = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_stroke_width, DEFAULT_PROGRESS_STROKE_WIDTH.px).toFloat()
-
-        mProgressStartColor = a.getColor(R.styleable.CircleProgressBar_progress_start_color, Color.parseColor(COLOR_FFF2A670))
-        mProgressEndColor = a.getColor(R.styleable.CircleProgressBar_progress_end_color, Color.parseColor(COLOR_FFF2A670))
-        mProgressTextColor = a.getColor(R.styleable.CircleProgressBar_progress_text_color, Color.parseColor(COLOR_FFF2A670))
-        mProgressBackgroundColor = a.getColor(R.styleable.CircleProgressBar_progress_background_color, Color.parseColor(COLOR_FFD3D3D5))
-
-        mStartDegree = a.getInt(R.styleable.CircleProgressBar_progress_start_degree, DEFAULT_START_DEGREE)
-        mDrawBackgroundOutsideProgress = a.getBoolean(R.styleable.CircleProgressBar_drawBackgroundOutsideProgress, false)
-
-        mBlurRadius = a.getDimensionPixelSize(R.styleable.CircleProgressBar_progress_blur_radius, 0)
-        val blurStyle = a.getInt(R.styleable.CircleProgressBar_progress_blur_style, 0)
-        mBlurStyle = when (blurStyle) {
-            1 -> BlurMaskFilter.Blur.SOLID
-            2 -> BlurMaskFilter.Blur.OUTER
-            3 -> BlurMaskFilter.Blur.INNER
-            else -> BlurMaskFilter.Blur.NORMAL
-        }
-        a.recycle()
     }
 
     /**
