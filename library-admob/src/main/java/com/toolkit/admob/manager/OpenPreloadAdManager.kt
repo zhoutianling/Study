@@ -74,7 +74,7 @@ object OpenAdMobManager {
                 AdMobManager.logMsg("OpenAd closed")
                 isAdShowing.set(false)
                 openAdLastShowTime = System.currentTimeMillis()
-                activityRef.get()?.let { if (!it.isFinishing) tryLoad() }
+//                activityRef.get()?.let { if (!it.isFinishing) tryLoad() }
                 andThen(true)
             }
 
@@ -82,7 +82,7 @@ object OpenAdMobManager {
                 AdMobManager.logMsg("OpenAd failed to show:${adError.code}")
                 isAdShowing.set(false)
                 andThen(true)
-                activityRef.get()?.let { if (!it.isFinishing) tryLoad() }
+//                activityRef.get()?.let { if (!it.isFinishing) tryLoad() }
             }
 
             override fun onAdShowedFullScreenContent() {

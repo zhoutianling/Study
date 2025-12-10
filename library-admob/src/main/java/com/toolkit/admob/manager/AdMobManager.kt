@@ -88,7 +88,7 @@ object AdMobManager {
 
     fun logMsg(msg: String) {
         if (BuildConfig.DEBUG) {
-            Log.i("zzz", "logMsg: $msg")
+            Log.d("zzz", "logMsg: $msg")
         }
     }
 }

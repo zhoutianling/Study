@@ -1,17 +1,17 @@
 package com.zero.study.ui.activity
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.view.View
 import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.animation.doOnEnd
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.toolkit.admob.listener.OpenAdStatusListener
 import com.toolkit.admob.manager.AdMobManager.dealConsentActionThen
 import com.toolkit.admob.manager.AdMobManager.initMobileAds
-import com.toolkit.admob.manager.AppOpenAdManager
+import com.toolkit.admob.manager.OpenAdMobManager
 import com.zero.base.activity.BaseActivity
 import com.zero.base.util.StorageUtils
 import com.zero.study.BuildConfig
@@ -38,7 +38,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
             doNext(false)
             return
         }
-        dealConsentActionThen(this@SplashActivity, { loadOpenAd(timeFirst) }, timeFirst)
+        dealConsentActionThen(this@SplashActivity, { loadOpenAd() }, timeFirst)
     }
 
     override fun initData() {
@@ -56,15 +56,30 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
     override fun addListener() {
     }
 
-    private fun loadOpenAd(timeFirst: Boolean) {
-        AppOpenAdManager.tryWaitingAndLoadAd(this@SplashActivity, if (BuildConfig.DEBUG) 1 else 7, object : OpenAdStatusListener {
-            override fun onNotReady(loadFailed: Boolean) {
+    private fun loadOpenAd() {
+        val maxProgress = 700
+        val maxDurationMs = 7_000L
+        binding.loadingProgress.max = maxProgress
+        binding.loadingProgress.progress = 0
+        OpenAdMobManager.tryLoad()
+        val animator = ObjectAnimator.ofInt(binding.loadingProgress, "progress", 0,
+            maxProgress).apply {
+            duration = maxDurationMs
+            interpolator = DecelerateInterpolator(1.3f)
+            doOnEnd {
+                OpenAdMobManager.showAdIfAvailable(this@SplashActivity) {
+                    doNext(timeFirst)
+                }
             }
-
-            override fun onComplete() {
-                doNext(timeFirst)
+        }
+        animator.start()
+        lifecycleScope.launch {
+            delay(2_000)
+            while (OpenAdMobManager.isLoadingAd.get()) {
+                delay(50)
             }
-        })
+            if (animator.isRunning) animator.end()
+        }
     }
 
 
