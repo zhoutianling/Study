@@ -10,6 +10,7 @@ plugins {
 }
 import com.github.megatronking.stringfog.plugin.StringFogMode
 import com.github.megatronking.stringfog.plugin.kg.RandomKeyGenerator
+
 android {
     namespace 'com.zero.study'
     compileSdk rootProject.ext.compileSdk
@@ -108,7 +109,7 @@ aabResGuard {
     filterList = ["BUNDLE-METADATA/*"]
     enableFilterStrings = false
     unusedStringPath = file("unused.txt").toPath()
-    languageWhiteList = ["en", "ar", "de", "es", "fr", "hi", "in", "ja", "ko","pt","ru"]
+    languageWhiteList = ["en", "ar", "de", "es", "fr", "hi", "in", "ja", "ko", "pt", "ru"]
 }
 dependencies {
     //StringFog
@@ -119,6 +120,8 @@ dependencies {
     implementation project(path: ':library-base')
     implementation project(path: ':library-health')
 //    debugImplementation libs.leakcanary.android
+    //OKHttp网络请求Android Studio插件
+    implementation(libs.okhttp.profiler)
     ksp libs.androidx.room.compiler
     compileOnly libs.xposed
     implementation(libs.coil)

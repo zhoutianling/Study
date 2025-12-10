@@ -47,7 +47,7 @@ dependencies {
     api libs.lifecycle.viewmodel.ktx
     api libs.lifecycle.livedata.ktx
     //net library
-    api libs.retrofit
+//    api libs.retrofit
     api libs.converter.gson
     api libs.logging.interceptor
     api libs.gson

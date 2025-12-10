@@ -24,6 +24,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
+import com.toolkit.admob.manager.InterstitialPreloadAdMobManager
+import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
 import com.zero.base.bus.RxBus
 import com.zero.base.ext.appFileManager
@@ -72,7 +74,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         ViewModelProvider(this)[AskViewModel::class.java]
     }
     private var size: Int by Delegates.observable(0) { _, oldValue, newValue ->
-       val number = parseInt("123456").getOrElse { 0 }
+        val number = parseInt("123456").getOrElse { 0 }
         Log.d("zzz", "${number}->${newValue} ")
     }
 
@@ -85,7 +87,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     private var windowIsTranslucent: Boolean = false
     override fun initView() {
-        binding.tagFlow.addTag(requireContext(), Gson().fromJson(requireActivity().readJson("tags.json"))) { position, _ ->
+        binding.tagFlow.addTag(requireContext(),
+            Gson().fromJson(requireActivity().readJson("tags.json"))) { position, _ ->
             when (position + 1) {
                 1 -> {
                     size += 1
@@ -119,11 +122,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     }
                 }
 
-                10 -> context?.startActivity<InterstitialActivity>()
+                10 -> {
+                    InterstitialPreloadAdMobManager.tryShow(requireActivity(),
+                        BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT) {
+                        context?.startActivity<InterstitialActivity>()
+                    }
+                }
+
                 11 -> context?.startActivity<LanguageActivity>()
                 12 -> context?.startActivity<AccessPerActivity>()
                 13 -> {
-                    Dialog.Builder().setTitle("Custom Title").setCancelText("Exit").setConfirmText("Confirm").setCancelOnTouchOutSide(false).setOnClickListener { input ->
+                    Dialog.Builder().setTitle("Custom Title").setCancelText("Exit").setConfirmText(
+                        "Confirm").setCancelOnTouchOutSide(false).setOnClickListener { input ->
                         Toast.makeText(requireContext(), input, Toast.LENGTH_SHORT).show()
                     }.build().show(childFragmentManager, "Dialog")
                 }
@@ -131,7 +141,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 14 -> {
                     val builder = CustomTabsIntent.Builder()
                     val schemeBuilder = CustomTabColorSchemeParams.Builder()
-                    val param = schemeBuilder.setToolbarColor(ContextCompat.getColor(requireContext(), R.color.appThemeColor)).build()
+                    val param = schemeBuilder.setToolbarColor(
+                        ContextCompat.getColor(requireContext(), R.color.appThemeColor)).build()
                     val customTabsIntent = builder.setDefaultColorSchemeParams(param).build()
                     customTabsIntent.launchUrl(requireContext(), Uri.parse("https:www.baidu.com"))
                 }
@@ -157,7 +168,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 22 -> context?.startActivity<NotificationActivity>()
                 23 -> {
                     //setFragmentResult API
-                    parentFragmentManager.setFragmentResult(MainActivity::class.java.simpleName, bundleOf("screenHeight" to resources.displayMetrics.heightPixels))
+                    parentFragmentManager.setFragmentResult(MainActivity::class.java.simpleName,
+                        bundleOf("screenHeight" to resources.displayMetrics.heightPixels))
                 }
 
                 24 -> {
@@ -168,7 +180,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     "EventBus post".log("zzz")
                     isHookEnabled(requireContext())
                     RxBus.getInstance().post(MsgEvent("time:${System.currentTimeMillis()}"))
-                    BottomSheetDialog.Builder().setTitle(getString(R.string.dialog_title)).setCancelText(getString(R.string.dialog_cancel)).setConfirmText(getString(R.string.dialog_confirm)).setOnClickListener {
+                    BottomSheetDialog.Builder().setTitle(
+                        getString(R.string.dialog_title)).setCancelText(
+                        getString(R.string.dialog_cancel)).setConfirmText(
+                        getString(R.string.dialog_confirm)).setOnClickListener {
 
                     }.build().show(childFragmentManager, "BottomSheetDialog")
                 }
@@ -176,7 +191,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 26 -> context?.startActivity<AlarmRemindActivity>()
                 27 -> context?.startActivity<ContextProviderActivity>()
 
-                else -> ThreadPool.execute { Log.i("zzz", "ThreadName:" + Thread.currentThread().name) }
+                else -> ThreadPool.execute {
+                    Log.i("zzz", "ThreadName:" + Thread.currentThread().name)
+                }
             }
         }
     }
@@ -187,7 +204,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             val authority = "${appContext.packageName}.HookSwitchProvider"
             val uri = "content://$authority/$PATH_SWITCH".toUri()
             val contentResolver: ContentResolver = context.contentResolver
-            val cursor: Cursor? = contentResolver.query(uri, arrayOf("is_enabled"), null, null, null)
+            val cursor: Cursor? = contentResolver.query(uri, arrayOf("is_enabled"), null, null,
+                null)
             var enabled = false
             cursor?.use {
                 if (it.count > 0 && it.moveToFirst()) {
@@ -232,24 +250,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arrayOf(Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO)
         } else {
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
     }
-    private var activityResult: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    private var activityResult: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
             val resultData = result.data!!.getStringExtra("data_return")
             Log.d("zzz", "resultData: $resultData")
         }
     }
-    var requestLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted: Boolean ->
+    var requestLauncher: ActivityResultLauncher<String> = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { granted: Boolean ->
         if (!granted) {
-            val result = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val result = ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
             if (result == PermissionChecker.PERMISSION_DENIED) {
             }
         }
-        Toast.makeText(requireContext(), "request permission result:" + (if (granted) "success" else "failed"), Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(),
+            "request permission result:" + (if (granted) "success" else "failed"),
+            Toast.LENGTH_SHORT).show()
     }
-    private var storageLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted: Boolean ->
+    private var storageLauncher: ActivityResultLauncher<String> = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { granted: Boolean ->
         if (granted) {
             deleteFile()
         } else {
@@ -261,18 +286,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
             permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {
-            selectSinglePhotoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            selectSinglePhotoLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
     }
 
-    private val selectSinglePhotoLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+    private val selectSinglePhotoLauncher = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
 
         }
     }
-    private var permissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted: Boolean ->
+    private var permissionLauncher: ActivityResultLauncher<String> = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { granted: Boolean ->
         if (granted) {
-            selectSinglePhotoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            selectSinglePhotoLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         } else {
             requireContext().toast("Permission denied")
         }

@@ -9,6 +9,8 @@ import androidx.core.animation.addListener
 import androidx.core.os.BundleCompat
 import androidx.core.view.drawToBitmap
 import com.google.android.material.tabs.TabLayoutMediator
+import com.toolkit.admob.manager.InterstitialPreloadAdMobManager
+import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
 import com.zero.base.theme.AppTheme
 import com.zero.base.transformer.CustomPageTransformer
@@ -42,7 +44,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
-            recreateTransitionData = BundleCompat.getParcelable(savedInstanceState, TRANSITION_DATA_KEY, TransitionData::class.java)
+            recreateTransitionData = BundleCompat.getParcelable(savedInstanceState,
+                TRANSITION_DATA_KEY, TransitionData::class.java)
             recreateTransitionData?.let { transitionAnimation(it) }
         }
     }
@@ -56,10 +59,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun initData() {
         val viewPagerAdapter = ViewPagerAdapter(this);
-        viewPagerAdapter.addFragment(ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_home), R.drawable.tab_home_selector, HomeFragment()))
-        viewPagerAdapter.addFragment(ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_editor), R.drawable.tab_editor_selector, SecondFragment()))
-        viewPagerAdapter.addFragment(ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_free_style), R.drawable.tab_free_style_selector, ThirdFragment.newInstance()))
-        viewPagerAdapter.addFragment(ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_setting), R.drawable.tab_setting_selector, FourFragment.newInstance()))
+        viewPagerAdapter.addFragment(ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_home),
+            R.drawable.tab_home_selector, HomeFragment()))
+        viewPagerAdapter.addFragment(
+            ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_editor),
+                R.drawable.tab_editor_selector, SecondFragment()))
+        viewPagerAdapter.addFragment(
+            ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_free_style),
+                R.drawable.tab_free_style_selector, ThirdFragment.newInstance()))
+        viewPagerAdapter.addFragment(
+            ViewPagerAdapter.FragmentWrapper(getString(R.string.tab_setting),
+                R.drawable.tab_setting_selector, FourFragment.newInstance()))
         binding.viewPager.adapter = viewPagerAdapter
         binding.viewPager.isUserInputEnabled = false
         binding.viewPager.setPageTransformer(CustomPageTransformer())
@@ -81,13 +91,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             when (transitionData.type) {
                 TransitionType.ENTER -> {
                     // 进入动画，裁切掉圆内的区域 圆由小变大
-                    animator.setFloatValues(0f, hypot(binding.ivTransition.width.toFloat(), binding.ivTransition.height.toFloat()))
+                    animator.setFloatValues(0f, hypot(binding.ivTransition.width.toFloat(),
+                        binding.ivTransition.height.toFloat()))
                     clipType = ClipImageView.ClipType.CIRCLE_REVERSE
                 }
 
                 TransitionType.EXIT -> {
                     // 退出动画，裁切掉圆外的区域 圆由大变小
-                    animator.setFloatValues(hypot(binding.ivTransition.width.toFloat(), binding.ivTransition.height.toFloat()), 0f)
+                    animator.setFloatValues(hypot(binding.ivTransition.width.toFloat(),
+                        binding.ivTransition.height.toFloat()), 0f)
                     clipType = ClipImageView.ClipType.CIRCLE
                 }
             }
@@ -99,7 +111,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             animator.addUpdateListener {
                 val radius = it.animatedValue as Float
                 // 更新裁切区域
-                binding.ivTransition.clipCircle(transitionData.centerX, transitionData.centerY, radius, clipType)
+                binding.ivTransition.clipCircle(transitionData.centerX, transitionData.centerY,
+                    radius, clipType)
             }
             animator.start()
         }
@@ -120,7 +133,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     }
 
     override fun addListener() {
-        supportFragmentManager.setFragmentResultListener(this::class.java.simpleName, this) { requestKey, result ->
+        supportFragmentManager.setFragmentResultListener(this::class.java.simpleName,
+            this) { requestKey, result ->
             if (requestKey == this::class.java.simpleName) {
                 val screenHeight = result.getInt("screenHeight")
                 Log.d("zzz", "setFragmentResultListener: $screenHeight")
@@ -149,4 +163,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        InterstitialPreloadAdMobManager.preLoadInterstitialAd(
+            BuildConfig.ADMOB_INTERSTITIAL_CONNECT_RESULT)
+    }
 }

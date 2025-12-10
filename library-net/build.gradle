@@ -28,7 +28,7 @@ android {
 
 dependencies {
     implementation libs.appcompat
-    implementation(platform(libs.okhttp.bom))
+//    implementation(platform(libs.okhttp.bom))
     implementation libs.androidx.documentfile
     implementation(libs.okhttp)
 }

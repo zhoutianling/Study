@@ -1,47 +1,31 @@
-package com.toolkit.admob.listener;
+package com.toolkit.admob.listener
 
-import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.app.Activity
+import android.app.Application.ActivityLifecycleCallbacks
+import android.os.Bundle
 
 /**
  * @author Admin
  */
-public abstract class AbstractLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
-    @Override
-    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+abstract class AbstractLifecycleCallbacks : ActivityLifecycleCallbacks {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
     }
 
-    @Override
-    public void onActivityStarted(@NonNull Activity activity) {
-
+    override fun onActivityStarted(activity: Activity) {
     }
 
-    @Override
-    public void onActivityResumed(@NonNull Activity activity) {
-
+    override fun onActivityResumed(activity: Activity) {
     }
 
-    @Override
-    public void onActivityPaused(@NonNull Activity activity) {
-
+    override fun onActivityPaused(activity: Activity) {
     }
 
-    @Override
-    public void onActivityStopped(@NonNull Activity activity) {
-
+    override fun onActivityStopped(activity: Activity) {
     }
 
-    @Override
-    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
     }
 
-    @Override
-    public void onActivityDestroyed(@NonNull Activity activity) {
-
+    override fun onActivityDestroyed(activity: Activity) {
     }
 }

@@ -36,8 +36,6 @@ import com.zero.study.ui.fragment.HomeFragment
 class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimationBinding::inflate), HomeFragment.OnClickListener {
 
 
-    @BindView(R.id.btn_01)
-    lateinit var btn: AppCompatTextView
     private val adSize: AdSize
         get() {
             val displayMetrics = resources.displayMetrics

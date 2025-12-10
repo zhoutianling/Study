@@ -51,11 +51,11 @@ class NativeAdManager(private val mContext: Context, private val mUnitId: String
 
     fun tryRemoveAd(checkCooling: Boolean) {
         if (System.currentTimeMillis() - mAdShowTime < 15 * 1000 && checkCooling) {
-            AdMobManager.showTips("tryRemoveAd : Ad is kept")
+            AdMobManager.logMsg("tryRemoveAd : Ad is kept")
             return
         }
         mRootView.removeAllViews()
-        AdMobManager.showTips("NativeAd Removed")
+        AdMobManager.logMsg("NativeAd Removed")
         if (mNativeAd != null) {
             mNativeAd?.destroy()
         }
@@ -73,25 +73,25 @@ class NativeAdManager(private val mContext: Context, private val mUnitId: String
         val now = System.currentTimeMillis()
         // 广告加载中
         if (mIsAdLoading) {
-            AdMobManager.showTips("NativeAd is loading")
+            AdMobManager.logMsg("NativeAd is loading")
             return
         }
 
         if (now - mAdLoadTime < 5 * 1000) {
-            AdMobManager.showTips("NativeAd load too frequently")
+            AdMobManager.logMsg("NativeAd load too frequently")
             return
         }
 
         if (mRootView.childCount > 0) {
-            AdMobManager.showTips(" NativeAd is exist")
+            AdMobManager.logMsg(" NativeAd is exist")
             return
         }
-        AdMobManager.showTips("load NativeAd")
+        AdMobManager.logMsg("load NativeAd")
         mIsAdLoading = true
         mAdContainer = AdContainer(mContext, mLayoutRes)
         mAdLoadTime = now
         val adLoader = AdLoader.Builder(mContext, mUnitId).forNativeAd { nativeAd: NativeAd ->
-            AdMobManager.showTips("NativeAd is loaded")
+            AdMobManager.logMsg("NativeAd is loaded")
 //            Enhancer.enhance(mUnitId, nativeAd);
             // 修正加载中标识
             mIsAdLoading = false
@@ -115,7 +115,7 @@ class NativeAdManager(private val mContext: Context, private val mUnitId: String
             mAdShowTime = System.currentTimeMillis()
         }.withAdListener(object : AdListener() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
-                AdMobManager.showTips("NativeAd is loading failure : ${adError.message}")
+                AdMobManager.logMsg("NativeAd is loading failure : ${adError.message}")
                 mIsAdLoading = false
                 mRootView.removeAllViews()
                 mAdContainer = null

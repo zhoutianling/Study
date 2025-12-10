@@ -1,5 +1,7 @@
 [versions]
+coilVersion = "2.7.0"
 leakcanaryAndroidVersion = "2.14"
+okhttpProfilerVersion = "1.1.1"
 xposedVersion = "82"
 cameraVersion = "1.4.2"
 converterGsonVersion = "3.0.0"
@@ -44,13 +46,15 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomVersion" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingVersion" }
 
+coil = { module = "io.coil-kt:coil", version.ref = "coilVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
+okhttp-profiler = { module = "io.nerdythings:okhttp-profiler", version.ref = "okhttpProfilerVersion" }
 xposed = { module = "de.robv.android.xposed:api", version.ref = "xposedVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGsonVersion" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexboxVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
-okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttpBom" }
-okhttp = { module = "com.squareup.okhttp3:okhttp" }
+#okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttpBom" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpBom" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentFileVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }

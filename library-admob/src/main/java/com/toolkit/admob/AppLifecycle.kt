@@ -67,11 +67,11 @@ class AppLifecycle(application: Application, private var filterClassName: String
     override fun onActivityStarted(activity: Activity) {
         currentActivity = null
         if (AppOpenAdManager.isAdShowing) {
-            AdMobManager.showTips("AppOpenAd iShowing return...")
+            AdMobManager.logMsg("AppOpenAd iShowing return...")
             return
         }
         if (InterstitialAdManager.isAdShowing) {
-            AdMobManager.showTips("InterstitialAd isShowing return...")
+            AdMobManager.logMsg("InterstitialAd isShowing return...")
             return
         }
         currentActivity = WeakReference(activity);

@@ -38,10 +38,10 @@ object InterstitialAdManager {
             val countDownTimer: CountDownTimer = object : CountDownTimer((maxSeconds * 1000).toLong(), 1000) {
                 override fun onTick(secondsFinished: Long) {
                     val progress = maxSeconds - (secondsFinished.toInt() / 1000)
-                    AdMobManager.showTips("onTick:$progress")
+                    AdMobManager.logMsg("onTick:$progress")
                     doLoadInterstitialAd(context, unitId)
                     if (READY_ADS.containsKey(unitId)) {
-                        AdMobManager.showTips("InterstitialAd isLoaded")
+                        AdMobManager.logMsg("InterstitialAd isLoaded")
                         cancel()
                         onFinish()
                     }
@@ -61,11 +61,11 @@ object InterstitialAdManager {
      */
     private fun doLoadInterstitialAd(context: Context, unitId: String) {
         if (isLoading(unitId)) {
-            AdMobManager.showTips("InterstitialAd is loading return")
+            AdMobManager.logMsg("InterstitialAd is loading return")
             return
         }
         if (isReady(unitId) && isAdValid(unitId)) {
-            AdMobManager.showTips("InterstitialAd is isReady but within the valid  period return")
+            AdMobManager.logMsg("InterstitialAd is isReady but within the valid  period return")
             return
         }
         READY_ADS.remove(unitId)
@@ -73,7 +73,7 @@ object InterstitialAdManager {
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(context, unitId, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                AdMobManager.showTips("InterstitialAd onAdLoaded:${unitId}")
+                AdMobManager.logMsg("InterstitialAd onAdLoaded:${unitId}")
 //                Enhancer.enhance(unitId, interstitialAd)
                 LOADING_ADS.remove(unitId)
                 if (AdMobManager.connected) {
@@ -99,11 +99,11 @@ object InterstitialAdManager {
 
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                 val error = String.format(Locale.getDefault(), "domain: %s, code: %d, message: %s", loadAdError.domain, loadAdError.code, loadAdError.message)
-                AdMobManager.showTips("InterstitialAd onAdFailedToLoad:$error")
+                AdMobManager.logMsg("InterstitialAd onAdFailedToLoad:$error")
                 LOADING_ADS.remove(unitId)
             }
         })
-        AdMobManager.showTips("InterstitialAd is Loading ....:${unitId}")
+        AdMobManager.logMsg("InterstitialAd is Loading ....:${unitId}")
     }
 
 
@@ -113,17 +113,17 @@ object InterstitialAdManager {
             return
         }
         if (checkCooling && now - lastDismissStamp < COOLING_INTERVAL) {
-            AdMobManager.showTips("Interstitial Ad is cooling  ...:${unitId}")
+            AdMobManager.logMsg("Interstitial Ad is cooling  ...:${unitId}")
             listener.callback(false)
             return
         }
         if (!isReady(unitId)) {
-            AdMobManager.showTips("Interstitial Ad is not ready:${unitId}")
+            AdMobManager.logMsg("Interstitial Ad is not ready:${unitId}")
             listener.callback(false)
             return
         }
         if (!isAdValid(unitId)) {
-            AdMobManager.showTips("Interstitial Ad is not with in valid period:${unitId}")
+            AdMobManager.logMsg("Interstitial Ad is not with in valid period:${unitId}")
             READY_ADS.remove(unitId)
             listener.callback(false)
             return
@@ -155,7 +155,7 @@ object InterstitialAdManager {
             }
             isAdShowing = true
             ad.interstitialAd.show(activity)
-            AdMobManager.showTips("Interstitial Ad is show and is advance:" + ad.advance)
+            AdMobManager.logMsg("Interstitial Ad is show and is advance:" + ad.advance)
         }
     }
 

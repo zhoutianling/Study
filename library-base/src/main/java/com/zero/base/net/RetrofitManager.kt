@@ -35,9 +35,10 @@ object RetrofitManager {
             connectTimeout(TIME_OUT_SECONDS, TimeUnit.SECONDS)
             readTimeout(TIME_OUT_SECONDS, TimeUnit.SECONDS)
             writeTimeout(TIME_OUT_SECONDS, TimeUnit.SECONDS)
-            cache(Cache(context.cacheDir, 1024 * 1024 * 128))
+            cache(Cache(context.cacheDir, 1024 * 1024 * 64))
             setDebug(BuildConfig.DEBUG)
             setRequestInterceptor(GlobalParamInterceptor())
+
             addInterceptor(LogRecordInterceptor(BuildConfig.DEBUG))
             setConverter(GsonConverter())
         }
@@ -51,6 +52,7 @@ object RetrofitManager {
     /**
      * Retrofit相关配置
      */
+    @Deprecated("后续使用Net库请求网络，该方式逐步废弃")
     fun <T> getService(serviceClass: Class<T>, baseUrl: String? = null): T {
         return Retrofit.Builder().client(client).addConverterFactory(GsonConverterFactory.create()).baseUrl(baseUrl
             ?: BASE_URL).build().create(serviceClass)

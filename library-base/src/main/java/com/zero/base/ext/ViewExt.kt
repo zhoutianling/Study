@@ -18,7 +18,12 @@ import java.util.concurrent.TimeUnit
  */
 
 inline fun <reified T : Activity> Context.startActivity() {
-    startActivity( Intent(this, T::class.java))
+    startActivity(Intent(this, T::class.java))
+}
+
+inline fun <reified T : Activity> Context.startActivity(noinline block: Intent.() -> Unit = {}) {
+    val intent = Intent(this, T::class.java).apply(block)
+    startActivity(intent)
 }
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int): View =
@@ -50,7 +55,8 @@ fun View.animateHeart(minScale: Float = 0.8f, maxScale: Float = 1.0f, duration: 
 }
 
 fun View.moveAnimal(duration: Long = 1000) {
-    ObjectAnimator.ofFloat(this, "translationX", -this.width.toFloat() + 15, this.width.toFloat() - 15.dp).apply {
+    ObjectAnimator.ofFloat(this, "translationX", -this.width.toFloat() + 15,
+        this.width.toFloat() - 15.dp).apply {
         this.duration = duration
         interpolator = LinearInterpolator()
         repeatCount = ObjectAnimator.INFINITE

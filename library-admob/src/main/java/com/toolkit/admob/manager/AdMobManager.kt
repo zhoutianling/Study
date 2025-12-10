@@ -36,15 +36,15 @@ object AdMobManager {
     @JvmStatic
     fun initMobileAds(app: Context, timeFirst: Boolean) {
         if (atomicBoolean.getAndSet(true)) {
-            showTips("-->Admob initialized ")
+            logMsg("-->Admob initialized ")
             return
         }
         val backgroundScope = CoroutineScope(Dispatchers.IO)
         backgroundScope.launch {
-            showTips("--> Admob initializing... ")
+            logMsg("--> Admob initializing... ")
             MobileAds.initialize(app) {
                 atomicBoolean.set(true)
-                showTips("--> Admob complete... ")
+                logMsg("--> Admob complete... ")
                 if (timeFirst) {
                     loadAd(app, BuildConfig.ADMOB_INTERSTITIAL_GUIDE)
                 }
@@ -86,9 +86,9 @@ object AdMobManager {
     }
 
 
-    fun showTips(msg: String) {
+    fun logMsg(msg: String) {
         if (BuildConfig.DEBUG) {
-            Log.i("ad", "showTips: $msg")
+            Log.i("zzz", "logMsg: $msg")
         }
     }
 }

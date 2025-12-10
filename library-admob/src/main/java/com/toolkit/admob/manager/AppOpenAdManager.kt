@@ -43,7 +43,7 @@ object AppOpenAdManager {
 
     private fun doLoadAd(context: Context) {
         if (isLoadingAd || isAdAvailable) {
-            AdMobManager.showTips("open ad isLoading or isAdAvailable return")
+            AdMobManager.logMsg("open ad isLoading or isAdAvailable return")
             return
         }
 
@@ -61,7 +61,7 @@ object AppOpenAdManager {
                 isLoadingAd = false
                 isAdLoadFailed = false
                 loadTime = Date().time
-                AdMobManager.showTips("open ad load complete")
+                AdMobManager.logMsg("open ad load complete")
 
             }
 
@@ -73,7 +73,7 @@ object AppOpenAdManager {
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                 isLoadingAd = false
                 isAdLoadFailed = true
-                AdMobManager.showTips("open ad preload onAdFailedToLoad")
+                AdMobManager.logMsg("open ad preload onAdFailedToLoad")
             }
         })
     }
@@ -103,14 +103,14 @@ object AppOpenAdManager {
     fun showAdIfAvailable(activity: Activity, adStatusListener: OpenAdStatusListener) {
         // If the app open ad is already showing, do not show the ad again.
         if (isAdShowing) {
-            AdMobManager.showTips("open ad is showing")
+            AdMobManager.logMsg("open ad is showing")
             return
         }
 
         // If the app open ad is not available yet, invoke the callback then load the ad.
         if (!isAdAvailable) {
             adStatusListener.onNotReady(isAdLoadFailed)
-            AdMobManager.showTips("open ad is no ready,load failed:$isAdLoadFailed")
+            AdMobManager.logMsg("open ad is no ready,load failed:$isAdLoadFailed")
             loadAd(activity)
             return
         }
@@ -147,17 +147,17 @@ object AppOpenAdManager {
         val countDownTimer: CountDownTimer = object : CountDownTimer((maxSeconds * 1000).toLong(), 1000) {
             override fun onTick(secondsFinished: Long) {
                 val progress = maxSeconds - (secondsFinished.toInt() / 1000)
-                AdMobManager.showTips("onTick:$progress")
+                AdMobManager.logMsg("onTick:$progress")
                 loadAd(activity)
                 if (!isLoadingAd || isAdShowing) {
-                    AdMobManager.showTips("open ad isAdAvailable,try show")
+                    AdMobManager.logMsg("open ad isAdAvailable,try show")
                     cancel()
                     onFinish()
                 }
             }
 
             override fun onFinish() {
-                AdMobManager.showTips("onTick finish")
+                AdMobManager.logMsg("onTick finish")
                 showAdIfAvailable(activity, object : OpenAdStatusListener {
                     override fun onNotReady(loadFailed: Boolean) {
                         listener.onComplete()
