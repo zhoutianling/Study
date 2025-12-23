@@ -66,7 +66,8 @@ class LanguageActivity : BaseActivity<ActivityLanguageBinding>(ActivityLanguageB
         binding.tvNext.setOnClickListener {
             val selectedCode = languageAdapter.getSelectedCode()
             StorageUtils.putString(selectedLanguageKey, selectedCode)
-            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(Locale(selectedCode)))
+            val locale = Locale.forLanguageTag(selectedCode)
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
             if (isFistTime) {
                 InterstitialPreloadAdMobManager.tryShow(this@LanguageActivity,
                     BuildConfig.ADMOB_INTERSTITIAL_LANGUAGE) {

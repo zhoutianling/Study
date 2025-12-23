@@ -47,7 +47,7 @@ class LanguageAdapter(private var languageCodes: MutableList<String>) : Recycler
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val code = languageCodes[position]
-        val loc = Locale(code)
+        val loc = Locale.forLanguageTag(code)
         holder.binding.tvLanguageName.text = loc.getDisplayLanguage(loc)
         holder.binding.tvLocalTitle.text = loc.displayLanguage
         holder.binding.ivSelect.visibility = if (selected == position) View.VISIBLE else View.INVISIBLE

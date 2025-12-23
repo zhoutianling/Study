@@ -43,11 +43,8 @@ dependencies {
     api libs.material
     api libs.swiperefresh.layout
     //lifecycle
-    api libs.lifecycle.process
     api libs.androidx.lifecycle.process
     api libs.androidx.lifecycle.viewmodel.ktx
-    //net library
-//    api libs.retrofit
     api libs.converter.gson
     api libs.gson
     //glide
