@@ -1,184 +1,200 @@
 package com.zero.health.ui.activity
 
-/**
- * @date:2025/12/23 19:47
- * @path:com.zero.health.ui.activity.ProcessMonitor
- */
-import android.system.Os
-import android.system.OsConstants
-import java.io.File
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 
+import java.util.concurrent.atomic.AtomicBoolean
+
+/**
+ * 基于 su 的进程监控器
+ * - 扫描 /proc
+ * - 统计进程 start / end / duration
+ * - 适合实时 RecyclerView 展示
+ */
 class ProcessMonitor(private val scanIntervalMs: Long = 2000L) {
 
-    // ======================
-    // 数据模型
-    // ======================
-
-    data class ProcessTimeline(val pid: Int, val packageName: String, val startUptimeSec: Double,
-                               @Volatile var endUptimeSec: Double? = null) {
-        fun durationSec(now: Double): Double = (endUptimeSec ?: now) - startUptimeSec
-    }
+    // =========================
+    // 对外 UI 使用的数据模型
+    // =========================
 
     data class ProcessUiModel(val pid: Int, val packageName: String, val aliveSeconds: Double,
                               val isRunning: Boolean)
 
-    private data class ScanInfo(val pid: Int, val packageName: String, val startUptimeSec: Double)
+    // =========================
+    // 内部时间轴模型
+    // =========================
 
-    // ======================
-    // 内部状态
-    // ======================
+    private data class Timeline(val pid: Int, val packageName: String, val startUptimeSec: Double,
+                                var endUptimeSec: Double? = null) {
+        fun duration(now: Double): Double = (endUptimeSec ?: now) - startUptimeSec
+    }
 
-    private val activeProcesses = ConcurrentHashMap<Int, ProcessTimeline>()
-    private val finishedProcesses = CopyOnWriteArrayList<ProcessTimeline>()
+    // =========================
+    // Raw /proc 扫描结果
+    // =========================
 
-    @Volatile
-    private var running = false
+    private data class RawProc(val pid: Int, val cmdline: String, val stat: String)
 
+    // =========================
+    // 状态容器
+    // =========================
+
+    private val active = HashMap<Int, Timeline>()
+    private val finished = ArrayList<Timeline>()
+
+    private val running = AtomicBoolean(false)
     private var workerThread: Thread? = null
 
-    // ======================
-    // 对外 API
-    // ======================
+    // =========================
+    // Public API
+    // =========================
 
     fun start() {
-        if (running) return
-        running = true
+        if (running.get()) return
+        running.set(true)
 
         workerThread = Thread {
-            while (running) {
+            while (running.get()) {
                 try {
                     tick()
                     Thread.sleep(scanIntervalMs)
                 } catch (_: InterruptedException) {
                 } catch (_: Throwable) {
+                    // 防止单次异常导致线程退出
                 }
             }
         }.apply { start() }
     }
 
     fun stop() {
-        running = false
+        running.set(false)
         workerThread?.interrupt()
         workerThread = null
     }
 
+    /**
+     * 构建给 RecyclerView 使用的数据
+     */
     fun buildUiList(): List<ProcessUiModel> {
-        val now = readUptimeSeconds()
+        val now = readUptimeBySu()
 
-        val runningList = activeProcesses.values.map {
+        val runningList = active.values.map {
             ProcessUiModel(pid = it.pid, packageName = it.packageName,
-                aliveSeconds = it.durationSec(now), isRunning = true)
+                aliveSeconds = it.duration(now), isRunning = true)
         }
 
-        val finishedList = finishedProcesses.map {
+        val finishedList = finished.map {
             ProcessUiModel(pid = it.pid, packageName = it.packageName,
-                aliveSeconds = it.durationSec(now), isRunning = false)
+                aliveSeconds = it.duration(now), isRunning = false)
         }
 
         return (runningList + finishedList).sortedByDescending { it.aliveSeconds }
     }
 
-    fun clearFinished() {
-        finishedProcesses.clear()
-    }
-
-    // ======================
+    // =========================
     // 核心扫描逻辑
-    // ======================
+    // =========================
 
     private fun tick() {
-        val nowUptime = readUptimeSeconds()
-        val scanned = scanProcesses()
+        val now = readUptimeBySu()
+        val hz = readHzBySu()
+        val scanned = scanProcessesBySu().associateBy { it.pid }
 
         // 新进程
-        scanned.values.forEach { info ->
-            activeProcesses.putIfAbsent(info.pid,
-                ProcessTimeline(pid = info.pid, packageName = info.packageName,
-                    startUptimeSec = info.startUptimeSec))
-        }
-
-        // 已结束进程
-        val iterator = activeProcesses.entries.iterator()
-        while (iterator.hasNext()) {
-            val entry = iterator.next()
-            if (!scanned.containsKey(entry.key)) {
-                entry.value.endUptimeSec = nowUptime
-                finishedProcesses.add(entry.value)
-                iterator.remove()
-            }
-        }
-    }
-
-    // ======================
-    // 扫描 /proc
-    // ======================
-
-    private fun scanProcesses(): Map<Int, ScanInfo> {
-        val result = HashMap<Int, ScanInfo>()
-
-        val hz = Os.sysconf(OsConstants._SC_CLK_TCK)
-
-        File("/proc").listFiles()?.forEach { file ->
-            val pid = file.name.toIntOrNull() ?: return@forEach
-
-            try {
-                if (!isAppProcess(pid)) return@forEach
-
-                val pkg = readPackageName(pid) ?: return@forEach
-                val startJiffies = readProcessStartJiffies(pid)
-                if (startJiffies <= 0) return@forEach
+        for (proc in scanned.values) {
+            if (!active.containsKey(proc.pid)) {
+                val startJiffies = parseStartJiffies(proc.stat)
+                if (startJiffies <= 0) continue
 
                 val startUptime = startJiffies.toDouble() / hz
 
-                result[pid] = ScanInfo(pid = pid, packageName = pkg, startUptimeSec = startUptime)
-            } catch (_: Throwable) {
-                // 进程可能在扫描过程中结束
+                active[proc.pid] = Timeline(pid = proc.pid, packageName = proc.cmdline,
+                    startUptimeSec = startUptime)
             }
         }
-        return result
+
+        // 已结束进程
+        val it = active.iterator()
+        while (it.hasNext()) {
+            val entry = it.next()
+            if (!scanned.containsKey(entry.key)) {
+                entry.value.endUptimeSec = now
+                finished.add(entry.value)
+                it.remove()
+            }
+        }
     }
 
-    // ======================
-    // /proc 工具方法
-    // ======================
+    // =========================
+    // su 扫描 /proc
+    // =========================
 
-    private fun readUptimeSeconds(): Double {
-        val text = File("/proc/uptime").readText()
-        return text.substringBefore(" ").toDouble()
+    private fun scanProcessesBySu(): List<RawProc> {
+        val script = """
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p##*/}
+              stat=$(cat ${'$'}p/stat 2>/dev/null) || continue
+              cmd=$(tr '\0' ' ' < ${'$'}p/cmdline 2>/dev/null)
+              [ -z "${'$'}cmd" ] && continue
+              echo "${'$'}pid|${'$'}cmd|${'$'}stat"
+            done
+        """.trimIndent()
+
+        return runSu(script).mapNotNull { line ->
+            val first = line.indexOf('|')
+            val second = line.indexOf('|', first + 1)
+            if (first <= 0 || second <= first) return@mapNotNull null
+
+            val pid = line.substring(0, first).toIntOrNull() ?: return@mapNotNull null
+            val cmd = line.substring(first + 1, second).trim()
+            val stat = line.substring(second + 1)
+
+            RawProc(pid, cmd, stat)
+        }
     }
 
-    private fun readProcessStartJiffies(pid: Int): Long {
-        val stat = File("/proc/$pid/stat").readText()
+    // =========================
+    // /proc 解析
+    // =========================
+
+    private fun parseStartJiffies(stat: String): Long {
         val end = stat.lastIndexOf(')')
         if (end < 0) return -1
 
         val after = stat.substring(end + 2)
         val fields = after.split(" ")
-
-        // starttime is 22nd field
-        return fields[19].toLong()
+        return fields.getOrNull(19)?.toLongOrNull() ?: -1
     }
 
-    private fun readPackageName(pid: Int): String? {
-        val file = File("/proc/$pid/cmdline")
-        if (!file.exists()) return null
+    // =========================
+    // su 工具方法
+    // =========================
 
-        val bytes = file.readBytes()
-        val end = bytes.indexOf(0)
-        if (end <= 0) return null
-
-        return String(bytes, 0, end)
+    private fun readUptimeBySu(): Double {
+        return runSu("cat /proc/uptime").firstOrNull()?.substringBefore(" ")?.toDoubleOrNull()
+            ?: 0.0
     }
 
-    private fun isAppProcess(pid: Int): Boolean {
-        val status = File("/proc/$pid/status")
-        if (!status.exists()) return false
+    private fun readHzBySu(): Int {
+        return runSu("getconf CLK_TCK").firstOrNull()?.toIntOrNull() ?: 100
+    }
 
-        val uidLine = status.readLines().firstOrNull { it.startsWith("Uid:") } ?: return false
+    private fun runSu(cmd: String): List<String> {
+        val process = Runtime.getRuntime().exec("su")
+        val result = ArrayList<String>()
 
-        val uid = uidLine.split("\\s+".toRegex())[1].toInt()
-        return uid >= 10000
+        process.outputStream.bufferedWriter().use { w ->
+            w.write(cmd)
+            w.newLine()
+            w.write("exit")
+            w.newLine()
+            w.flush()
+        }
+
+        process.inputStream.bufferedReader().useLines { lines ->
+            lines.forEach { result.add(it) }
+        }
+
+        process.waitFor()
+        return result
     }
 }
+
