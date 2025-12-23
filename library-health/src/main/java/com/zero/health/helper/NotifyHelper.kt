@@ -34,17 +34,22 @@ object NotifyHelper {
             iconRes = RemindType.getTypeIcon(RemindType.HEALTH_TOOLS)
             channelId = RemindType.getChannelId(RemindType.HEALTH_TOOLS)
             channelName = context.getString(RemindType.getChannelName(RemindType.HEALTH_TOOLS))
-            remoteViews = RemoteViews(context.packageName, R.layout.notification_main_normal).apply {
+            remoteViews = RemoteViews(context.packageName,
+                R.layout.notification_main_normal).apply {
                 remoteViews?.setTextViewText(R.id.tv_blood_pressure_value, "No Record")
                 val flag = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
-                val clickIntent = Intent(context, HeartRateActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                remoteViews?.setOnClickPendingIntent(R.id.tv_blood_pressure_value, PendingIntent.getActivity(context, Activity.RESULT_OK, clickIntent, flag))
+                val clickIntent = Intent(context, HeartRateActivity::class.java).setFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK)
+                remoteViews?.setOnClickPendingIntent(R.id.tv_blood_pressure_value,
+                    PendingIntent.getActivity(context, Activity.RESULT_OK, clickIntent, flag))
             }
-            bigRemoteViews = RemoteViews(context.packageName, R.layout.notification_main_big).apply {
+            bigRemoteViews = RemoteViews(context.packageName,
+                R.layout.notification_main_big).apply {
 
             }
         }
-        context.startForeground(RemindType.getNotificationId(RemindType.HEALTH_TOOLS), mainNotification)
+        context.startForeground(RemindType.getNotificationId(RemindType.HEALTH_TOOLS),
+            mainNotification)
     }
 
     /**
@@ -61,21 +66,54 @@ object NotifyHelper {
             channelId = RemindType.getChannelId(type)
             importance = NotificationManagerCompat.IMPORTANCE_HIGH
             channelName = context.getString(RemindType.getChannelName(type))
-            remoteViews = RemoteViews(context.packageName, R.layout.notification_remind_normal).apply {
+            remoteViews = RemoteViews(context.packageName,
+                R.layout.notification_remind_normal).apply {
                 setImageViewResource(R.id.iv_remind_logo, iconRes)
                 setTextViewText(R.id.tv_remind_content, channelName)
                 setTextViewText(R.id.tv_record, context.getString(R.string.health_record))
             }
-            bigRemoteViews = RemoteViews(context.packageName, R.layout.notification_remind_big).apply {
+            bigRemoteViews = RemoteViews(context.packageName,
+                R.layout.notification_remind_big).apply {
                 setImageViewResource(R.id.iv_remind_logo, R.drawable.ic_alarm_clock)
                 setTextViewText(R.id.tv_remind_title, Date().formatHourMinute)
                 setTextViewText(R.id.tv_remind_content, channelName)
                 setTextViewText(R.id.tv_record, context.getString(R.string.health_record))
             }
         }
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
-        NotificationManagerCompat.from(context).notify(RemindType.getNotificationId(type), remindNotification)
+        NotificationManagerCompat.from(context).notify(RemindType.getNotificationId(type),
+            remindNotification)
+    }
+
+    fun showNotification(context: Context, title: String, content: String, notifyId: Int) {
+        val remindNotification = context.createNotification {
+            this.title = title
+            this.content = content
+            this.iconRes = R.drawable.ic_alarm_clock
+            this.importance = NotificationManagerCompat.IMPORTANCE_DEFAULT
+            this.remoteViews = RemoteViews(context.packageName,
+                R.layout.notification_remind_normal).apply {
+                setImageViewResource(R.id.iv_remind_logo, iconRes)
+                setTextViewText(R.id.tv_remind_content, content)
+                setTextViewText(R.id.tv_record, context.getString(R.string.health_record))
+            }
+            this.bigRemoteViews = RemoteViews(context.packageName,
+                R.layout.notification_remind_big).apply {
+                setImageViewResource(R.id.iv_remind_logo, iconRes)
+                setTextViewText(R.id.tv_remind_title, Date().formatHourMinute)
+                setTextViewText(R.id.tv_remind_content, content)
+                setTextViewText(R.id.tv_record, context.getString(R.string.health_record))
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        NotificationManagerCompat.from(context).notify(notifyId, remindNotification)
     }
 }
