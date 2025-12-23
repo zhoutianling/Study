@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
@@ -53,7 +52,7 @@ fun Context.saveImageToPrivateDir(bitmap: Bitmap): Boolean {
 
     val targetDir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         // Android 10+ 使用 getExternalFilesDir
-       File (getExternalFilesDir(null),"zzz")
+        File(getExternalFilesDir(null), "zzz")
     } else {
         // Android 9- 使用传统路径
         getExternalFilesDir(null)
@@ -88,7 +87,8 @@ fun checkPermission(context: Context): Boolean {
         // Android 11及以上无需WRITE_EXTERNAL_STORAGE权限
         true
     } else {
-        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(context,
+            Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 }
 
@@ -98,12 +98,15 @@ fun requestPermission(activity: FragmentActivity) {
         // Android 11及以上无需WRITE_EXTERNAL_STORAGE权限
         Log.d(TAG, "Android 11+ 无需存储权限")
     } else {
-        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CODE_WRITE_EXTERNAL_STORAGE)
+        ActivityCompat.requestPermissions(activity,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            REQUEST_CODE_WRITE_EXTERNAL_STORAGE)
     }
 }
 
 // Android 10及以上版本使用MediaStore保存图片
-private fun saveImageWithMediaStore(context: Context, bitmap: Bitmap, displayName: String): Boolean {
+private fun saveImageWithMediaStore(context: Context, bitmap: Bitmap,
+                                    displayName: String): Boolean {
     val contentResolver: ContentResolver = context.contentResolver
     val values = ContentValues().apply {
         put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
@@ -113,7 +116,8 @@ private fun saveImageWithMediaStore(context: Context, bitmap: Bitmap, displayNam
     }
 
     // 创建图片URI
-    val imageUri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    val imageUri: Uri? = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        values)
     if (imageUri == null) {
         Log.e(TAG, "无法创建图片URI")
         return false
@@ -147,7 +151,8 @@ private fun saveImageWithMediaStore(context: Context, bitmap: Bitmap, displayNam
 }
 
 // Android 9及以下版本保存图片到公共目录
-private fun saveImageToPublicDirectory(context: Context, bitmap: Bitmap, displayName: String): Boolean {
+private fun saveImageToPublicDirectory(context: Context, bitmap: Bitmap,
+                                       displayName: String): Boolean {
     // 创建保存图片的目录
     val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
 
@@ -164,8 +169,6 @@ private fun saveImageToPublicDirectory(context: Context, bitmap: Bitmap, display
             // 将Bitmap写入文件
             if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)) {
                 fos.flush()
-                // 通知媒体库更新
-                context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(imageFile)))
                 Log.d(TAG, "图片保存成功: ${imageFile.absolutePath}")
                 true
             } else {

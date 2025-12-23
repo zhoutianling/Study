@@ -69,7 +69,9 @@ object NetOkHttpInterceptor : Interceptor {
             val respBody = response.body?.toNetResponseBody(request.tagOf<NetTag.DownloadListeners>()) {
                 removeRunningCall(chain)
             }
-            response = response.newBuilder().body(respBody).build()
+            if (respBody != null) {
+                response = response.newBuilder().body(respBody).build()
+            }
             return response
         } catch (e: SocketTimeoutException) {
             throw NetSocketTimeoutException(request, e.message, e)

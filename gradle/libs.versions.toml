@@ -3,6 +3,7 @@ coilVersion = "2.7.0"
 leakcanaryAndroidVersion = "2.14"
 okhttpProfilerVersion = "1.1.1"
 onesignalVersion = "5.4.1"
+workRuntimeKtxVersion = "2.11.0"
 xposedVersion = "82"
 cameraVersion = "1.5.2"
 converterGsonVersion = "3.0.0"
@@ -17,7 +18,7 @@ material = "1.13.0"
 aabresguardPluginVersion = "0.1.10"
 roomVersion = "2.8.4"
 pagingVersion = "3.3.6"
-okhttpBom = "4.12.0"
+okhttpBom = "5.3.2"
 documentFileVersion = "1.1.0"
 xor = "5.0.0"
 stringfogGradlePlugin = "5.2.0"
@@ -25,8 +26,8 @@ glide = "5.0.5"
 swiperefresh = "1.2.0"
 mmkv = "2.3.0"
 lottieVersion = "6.6.9"
-playServicesAdsVersion = "24.6.0"
-activityVersion = "1.10.1"
+playServicesAdsVersion = "24.9.0"
+activityVersion = "1.12.2"
 opencvVersion = "4.12.0"
 media3Exoplayer = "1.9.0"
 fragmentKtx = "1.8.9"
@@ -44,6 +45,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomVersion" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingVersion" }
 
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 coil = { module = "io.coil-kt:coil", version.ref = "coilVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 okhttp-profiler = { module = "io.nerdythings:okhttp-profiler", version.ref = "okhttpProfilerVersion" }

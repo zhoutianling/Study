@@ -13,7 +13,6 @@ import com.drake.net.okhttp.toNetOkhttp
 import com.drake.net.reflect.typeTokenOf
 import com.drake.net.response.convert
 import com.drake.net.tag.NetTag
-import com.drake.net.utils.OkHttpUtils
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl

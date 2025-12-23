@@ -16,6 +16,6 @@ open class URLParseException(
     var occurred: String = ""
 
     override fun getLocalizedMessage(): String? {
-        return super.getLocalizedMessage() + occurred
+        return (super.getLocalizedMessage() ?: "") + occurred
     }
 }

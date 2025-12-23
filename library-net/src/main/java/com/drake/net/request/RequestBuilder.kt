@@ -7,7 +7,7 @@ import com.drake.net.interfaces.ProgressListener
 import com.drake.net.tag.NetTag
 import kotlinx.coroutines.CoroutineExceptionHandler
 import okhttp3.Headers
-import com.drake.net.utils.OkHttpUtils
+import okhttp3.OkHttpUtils
 import okhttp3.Request
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.reflect.KType

@@ -1,7 +1,6 @@
 package com.drake.net.interfaces
 
 import android.view.View
-import com.drake.net.BuildConfig
 import com.drake.net.Net
 import com.drake.net.NetConfig
 import com.drake.net.R
@@ -38,9 +37,7 @@ interface NetErrorHandler {
         }
 
         Net.debug(e)
-        if (NetConfig.debug) {
-            TipUtils.toast(message)
-        }
+        TipUtils.toast(message)
     }
 
     /**

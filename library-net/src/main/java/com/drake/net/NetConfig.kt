@@ -12,7 +12,7 @@ import com.drake.net.interfaces.NetErrorHandler
 import com.drake.net.okhttp.toNetOkhttp
 import okhttp3.Call
 import okhttp3.OkHttpClient
-import com.drake.net.utils.OkHttpUtils
+import okhttp3.OkHttpUtils
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentLinkedQueue
 
