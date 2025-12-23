@@ -44,12 +44,11 @@ dependencies {
     api libs.swiperefresh.layout
     //lifecycle
     api libs.lifecycle.process
-    api libs.lifecycle.viewmodel.ktx
-    api libs.lifecycle.livedata.ktx
+    api libs.androidx.lifecycle.process
+    api libs.androidx.lifecycle.viewmodel.ktx
     //net library
 //    api libs.retrofit
     api libs.converter.gson
-    api libs.logging.interceptor
     api libs.gson
     //glide
     api libs.glide
@@ -61,11 +60,9 @@ dependencies {
     //FlexLayoutManager
     api libs.flexbox
     //androidx.activity
-    api libs.androidx.activity
+    api libs.androidx.activity.ktx
+    api libs.androidx.fragment.ktx
     //OpenCV
 //    api libs.opencv
-    //Rxjava
-    api libs.rxjava
-    api libs.rxandroid
     api project(path: ':library-net')
 }

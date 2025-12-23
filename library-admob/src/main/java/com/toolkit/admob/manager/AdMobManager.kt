@@ -4,16 +4,12 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import com.adjust.sdk.Adjust
-import com.adjust.sdk.AdjustConfig
-import com.adjust.sdk.LogLevel
 import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
 import com.google.android.ump.UserMessagingPlatform
 import com.toolkit.admob.AppLifecycle
-import com.toolkit.admob.listener.AbstractLifecycleCallbacks
 import com.toolkit.admob.manager.InterstitialAdManager.loadAd
 import com.toolkit.admob_libray.BuildConfig
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +29,6 @@ object AdMobManager {
         appLifecycle = AppLifecycle(application, filterClassName)
     }
 
-    @JvmStatic
     fun initMobileAds(app: Context, timeFirst: Boolean) {
         if (atomicBoolean.getAndSet(true)) {
             logMsg("-->Admob initialized ")
@@ -53,11 +48,10 @@ object AdMobManager {
         }
     }
 
-    @JvmStatic
     fun dealConsentActionThen(activity: Activity, action: Runnable, timeFirst: Boolean) {
         val params: ConsentRequestParameters
         if (BuildConfig.DEBUG) {
-            val debugSettings = ConsentDebugSettings.Builder(activity).setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA).addTestDeviceHashedId("D36E7BC7027FB350A06CA34BBF35BFB7").build()
+            val debugSettings = ConsentDebugSettings.Builder(activity).setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA).addTestDeviceHashedId("314F2F7853AB35EEE665C2D365318FA0").build()
             params = ConsentRequestParameters.Builder().setConsentDebugSettings(debugSettings).build()
         } else {
             params = ConsentRequestParameters.Builder().build()

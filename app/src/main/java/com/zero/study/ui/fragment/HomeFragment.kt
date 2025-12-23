@@ -27,7 +27,6 @@ import com.google.gson.Gson
 import com.toolkit.admob.manager.InterstitialPreloadAdMobManager
 import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
-import com.zero.base.bus.RxBus
 import com.zero.base.ext.appFileManager
 import com.zero.base.ext.fromJson
 import com.zero.base.ext.log
@@ -42,7 +41,6 @@ import com.zero.health.ui.activity.AlarmRemindActivity
 import com.zero.health.ui.activity.HeartRateActivity
 import com.zero.study.R
 import com.zero.study.databinding.FragmentHomeBinding
-import com.zero.study.event.MsgEvent
 import com.zero.study.provider.HookSwitchProvider.Companion.PATH_SWITCH
 import com.zero.study.ui.activity.AccessPerActivity
 import com.zero.study.ui.activity.AnimationActivity
@@ -55,13 +53,13 @@ import com.zero.study.ui.activity.NotificationActivity
 import com.zero.study.ui.activity.OkioActivity
 import com.zero.study.ui.activity.PagingActivity
 import com.zero.study.ui.activity.PermissionManagerActivity
+import com.zero.study.ui.activity.PlayerActivity
 import com.zero.study.ui.activity.RecyclerViewActivity
 import com.zero.study.ui.activity.RoomActivity
 import com.zero.study.ui.activity.SecondActivity
 import com.zero.study.ui.activity.TakePhotoActivity
 import com.zero.study.ui.dialog.BottomSheetDialog
 import com.zero.study.ui.dialog.Dialog
-import com.zero.study.ui.model.AskViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -70,9 +68,6 @@ import kotlin.properties.Delegates
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
     private var listener: OnClickListener? = null
 
-    private val viewModel: AskViewModel by lazy {
-        ViewModelProvider(this)[AskViewModel::class.java]
-    }
     private var size: Int by Delegates.observable(0) { _, oldValue, newValue ->
         val number = parseInt("123456").getOrElse { 0 }
         Log.d("zzz", "${number}->${newValue} ")
@@ -149,12 +144,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 15 -> context?.startActivity<TakePhotoActivity>()
                 16 -> {
-                    viewModel.fetchAskPageList()
-                    viewModel.apply {
-                        viewModel.articlePageListLiveData.observe(this@HomeFragment) {
-                            requireContext().toast(it?.datas.toString())
-                        }
-                    }
                 }
 
                 17 -> context?.startActivity<RoomActivity>()
@@ -179,7 +168,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 25 -> {
                     "EventBus post".log("zzz")
                     isHookEnabled(requireContext())
-                    RxBus.getInstance().post(MsgEvent("time:${System.currentTimeMillis()}"))
                     BottomSheetDialog.Builder().setTitle(
                         getString(R.string.dialog_title)).setCancelText(
                         getString(R.string.dialog_cancel)).setConfirmText(
@@ -190,6 +178,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 26 -> context?.startActivity<AlarmRemindActivity>()
                 27 -> context?.startActivity<ContextProviderActivity>()
+                28 -> context?.startActivity<PlayerActivity>()
 
                 else -> ThreadPool.execute {
                     Log.i("zzz", "ThreadName:" + Thread.currentThread().name)

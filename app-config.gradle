@@ -1,5 +1,5 @@
 ext {
-    APPLICATION_ID = "com.zero.study"
+    APPLICATION_ID = "com.test.keekalivetest"
     VERSION_NAME = "1.1.0"
     VERSION_CODE = "240605"
 

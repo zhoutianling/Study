@@ -148,6 +148,9 @@
         <activity
             android:name=".ui.activity.ContextProviderActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.activity.PlayerActivity"
+            android:exported="false" />
         <!--Activity-->
         <!--Service-->
         <service

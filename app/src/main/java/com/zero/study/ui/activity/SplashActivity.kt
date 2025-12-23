@@ -43,14 +43,13 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
 
     override fun initData() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
-        initMobileAds(this, timeFirst)
+//        initMobileAds(this, timeFirst)
         viewModel.getCountry().observe(this) { country ->
             Toast.makeText(this@SplashActivity, "IP:${country.ip}", Toast.LENGTH_SHORT).show()
             lifecycleScope.launch {
                 delay(1000)
             }
         }
-        viewModel.fetchCountry()
     }
 
     override fun addListener() {
@@ -75,7 +74,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>(ActivitySplashBinding
         animator.start()
         lifecycleScope.launch {
             delay(2_000)
-            while (OpenAdMobManager.isLoadingAd.get()) {
+            while (!OpenAdMobManager.isAvailable()) {
                 delay(50)
             }
             if (animator.isRunning) animator.end()

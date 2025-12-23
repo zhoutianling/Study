@@ -82,12 +82,12 @@ data class NotificationConfig(
     /**
      * 自定义图片资源
      */
-    @DrawableRes var iconRes: Int = 0,
+    @param:DrawableRes var iconRes: Int = 0,
 
     /**
      * 通知图标
      */
-    @DrawableRes var smallIcon: Int = R.drawable.base_ic_circle,
+    @param:DrawableRes var smallIcon: Int = R.drawable.base_ic_circle,
     /**
      * 通知id
      */

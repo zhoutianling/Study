@@ -6,7 +6,6 @@ import android.content.Intent
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.adjust.sdk.Adjust
 import com.toolkit.admob.activity.OpenActivity
 import com.toolkit.admob.listener.AbstractLifecycleCallbacks
 import com.toolkit.admob.manager.AdMobManager
@@ -78,11 +77,9 @@ class AppLifecycle(application: Application, private var filterClassName: String
     }
 
     override fun onActivityResumed(activity: Activity) {
-        Adjust.onResume()
     }
 
     override fun onActivityPaused(activity: Activity) {
-        Adjust.onPause()
     }
 
     val lastOpenAdShowTime: Long

@@ -125,4 +125,8 @@ dependencies {
     ksp libs.androidx.room.compiler
     compileOnly libs.xposed
     implementation(libs.coil)
+    implementation(libs.onesignal)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.session)
 }

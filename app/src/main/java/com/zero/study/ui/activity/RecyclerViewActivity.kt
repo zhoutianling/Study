@@ -12,7 +12,6 @@ import com.zero.base.util.PingUtils
 import com.zero.study.databinding.ActivityRecyclerViewBinding
 import com.zero.study.net.entity.Article
 import com.zero.study.ui.adapter.LineAdapter
-import com.zero.study.ui.model.AskViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -28,9 +27,6 @@ class RecyclerViewActivity : BaseActivity<ActivityRecyclerViewBinding>(ActivityR
                 WebActivity.startWebView(this@RecyclerViewActivity, it.title, it.link)
             }
         }
-    }
-    private val viewModel: AskViewModel by lazy {
-        ViewModelProvider(this)[AskViewModel::class.java]
     }
 
     override fun initView() {
