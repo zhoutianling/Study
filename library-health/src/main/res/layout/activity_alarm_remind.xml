@@ -4,6 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_process_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/health_15dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_add_remind"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_add_remind"
@@ -12,7 +19,7 @@
         android:layout_margin="@dimen/health_15dp"
         android:background="@drawable/green_shape_bg"
         android:gravity="center"
-        android:text="Add Reminder"
+        android:text="Start Alarm"
         android:textColor="@color/health_white_color"
         android:textSize="22sp"
         android:textStyle="bold"

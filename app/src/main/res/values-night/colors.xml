@@ -2,12 +2,11 @@
 <resources>
     <color name="colorPrimaryDark">#FFBB86FC</color>
     <color name="colorAccent">#4A66E0</color>
-    <color name="colorPrimary">#FFBB86FC</color>
+    <color name="colorPrimary">#FFBB86</color>
     <color name="colorSecond">#7486FC</color>
     <color name="themeColor">#FFFFFF</color>
     <color name="windowBackground">#4A5250</color>
     <color name="colorBlack">#F7191414</color>
     <color name="colorWhite">#FFFFFFFF</color>
     <color name="appThemeColor">#2B2A30</color>
-    <color name="colorDefText">#FFFFFF</color>
 </resources>
