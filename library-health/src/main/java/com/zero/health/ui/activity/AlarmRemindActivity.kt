@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 class AlarmRemindActivity :
     BaseActivity<ActivityAlarmRemindBinding>(ActivityAlarmRemindBinding::inflate) {
     private lateinit var adapter: ProcessAdapter
+    private lateinit var monitor: ProcessMonitor
     override fun initView() {
         adapter = ProcessAdapter()
         binding.recyclerView.adapter = adapter
@@ -31,9 +32,7 @@ class AlarmRemindActivity :
     }
 
     override fun initData() {
-        val monitor = ProcessMonitor(2000)
-        monitor.start()
-
+        monitor = ProcessMonitor(2000,setOf("com.zionhuang.music.debug", "com.dev.example","com.toto.jcyj.mvmix","com.github.metacubex.clash.meta"))
         lifecycleScope.launch {
             while (isActive) {
                 val list = withContext(Dispatchers.IO) {
@@ -48,7 +47,8 @@ class AlarmRemindActivity :
 
     override fun addListener() {
         binding.tvAddRemind.setOnClickListener {
-            ReminderManager.scheduleReminders(this, 2)
+//            ReminderManager.scheduleReminders(this, 2)
+            monitor.start()
         }
     }
 

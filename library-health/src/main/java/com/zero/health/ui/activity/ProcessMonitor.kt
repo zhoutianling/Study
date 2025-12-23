@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - 统计进程 start / end / duration
  * - 适合实时 RecyclerView 展示
  */
-class ProcessMonitor(private val scanIntervalMs: Long = 2000L) {
+class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targetPackages: Set<String>? = null) {
 
     // =========================
     // 对外 UI 使用的数据模型
@@ -104,6 +104,9 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L) {
                 val startJiffies = parseStartJiffies(proc.stat)
                 if (startJiffies <= 0) continue
 
+                // 过滤非目标包名的进程
+                if (!isTargetPackage(proc.cmdline)) continue
+
                 val startUptime = startJiffies.toDouble() / hz
 
                 active[proc.pid] = Timeline(pid = proc.pid, packageName = proc.cmdline,
@@ -121,6 +124,14 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L) {
                 it.remove()
             }
         }
+    }
+
+    private fun isTargetPackage(packageName: String): Boolean {
+        // 如果没有指定目标包名，则不过滤（返回true表示不跳过）
+        if (targetPackages == null) return true
+        
+        // 检查包名是否在目标列表中
+        return targetPackages.any { packageName.contains(it) }
     }
 
     // =========================
