@@ -1,6 +1,7 @@
 {
   "latestVersionCode": 5,
   "latestVersionName": "1.0.5",
-  "updateUrl": "https://github.com/zhoutianling/Study/raw/main/update/study.apk",
-  "updateMessage": "修复了一些 bug，并提升了性能"
+  "downloadUrl": "https://github.com/zhoutianling/Study/raw/main/update/study.apk",
+  "updateMessage": "修复了一些 bug，并提升了性能",
+  "forceUpdate": true
 }
