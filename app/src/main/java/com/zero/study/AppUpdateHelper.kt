@@ -89,10 +89,12 @@ object AppUpdateHelper {
                 addDownloadListener(object : ProgressListener() {
                     override fun onProgress(p: Progress) {
                         CoroutineScope(Dispatchers.Main).launch {
+                            Log.d("zzz", "onProgress: ${p.progress()}")
                             if (p.finish) {
                                 Toast.makeText(context, "下载成功", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "开始下载", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Downloading...${p.progress()}%",
+                                    Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
