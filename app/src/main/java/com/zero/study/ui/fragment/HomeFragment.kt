@@ -39,6 +39,7 @@ import com.zero.base.fragment.LoadingDialog
 import com.zero.base.util.ThreadPool
 import com.zero.health.ui.activity.AlarmRemindActivity
 import com.zero.health.ui.activity.HeartRateActivity
+import com.zero.study.AppUpdateHelper
 import com.zero.study.R
 import com.zero.study.databinding.FragmentHomeBinding
 import com.zero.study.provider.HookSwitchProvider.Companion.PATH_SWITCH
@@ -139,11 +140,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     val param = schemeBuilder.setToolbarColor(
                         ContextCompat.getColor(requireContext(), R.color.appThemeColor)).build()
                     val customTabsIntent = builder.setDefaultColorSchemeParams(param).build()
-                    customTabsIntent.launchUrl(requireContext(), Uri.parse("https:www.baidu.com"))
+                    customTabsIntent.launchUrl(requireContext(), "https:www.baidu.com".toUri())
                 }
 
                 15 -> context?.startActivity<TakePhotoActivity>()
                 16 -> {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        AppUpdateHelper.checkUpdate(requireContext())
+                    }
+
                 }
 
                 17 -> context?.startActivity<RoomActivity>()

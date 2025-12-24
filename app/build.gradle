@@ -18,8 +18,8 @@ android {
         applicationId APPLICATION_ID
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
-        versionCode 2
-        versionName "1.1"
+        versionCode 4
+        versionName "4.1"
         buildConfigField("String", "COUNTRY_API_URL", "\"https://ipinfo.io/json/\"")
         buildConfigField("String", "METRICA_KEY", "\"63fd3c51-0d53-44c9-aba4-e0136520346b\"")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
