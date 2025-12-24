@@ -82,12 +82,8 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
                 aliveSeconds = it.duration(now), isRunning = true, restartCount = it.restartCount)
         }
 
-        val finishedList = finished.map {
-            ProcessUiModel(pid = it.pid, packageName = it.packageName,
-                aliveSeconds = it.duration(now), isRunning = false, restartCount = it.restartCount)
-        }
-
-        return (runningList + finishedList).sortedByDescending { it.aliveSeconds }
+        // 只返回正在运行的进程
+        return runningList.sortedByDescending { it.aliveSeconds }
     }
 
     // =========================
