@@ -32,7 +32,9 @@ class AlarmRemindActivity :
     }
 
     override fun initData() {
-        monitor = ProcessMonitor(2000,setOf("com.zionhuang.music.debug", "com.dev.example","com.toto.jcyj.mvmix","com.github.metacubex.clash.meta"))
+        monitor = ProcessMonitor(2000,
+            setOf("com.zionhuang.music.debug", "com.dev.example", "com.toto.jcyj.mvmix",
+                "com.github.metacubex.clash.meta"))
         lifecycleScope.launch {
             while (isActive) {
                 val list = withContext(Dispatchers.IO) {
@@ -67,12 +69,14 @@ class AlarmRemindActivity :
         class VH(private val binding: ItemProcessBinding) : RecyclerView.ViewHolder(binding.root) {
 
             fun bind(item: ProcessMonitor.ProcessUiModel) {
-                binding.title.text = "PID ${item.pid}  ${item.packageName}"
+                binding.tvPid.text = "PID ${item.pid}  ${item.packageName}"
 
                 val status = if (item.isRunning) "RUNNING" else "ENDED"
                 val alive = formatTime(item.aliveSeconds)
 
-                binding.subtitle.text = "存活：$alive   状态：$status"
+                binding.tvSubtitle.text = "存活：$alive   状态：$status"
+
+                binding.tvRestartCount.text = "重启次数：${item.restartCount}"
 
                 binding.root.alpha = if (item.isRunning) 1f else 0.5f
             }

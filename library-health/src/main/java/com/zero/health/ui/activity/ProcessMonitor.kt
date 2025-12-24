@@ -16,14 +16,14 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
     // =========================
 
     data class ProcessUiModel(val pid: Int, val packageName: String, val aliveSeconds: Double,
-                              val isRunning: Boolean)
+                              val isRunning: Boolean, val restartCount: Int = 0)
 
     // =========================
     // 内部时间轴模型
     // =========================
 
     private data class Timeline(val pid: Int, val packageName: String, val startUptimeSec: Double,
-                                var endUptimeSec: Double? = null) {
+                                var endUptimeSec: Double? = null, var restartCount: Int = 0) {
         fun duration(now: Double): Double = (endUptimeSec ?: now) - startUptimeSec
     }
 
@@ -39,6 +39,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
 
     private val active = HashMap<Int, Timeline>()
     private val finished = ArrayList<Timeline>()
+    private val processHistory = HashMap<String, Int>() // 记录每个包名的重启次数
 
     private val running = AtomicBoolean(false)
     private var workerThread: Thread? = null
@@ -78,12 +79,12 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
 
         val runningList = active.values.map {
             ProcessUiModel(pid = it.pid, packageName = it.packageName,
-                aliveSeconds = it.duration(now), isRunning = true)
+                aliveSeconds = it.duration(now), isRunning = true, restartCount = it.restartCount)
         }
 
         val finishedList = finished.map {
             ProcessUiModel(pid = it.pid, packageName = it.packageName,
-                aliveSeconds = it.duration(now), isRunning = false)
+                aliveSeconds = it.duration(now), isRunning = false, restartCount = it.restartCount)
         }
 
         return (runningList + finishedList).sortedByDescending { it.aliveSeconds }
@@ -108,9 +109,17 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
                 if (!isTargetPackage(proc.cmdline)) continue
 
                 val startUptime = startJiffies.toDouble() / hz
+                
+                // 检查是否为重启的进程
+                var restartCount = 0
+                val existingCount = processHistory[proc.cmdline]
+                if (existingCount != null) {
+                    restartCount = existingCount + 1
+                }
+                processHistory[proc.cmdline] = restartCount
 
                 active[proc.pid] = Timeline(pid = proc.pid, packageName = proc.cmdline,
-                    startUptimeSec = startUptime)
+                    startUptimeSec = startUptime, restartCount = restartCount)
             }
         }
 
