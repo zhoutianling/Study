@@ -30,8 +30,8 @@ class LoadingDialog : DialogFragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
-        binding.pbLoading.cancelAnimation()
+        _binding?.pbLoading?.cancelAnimation()
         _binding = null
+        super.onDestroyView()
     }
 }

@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import com.zero.base.fragment.LoadingDialog
 import com.zero.base.theme.AppTheme
 import com.zero.base.util.StorageUtils
 import com.zero.base.widget.Gloading
@@ -24,16 +25,10 @@ import kotlinx.coroutines.launch
  * @date:2024/5/24 18:35
  * @path:com.toolkit.base.ui.activity.AbstractActivity
  */
-abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflater) -> VB) : AppCompatActivity() {
+abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflater) -> VB) :
+    AppCompatActivity() {
     lateinit var binding: VB
-
-    private val loadingHolder: Gloading.Holder by lazy {
-        Gloading.default?.wrap(this)?.withRetry { onLoadRetry() }
-            ?: throw IllegalStateException("GLoading.default is null")
-    }
-
-    open fun onLoadRetry() {
-    }
+    private var loadingDialog: LoadingDialog? = null
 
     override fun attachBaseContext(newBase: Context) {
         // 加载本地配置的主题
@@ -68,7 +63,8 @@ abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflat
         }
         binding = inflate(layoutInflater)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             stateBarHeight = systemBars.top
             navigationBarHeight = systemBars.bottom
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -81,28 +77,21 @@ abstract class BaseActivity<VB : ViewBinding>(private val inflate: (LayoutInflat
     }
 
     fun showLoading() {
-        if (isMainThread()) {
-            loadingHolder.showLoading()
-        } else {
-            lifecycleScope.launch(Dispatchers.Main) {
-                loadingHolder.showLoading()
-            }
-        }
+        if (isFinishing || isDestroyed) return
+
+        val fm = supportFragmentManager
+        if (fm.findFragmentByTag("loading") != null) return
+
+        loadingDialog = LoadingDialog()
+        loadingDialog?.show(fm, "loading")
     }
 
     fun hideLoading() {
-        if (isMainThread()) {
-            loadingHolder.showLoadSuccess()
-        } else {
-            lifecycleScope.launch(Dispatchers.Main) {
-                loadingHolder.showLoadSuccess()
-            }
-        }
+        val dialog = supportFragmentManager.findFragmentByTag("loading") as? LoadingDialog
+        dialog?.dismissAllowingStateLoss()
+        loadingDialog = null
     }
 
-    open fun isMainThread(): Boolean {
-        return Thread.currentThread() == Looper.getMainLooper().thread
-    }
 
     /**
      * 使用 WindowInsetsCompat.Type.statusBars() 仅隐藏状态栏。

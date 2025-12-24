@@ -9,15 +9,12 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - 统计进程 start / end / duration
  * - 适合实时 RecyclerView 展示
  */
-class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targetPackages: Set<String>? = null) {
+class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
+                     private val targetPackages: Set<String>? = null) {
 
     // =========================
     // 对外 UI 使用的数据模型
     // =========================
-
-    data class ProcessUiModel(val pid: Int, val packageName: String, val aliveSeconds: Double,
-                              val isRunning: Boolean, val restartCount: Int = 0)
-
     // =========================
     // 内部时间轴模型
     // =========================
@@ -105,7 +102,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
                 if (!isTargetPackage(proc.cmdline)) continue
 
                 val startUptime = startJiffies.toDouble() / hz
-                
+
                 // 检查是否为重启的进程
                 var restartCount = 0
                 val existingCount = processHistory[proc.cmdline]
@@ -134,7 +131,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
     private fun isTargetPackage(packageName: String): Boolean {
         // 如果没有指定目标包名，则不过滤（返回true表示不跳过）
         if (targetPackages == null) return true
-        
+
         // 检查包名是否在目标列表中
         return targetPackages.any { packageName.contains(it) }
     }
@@ -212,5 +209,9 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L, private val targe
         process.waitFor()
         return result
     }
+
 }
+
+data class ProcessUiModel(val pid: Int, val packageName: String, val aliveSeconds: Double,
+                          val isRunning: Boolean, val restartCount: Int = 0)
 

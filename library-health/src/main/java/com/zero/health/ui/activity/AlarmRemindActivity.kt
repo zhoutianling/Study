@@ -1,8 +1,12 @@
 package com.zero.health.ui.activity
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -10,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zero.base.activity.BaseActivity
 import com.zero.health.databinding.ActivityAlarmRemindBinding
 import com.zero.health.databinding.ItemProcessBinding
-import com.zero.health.helper.ReminderManager
+import com.zero.health.state.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -24,7 +28,10 @@ import kotlinx.coroutines.withContext
 class AlarmRemindActivity :
     BaseActivity<ActivityAlarmRemindBinding>(ActivityAlarmRemindBinding::inflate) {
     private lateinit var adapter: ProcessAdapter
-    private lateinit var monitor: ProcessMonitor
+    private val viewModel: AlarmRemindViewModel by lazy {
+        ViewModelProvider(this)[AlarmRemindViewModel::class.java]
+    }
+
     override fun initView() {
         adapter = ProcessAdapter()
         binding.recyclerView.adapter = adapter
@@ -32,29 +39,37 @@ class AlarmRemindActivity :
     }
 
     override fun initData() {
-        monitor = ProcessMonitor(2000,
-            setOf("com.zionhuang.music.debug", "com.dev.example", "com.toto.jcyj.mvmix",
-                "com.github.metacubex.clash.meta"))
         lifecycleScope.launch {
-            while (isActive) {
-                val list = withContext(Dispatchers.IO) {
-                    monitor.buildUiList()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when (state) {
+                        UiState.Loading -> showLoading()
+
+                        is UiState.Success -> {
+                            hideLoading()
+                            adapter.submitList(state.data)
+                        }
+
+                        is UiState.Failed -> {
+                            hideLoading()
+                        }
+
+                        UiState.Idle -> Unit
+                    }
                 }
-                adapter.submitList(list)
-                delay(2000)
             }
         }
+
     }
 
 
     override fun addListener() {
         binding.tvAddRemind.setOnClickListener {
-//            ReminderManager.scheduleReminders(this, 2)
-            monitor.start()
+            viewModel.load()
         }
     }
 
-    class ProcessAdapter : ListAdapter<ProcessMonitor.ProcessUiModel, ProcessAdapter.VH>(Diff) {
+    class ProcessAdapter : ListAdapter<ProcessUiModel, ProcessAdapter.VH>(Diff) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             val binding = ItemProcessBinding.inflate(LayoutInflater.from(parent.context), parent,
@@ -68,7 +83,7 @@ class AlarmRemindActivity :
 
         class VH(private val binding: ItemProcessBinding) : RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(item: ProcessMonitor.ProcessUiModel) {
+            fun bind(item: ProcessUiModel) {
                 binding.tvPid.text = "PID ${item.pid}  ${item.packageName}"
 
                 val status = if (item.isRunning) "RUNNING" else "ENDED"
@@ -90,12 +105,10 @@ class AlarmRemindActivity :
         }
 
         companion object {
-            val Diff = object : DiffUtil.ItemCallback<ProcessMonitor.ProcessUiModel>() {
-                override fun areItemsTheSame(a: ProcessMonitor.ProcessUiModel,
-                                             b: ProcessMonitor.ProcessUiModel) = a.pid == b.pid
+            val Diff = object : DiffUtil.ItemCallback<ProcessUiModel>() {
+                override fun areItemsTheSame(a: ProcessUiModel, b: ProcessUiModel) = a.pid == b.pid
 
-                override fun areContentsTheSame(a: ProcessMonitor.ProcessUiModel,
-                                                b: ProcessMonitor.ProcessUiModel) = a == b
+                override fun areContentsTheSame(a: ProcessUiModel, b: ProcessUiModel) = a == b
             }
         }
     }
