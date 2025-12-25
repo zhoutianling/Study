@@ -210,6 +210,32 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
         return result
     }
 
+    /**
+     * 杀死指定PID的进程
+     */
+    fun killProcess(pid: Int): Boolean {
+        try {
+            val result = runSu("kill $pid")
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    /**
+     * 杀死所有目标包名的进程
+     */
+    fun killAllTargetProcesses(): Map<Int, Boolean> {
+        val results = mutableMapOf<Int, Boolean>()
+        val currentActive = active.toMap() // 创建快照防止并发问题
+        
+        for ((pid, _) in currentActive) {
+            results[pid] = killProcess(pid)
+        }
+        
+        return results
+    }
 }
 
 data class ProcessUiModel(val pid: Int, val packageName: String, val aliveSeconds: Double,

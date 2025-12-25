@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="4dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp">
@@ -26,8 +27,9 @@
             android:id="@+id/tv_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
+            android:textColor="#999999"
+            android:textSize="18sp"
+            tools:text="存活：06:29:33"
             android:textStyle="bold" />
 
 
@@ -36,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="@android:color/holo_red_dark"
+            android:textColor="@color/baseColorGreen"
+            tools:text="重启次数"
             android:textSize="14sp" />
     </LinearLayout>
 

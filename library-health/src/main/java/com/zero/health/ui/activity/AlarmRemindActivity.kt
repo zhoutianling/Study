@@ -64,10 +64,37 @@ class AlarmRemindActivity :
 
 
     override fun addListener() {
-        binding.tvAddRemind.setOnClickListener {
+        binding.tvStart.setOnClickListener {
             viewModel.load()
         }
+
+        binding.tvKillAll.setOnClickListener {
+            killAllProcesses()
+        }
     }
+
+    private fun killAllProcesses() {
+        lifecycleScope.launch {
+            val results = withContext(Dispatchers.IO) {
+                viewModel.killAllTargetProcesses()
+            }
+
+            // 显示结果
+            val successCount = results.count { it.value }
+            val totalCount = results.size
+
+            if (totalCount > 0) {
+                val message = "成功杀死 $successCount / $totalCount 个进程"
+                // 可以使用 Toast 或其他方式显示结果
+                android.widget.Toast.makeText(this@AlarmRemindActivity, message,
+                    android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                android.widget.Toast.makeText(this@AlarmRemindActivity, "没有可杀死的进程",
+                    android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     class ProcessAdapter : ListAdapter<ProcessUiModel, ProcessAdapter.VH>(Diff) {
 
@@ -84,7 +111,7 @@ class AlarmRemindActivity :
         class VH(private val binding: ItemProcessBinding) : RecyclerView.ViewHolder(binding.root) {
 
             fun bind(item: ProcessUiModel) {
-                binding.tvPid.text = "PID ${item.pid}  ${item.packageName}"
+                binding.tvPid.text = "PID ${item.pid}  包名：${item.packageName}"
 
                 val status = if (item.isRunning) "RUNNING" else "ENDED"
                 val alive = formatTime(item.aliveSeconds)
@@ -97,10 +124,16 @@ class AlarmRemindActivity :
             }
 
             private fun formatTime(sec: Double): String {
-                val s = sec.toInt()
-                val m = s / 60
-                val r = s % 60
-                return "%02d:%02d".format(m, r)
+                val totalSeconds = sec.toInt()
+                val hours = totalSeconds / 3600
+                val minutes = (totalSeconds % 3600) / 60
+                val seconds = totalSeconds % 60
+
+                return if (hours > 0) {
+                    "%02d:%02d:%02d".format(hours, minutes, seconds)
+                } else {
+                    "%02d:%02d".format(minutes, seconds)
+                }
             }
         }
 

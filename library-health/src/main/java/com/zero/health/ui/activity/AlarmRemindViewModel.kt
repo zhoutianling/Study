@@ -33,6 +33,10 @@ class AlarmRemindViewModel : ViewModel() {
             }
         }
     }
+    
+    fun killAllTargetProcesses(): Map<Int, Boolean> {
+        return monitor.killAllTargetProcesses()
+    }
 
     override fun onCleared() {
         super.onCleared()

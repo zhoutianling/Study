@@ -9,21 +9,56 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="@dimen/health_15dp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_add_remind"
+        app:layout_constraintBottom_toTopOf="@+id/ll_menu"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_add_remind"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/ll_menu"
         android:layout_width="match_parent"
         android:layout_height="@dimen/health_50dp"
-        android:layout_margin="@dimen/health_15dp"
-        android:background="@drawable/green_shape_bg"
-        android:gravity="center"
-        android:text="Start Alarm"
-        android:textColor="@color/health_white_color"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_start"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/green_shape_bg"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/health_15dp"
+            android:text="Start"
+            android:textColor="@color/health_white_color"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_kill_all"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/health_15dp"
+            android:layout_weight="1"
+            android:background="@drawable/green_shape_bg"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/health_15dp"
+            android:text="Kill All"
+            android:textColor="@color/health_white_color"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_clear"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/green_shape_bg"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/health_15dp"
+            android:text="Clear"
+            android:textColor="@color/health_white_color"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
