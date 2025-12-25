@@ -9,12 +9,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.RemoteViews
+import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.IMPORTANCE_LOW
+import androidx.core.app.TaskStackBuilder
 import com.zero.base.ext.createNotification
 import com.zero.base.ext.formatHourMinute
 import com.zero.health.R
 import com.zero.health.bean.RemindType
+import com.zero.health.ui.activity.AlarmRemindActivity
 import com.zero.health.ui.activity.HeartRateActivity
 import java.util.Date
 
@@ -87,6 +91,36 @@ object NotifyHelper {
         }
         NotificationManagerCompat.from(context).notify(RemindType.getNotificationId(type),
             remindNotification)
+    }
+
+    fun showMediaNotification(context: Context, notifyId: Int) {
+        val searchNotification = context.createNotification {
+            isPermanent = true
+            importance = IMPORTANCE_LOW
+            iconRes = R.drawable.ic_alarm_clock
+            channelId = "${context.packageName}.search"
+            channelName = "${context.packageName}.search_channel"
+            val flag = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+            val clickIntent = Intent(context, AlarmRemindActivity::class.java)
+            val pendingIntent = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(clickIntent)
+                getPendingIntent(Activity.RESULT_OK, flag)
+            }
+            remoteViews = RemoteViews(context.packageName,
+                R.layout.notification_search_normal).apply {
+                setOnClickPendingIntent(R.id.tv_search, pendingIntent)
+            }
+            bigRemoteViews = RemoteViews(context.packageName,
+                R.layout.notification_search_normal).apply {
+                setOnClickPendingIntent(R.id.tv_search, pendingIntent)
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        NotificationManagerCompat.from(context).notify(notifyId, searchNotification)
     }
 
     fun showNotification(context: Context, title: String, content: String, notifyId: Int) {

@@ -84,14 +84,17 @@ class AlarmRemindActivity :
             val totalCount = results.size
 
             if (totalCount > 0) {
-                val message = "成功杀死 $successCount / $totalCount 个进程"
+                val message = "尝试杀死 $totalCount 个进程"
                 // 可以使用 Toast 或其他方式显示结果
                 android.widget.Toast.makeText(this@AlarmRemindActivity, message,
-                    android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.LENGTH_LONG).show()
             } else {
                 android.widget.Toast.makeText(this@AlarmRemindActivity, "没有可杀死的进程",
                     android.widget.Toast.LENGTH_SHORT).show()
             }
+
+            // 刷新列表以显示最新状态
+            viewModel.load()
         }
     }
 

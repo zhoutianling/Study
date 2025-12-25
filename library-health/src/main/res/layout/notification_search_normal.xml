@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><!-- 血压数据 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/shape_tag_bg"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_search"
+        android:layout_width="@dimen/health_20dp"
+        android:layout_height="@dimen/health_20dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_alarm_clock" />
+
+    <TextView
+        android:id="@+id/tv_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:gravity="start|center_vertical"
+        android:paddingVertical="8dp"
+        android:text="@string/notification_channel_heart_rate"
+        android:textColor="@color/health_notification_gray" />
+</LinearLayout>
+

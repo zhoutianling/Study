@@ -215,7 +215,10 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
      */
     fun killProcess(pid: Int): Boolean {
         try {
-            val result = runSu("kill $pid")
+            // 尝试使用强制杀死命令
+            val result = runSu("kill -9 $pid")
+            // 检查命令执行结果，如果命令执行没有抛出异常，认为尝试执行成功
+            // 注意：这里只表示命令执行成功，不代表进程一定被杀死
             return true
         } catch (e: Exception) {
             e.printStackTrace()

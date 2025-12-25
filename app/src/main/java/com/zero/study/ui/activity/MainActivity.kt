@@ -1,14 +1,23 @@
 package com.zero.study.ui.activity
 
+import android.Manifest
 import android.animation.ValueAnimator
+import android.content.ComponentName
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.animation.addListener
 import androidx.core.os.BundleCompat
 import androidx.core.view.drawToBitmap
+import androidx.media3.common.MediaItem
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import com.toolkit.admob.manager.InterstitialPreloadAdMobManager
 import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
@@ -19,6 +28,8 @@ import com.zero.base.widget.ClipImageView
 import com.zero.base.widget.TRANSITION_DATA_KEY
 import com.zero.base.widget.TransitionData
 import com.zero.base.widget.TransitionType
+import com.zero.health.helper.NotifyHelper
+import com.zero.health.service.HealthService
 import com.zero.study.R
 import com.zero.study.databinding.ActivityMainBinding
 import com.zero.study.databinding.TabItemBinding
@@ -34,11 +45,40 @@ import kotlin.math.hypot
  */
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
     private var recreateTransitionData: TransitionData? = null
+    private var controllerFuture: ListenableFuture<MediaController>? = null
+    private val notificationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { result: Boolean? ->
+        if (result == true) {
+            NotifyHelper.showMediaNotification(this, notifyId = 0x10080)
+        }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        val sessionToken = SessionToken(this, ComponentName(this, HealthService::class.java))
+        controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+        controllerFuture?.addListener({
+            val controller = controllerFuture?.get()
+            val mediaItem = MediaItem.fromUri(
+                "https://www.cambridgeenglish.org/images/153149-movers-sample-listening-test-vol2.mp3")
+            controller?.setMediaItem(mediaItem)
+            controller?.prepare()
+            controller?.play()
+        }, MoreExecutors.directExecutor())
+    }
+
+    override fun onStop() {
+        controllerFuture?.let {
+            MediaController.releaseFuture(it)
+        }
+        super.onStop()
+    }
 
     override fun initView() {
         StorageUtils.putBoolean(SplashActivity.TIME_START, false)
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
