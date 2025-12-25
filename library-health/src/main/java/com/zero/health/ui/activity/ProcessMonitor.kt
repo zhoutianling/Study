@@ -217,6 +217,12 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
         try {
             // 尝试使用强制杀死命令
             val result = runSu("kill -9 $pid")
+            // 为了更彻底地杀死进程，也可以尝试使用 am 命令强制停止应用
+            // 获取进程对应的包名
+            val timeline = active[pid]
+            if (timeline != null) {
+                runSu("am force-stop ${timeline.packageName}")
+            }
             // 检查命令执行结果，如果命令执行没有抛出异常，认为尝试执行成功
             // 注意：这里只表示命令执行成功，不代表进程一定被杀死
             return true
@@ -233,11 +239,34 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
         val results = mutableMapOf<Int, Boolean>()
         val currentActive = active.toMap() // 创建快照防止并发问题
         
+        // 先尝试杀死所有可见的PID
         for ((pid, _) in currentActive) {
             results[pid] = killProcess(pid)
         }
         
+        // 然后尝试强制停止所有目标包名的应用
+        if (targetPackages != null) {
+            for (packageName in targetPackages) {
+                runSu("am force-stop $packageName")
+            }
+        }
+        
         return results
+    }
+    
+    /**
+     * 强制回收系统内存
+     */
+    fun forceMemoryReclaim(): Boolean {
+        try {
+            // 触发系统内存回收
+            runSu("echo 3 > /proc/sys/vm/drop_caches") // 清理页面缓存、目录项和inode缓存
+            runSu("sync") // 同步文件系统
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
     }
 }
 

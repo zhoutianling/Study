@@ -1,5 +1,8 @@
 package com.zero.health.ui.activity
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zero.base.activity.BaseActivity
 import com.zero.health.databinding.ActivityAlarmRemindBinding
 import com.zero.health.databinding.ItemProcessBinding
+import com.zero.health.service.MemoryMonitorOverlayService
 import com.zero.health.state.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,6 +75,14 @@ class AlarmRemindActivity :
         binding.tvKillAll.setOnClickListener {
             killAllProcesses()
         }
+
+        binding.tvClear.setOnClickListener {
+            forceMemoryReclaim()
+        }
+        
+        binding.tvOverlay.setOnClickListener {
+            toggleOverlayService()
+        }
     }
 
     private fun killAllProcesses() {
@@ -84,7 +96,7 @@ class AlarmRemindActivity :
             val totalCount = results.size
 
             if (totalCount > 0) {
-                val message = "尝试杀死 $totalCount 个进程"
+                val message = "已尝试杀死 $totalCount 个进程，并强制停止目标应用\n(结果可能因应用自启机制而有限)"
                 // 可以使用 Toast 或其他方式显示结果
                 android.widget.Toast.makeText(this@AlarmRemindActivity, message,
                     android.widget.Toast.LENGTH_LONG).show()
@@ -96,6 +108,56 @@ class AlarmRemindActivity :
             // 刷新列表以显示最新状态
             viewModel.load()
         }
+    }
+    
+    private fun forceMemoryReclaim() {
+        lifecycleScope.launch {
+            val success = withContext(Dispatchers.IO) {
+                viewModel.forceMemoryReclaim()
+            }
+            
+            if (success) {
+                android.widget.Toast.makeText(this@AlarmRemindActivity, "已触发系统内存回收，请观察进程变化",
+                    android.widget.Toast.LENGTH_SHORT).show()
+                
+                // 刷新列表以观察内存回收后的进程状态
+                viewModel.load()
+            } else {
+                android.widget.Toast.makeText(this@AlarmRemindActivity, "内存回收执行失败，请检查ROOT权限",
+                    android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun toggleOverlayService() {
+        if (Settings.canDrawOverlays(this)) {
+            // 如果已有悬浮窗权限，启动服务
+            val intent = Intent(this, MemoryMonitorOverlayService::class.java)
+            if (isServiceRunning(MemoryMonitorOverlayService::class.java)) {
+                // 如果服务已在运行，则停止它
+                stopService(intent)
+                android.widget.Toast.makeText(this, "已停止内存监控悬浮窗", android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                // 如果服务未运行，则启动它
+                startService(intent)
+                android.widget.Toast.makeText(this, "已启动内存监控悬浮窗", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // 请求悬浮窗权限
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            startActivity(intent)
+            android.widget.Toast.makeText(this, "请授予悬浮窗权限以使用内存监控功能", android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+    
+    private fun <T> isServiceRunning(serviceClass: Class<T>): Boolean {
+        val manager = getSystemService(android.app.Service.ACTIVITY_SERVICE) as android.app.ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
 

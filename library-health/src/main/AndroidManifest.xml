@@ -27,6 +27,8 @@
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+    <!-- 悬浮窗权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application>
         <activity android:name=".ui.activity.HeartRateActivity" />
@@ -55,6 +57,10 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".service.MemoryMonitorOverlayService"
+            android:enabled="true"
+            android:exported="false" />
         <provider
             android:name=".provider.HealthContextProvider"
             android:authorities="${applicationId}.contextProvider"

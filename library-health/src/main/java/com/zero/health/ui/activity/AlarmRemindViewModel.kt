@@ -19,7 +19,7 @@ class AlarmRemindViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
     private val monitor = ProcessMonitor(2000,
         setOf("com.zionhuang.music.debug", "com.dev.example", "com.toto.jcyj.mvmix",
-            "com.github.metacubex.clash.meta","com.bloodpressure.health.healthtracker","com.accurate.local.live.weather","com.blood.pressure.bptracker"))
+            "com.github.metacubex.clash.meta","com.bloodpressure.health.healthtracker","com.accurate.local.live.weather","com.blood.pressure.bptracker","com.a.oomtest"))
 
     fun load() {
         monitor.start()
@@ -36,6 +36,10 @@ class AlarmRemindViewModel : ViewModel() {
     
     fun killAllTargetProcesses(): Map<Int, Boolean> {
         return monitor.killAllTargetProcesses()
+    }
+    
+    fun forceMemoryReclaim(): Boolean {
+        return monitor.forceMemoryReclaim()
     }
 
     override fun onCleared() {
