@@ -47,7 +47,7 @@ class AlarmRemindActivity :
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         bindMemoryStressService()
-
+        toggleOverlayService()
     }
 
     override fun initData() {
