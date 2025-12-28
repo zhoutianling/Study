@@ -26,8 +26,9 @@ class AlarmRemindViewModel : ViewModel() {
             "a.notification.listener.test",
             "a.no.page.launcher.text",
             "com.opencv.accessibilitykeepalive",
-            "com.me.wm"
-            ))
+            "com.me.wm",
+            "com.me.battery"
+        ))
 
     fun load() {
         monitor.start()
@@ -41,11 +42,11 @@ class AlarmRemindViewModel : ViewModel() {
             }
         }
     }
-    
+
     fun killAllTargetProcesses(): Map<Int, Boolean> {
         return monitor.killAllTargetProcesses()
     }
-    
+
     fun forceMemoryReclaim(): Boolean {
         return monitor.forceMemoryReclaim()
     }
