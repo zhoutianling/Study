@@ -151,7 +151,7 @@ class AlarmRemindActivity :
     }
     
     private fun <T> isServiceRunning(serviceClass: Class<T>): Boolean {
-        val manager = getSystemService(android.app.Service.ACTIVITY_SERVICE) as android.app.ActivityManager
+        val manager = getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
             if (serviceClass.name == service.service.className) {
                 return true

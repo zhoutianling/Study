@@ -17,9 +17,21 @@ import kotlinx.coroutines.launch
 class AlarmRemindViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<List<ProcessUiModel>>>(UiState.Idle)
     val uiState = _uiState.asStateFlow()
-    private val monitor = ProcessMonitor(2000,
-        setOf("com.zionhuang.music.debug", "com.dev.example", "com.toto.jcyj.mvmix",
-            "com.github.metacubex.clash.meta","com.bloodpressure.health.healthtracker","com.accurate.local.live.weather","com.blood.pressure.bptracker","com.a.oomtest"))
+    private val monitor = ProcessMonitor(1000,
+        setOf(
+            "com.example.appwidget",
+            "com.zionhuang.music.debug",
+            "com.dev.example",
+            "com.toto.jcyj.mvmix",
+            "com.bloodpressure.health.healthtracker",
+            "com.accurate.local.live.weather",
+            "com.blood.pressure.bptracker",
+            "com.a.oomtest",
+            "a.page.launcher.test",
+            "a.notification.listener.test",
+            "a.no.page.launcher.text",
+            "com.opencv.accessibilitykeepalive"
+            ))
 
     fun load() {
         monitor.start()
@@ -27,7 +39,7 @@ class AlarmRemindViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
-                delay(2000)
+                delay(1000) // 减少延迟时间，提高更新频率
                 val list = monitor.buildUiList()
                 _uiState.value = UiState.Success(list)
             }
