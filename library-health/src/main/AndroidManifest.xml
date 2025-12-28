@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission
         android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32" />
@@ -47,6 +48,7 @@
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".service.HealthService"
             android:exported="false"
@@ -61,6 +63,12 @@
             android:name=".service.MemoryMonitorOverlayService"
             android:enabled="true"
             android:exported="false" />
+        <service
+            android:name=".service.MemoryStressService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <provider
             android:name=".provider.HealthContextProvider"
             android:authorities="${applicationId}.contextProvider"

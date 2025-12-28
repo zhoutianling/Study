@@ -20,17 +20,13 @@ class AlarmRemindViewModel : ViewModel() {
     private val monitor = ProcessMonitor(1000,
         setOf(
             "com.example.appwidget",
-            "com.zionhuang.music.debug",
-            "com.dev.example",
             "com.toto.jcyj.mvmix",
-            "com.bloodpressure.health.healthtracker",
-            "com.accurate.local.live.weather",
-            "com.blood.pressure.bptracker",
             "com.a.oomtest",
             "a.page.launcher.test",
             "a.notification.listener.test",
             "a.no.page.launcher.text",
-            "com.opencv.accessibilitykeepalive"
+            "com.opencv.accessibilitykeepalive",
+            "com.me.wm"
             ))
 
     fun load() {

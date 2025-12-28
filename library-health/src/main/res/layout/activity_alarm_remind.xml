@@ -21,7 +21,7 @@
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="@dimen/health_50dp">
+            android:layout_height="@dimen/health_30dp">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_start"
@@ -74,6 +74,21 @@
                 android:maxLines="1"
                 android:paddingHorizontal="@dimen/health_15dp"
                 android:text="Usage"
+                android:textColor="@color/health_white_color"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_pressure"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/health_15dp"
+                android:layout_weight="1"
+                android:background="@drawable/green_shape_bg"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/health_15dp"
+                android:text="压测"
                 android:textColor="@color/health_white_color"
                 android:textSize="14sp"
                 android:textStyle="bold" />
