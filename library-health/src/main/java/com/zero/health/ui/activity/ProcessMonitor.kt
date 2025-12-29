@@ -232,28 +232,52 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
         }
     }
 
+    fun swipeAwayAll(): Boolean {
+        try {
+            val myPid = android.os.Process.myPid() // 获取自身进程ID
+            val currentActive = active.toMap() // 快照
+
+            // 1. 收集 PID，并过滤掉自己
+            val pidsToKill = currentActive.keys.filter { it != myPid } // 千万别杀自己
+                .joinToString(separator = " ") // 拼接成 "123 456 789" 的格式
+
+            if (pidsToKill.isBlank()) {
+                return false // 没有可杀的进程
+            }
+
+            // 2. 批量执行 (只申请一次 Root 权限，效率极高)
+            // Linux kill 命令支持多个参数: kill -9 pid1 pid2 pid3
+            runSu("kill -9 $pidsToKill")
+
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
     /**
      * 杀死所有目标包名的进程
      */
     fun killAllTargetProcesses(): Map<Int, Boolean> {
         val results = mutableMapOf<Int, Boolean>()
         val currentActive = active.toMap() // 创建快照防止并发问题
-        
+
         // 先尝试杀死所有可见的PID
         for ((pid, _) in currentActive) {
             results[pid] = killProcess(pid)
         }
-        
+
         // 然后尝试强制停止所有目标包名的应用
         if (targetPackages != null) {
             for (packageName in targetPackages) {
                 runSu("am force-stop $packageName")
             }
         }
-        
+
         return results
     }
-    
+
     /**
      * 强制回收系统内存
      */

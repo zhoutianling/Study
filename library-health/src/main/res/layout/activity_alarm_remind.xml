@@ -8,7 +8,7 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/health_15dp"
+        android:layout_margin="@dimen/health_5dp"
         app:layout_constraintBottom_toTopOf="@+id/ll_menu"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,25 +31,40 @@
                 android:background="@drawable/green_shape_bg"
                 android:gravity="center"
                 android:maxLines="1"
-                android:paddingHorizontal="@dimen/health_15dp"
+                android:paddingHorizontal="@dimen/health_5dp"
                 android:text="Start"
                 android:textColor="@color/health_white_color"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_kill_all"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/health_15dp"
+                android:layout_marginHorizontal="@dimen/health_5dp"
                 android:layout_weight="1"
                 android:background="@drawable/green_shape_bg"
                 android:gravity="center"
                 android:maxLines="1"
-                android:paddingHorizontal="@dimen/health_15dp"
-                android:text="杀进程"
+                android:paddingHorizontal="@dimen/health_5dp"
+                android:text="强杀"
                 android:textColor="@color/health_white_color"
-                android:textSize="14sp"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_swipe_away"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/health_5dp"
+                android:layout_weight="1"
+                android:background="@drawable/green_shape_bg"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/health_5dp"
+                android:text="软杀"
+                android:textColor="@color/health_white_color"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -60,25 +75,25 @@
                 android:background="@drawable/green_shape_bg"
                 android:gravity="center"
                 android:maxLines="1"
-                android:paddingHorizontal="@dimen/health_15dp"
-                android:text="回收内存"
+                android:paddingHorizontal="@dimen/health_5dp"
+                android:text="回收"
                 android:textColor="@color/health_white_color"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_overlay"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/health_15dp"
+                android:layout_marginHorizontal="@dimen/health_5dp"
                 android:layout_weight="1"
                 android:background="@drawable/green_shape_bg"
                 android:gravity="center"
                 android:maxLines="1"
-                android:paddingHorizontal="@dimen/health_15dp"
+                android:paddingHorizontal="@dimen/health_5dp"
                 android:text="Usage"
                 android:textColor="@color/health_white_color"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -89,10 +104,10 @@
                 android:background="@drawable/green_shape_bg"
                 android:gravity="center"
                 android:maxLines="1"
-                android:paddingHorizontal="@dimen/health_15dp"
+                android:paddingHorizontal="@dimen/health_5dp"
                 android:text="压测"
                 android:textColor="@color/health_white_color"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 

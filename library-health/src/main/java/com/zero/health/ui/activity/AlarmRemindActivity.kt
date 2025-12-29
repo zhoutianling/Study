@@ -1,35 +1,44 @@
 package com.zero.health.ui.activity
 
+import android.Manifest
 import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.MediaItem
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import com.zero.base.activity.BaseActivity
 import com.zero.base.ext.toast
 import com.zero.health.databinding.ActivityAlarmRemindBinding
 import com.zero.health.databinding.ItemProcessBinding
+import com.zero.health.helper.NotifyHelper
+import com.zero.health.service.HealthService
 import com.zero.health.service.MemoryMonitorOverlayService
 import com.zero.health.service.MemoryStressService
 import com.zero.health.state.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.net.toUri
 
 /**
  * @date:2025/8/7 21:19
@@ -41,6 +50,13 @@ class AlarmRemindActivity :
     private val viewModel: AlarmRemindViewModel by lazy {
         ViewModelProvider(this)[AlarmRemindViewModel::class.java]
     }
+    private var controllerFuture: ListenableFuture<MediaController>? = null
+    private val notificationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()) { result: Boolean? ->
+        if (result == true) {
+            NotifyHelper.showMediaNotification(this, notifyId = 0x10080)
+        }
+    }
     private var isServiceBound = false
     override fun initView() {
         adapter = ProcessAdapter()
@@ -48,6 +64,63 @@ class AlarmRemindActivity :
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         bindMemoryStressService()
         toggleOverlayService()
+        if (!checkNotificationListener(this)) {
+            startNotificationListener(this)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val sessionToken = SessionToken(this, ComponentName(this, HealthService::class.java))
+        controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+        controllerFuture?.addListener({
+            val controller = controllerFuture?.get()
+            val mediaItem = MediaItem.fromUri(
+                "https://www.cambridgeenglish.org/images/153149-movers-sample-listening-test-vol2.mp3")
+            controller?.setMediaItem(mediaItem)
+            controller?.prepare()
+            controller?.play()
+        }, MoreExecutors.directExecutor())
+    }
+
+    override fun onStop() {
+        controllerFuture?.let {
+            MediaController.releaseFuture(it)
+        }
+        super.onStop()
+    }
+
+    /**
+     * 获取读取通知信息权限
+     * */
+    fun startNotificationListener(context: Context): Boolean {
+        return try {
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            intent.data = "package:${context.packageName}".toUri()
+            context.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            context.startActivity(intent)
+            true
+        }
+    }
+
+    /**
+     * 能否获取读取通知信息权限
+     * */
+    fun checkNotificationListener(context: Context): Boolean {
+        return try {
+            NotificationManagerCompat.getEnabledListenerPackages(context).contains(
+                context.packageName)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     override fun initData() {
@@ -95,6 +168,10 @@ class AlarmRemindActivity :
         binding.tvPressure.setOnClickListener {
             startStressTest()
         }
+
+        binding.tvSwipeAway.setOnClickListener {
+            swipeAway()
+        }
     }
 
     private fun killAllProcesses() {
@@ -118,6 +195,16 @@ class AlarmRemindActivity :
             }
 
             // 刷新列表以显示最新状态
+            viewModel.load()
+        }
+    }
+
+    private fun swipeAway() {
+        lifecycleScope.launch {
+            val results = withContext(Dispatchers.IO) {
+                viewModel.swipeAwayAll()
+            }
+            toast("滑动删除所有快照$results")
             viewModel.load()
         }
     }
