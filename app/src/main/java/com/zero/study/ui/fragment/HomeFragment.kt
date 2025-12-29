@@ -5,8 +5,8 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -21,7 +21,6 @@ import androidx.core.content.PermissionChecker
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import com.toolkit.admob.manager.InterstitialPreloadAdMobManager
@@ -29,6 +28,7 @@ import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
 import com.zero.base.ext.appFileManager
 import com.zero.base.ext.fromJson
+import com.zero.base.ext.isServiceRunning
 import com.zero.base.ext.log
 import com.zero.base.ext.parseInt
 import com.zero.base.ext.readJson
@@ -37,6 +37,7 @@ import com.zero.base.ext.toast
 import com.zero.base.fragment.BaseFragment
 import com.zero.base.fragment.LoadingDialog
 import com.zero.base.util.ThreadPool
+import com.zero.health.service.MemoryMonitorOverlayService
 import com.zero.health.ui.activity.AlarmRemindActivity
 import com.zero.health.ui.activity.HeartRateActivity
 import com.zero.study.AppUpdateHelper
@@ -184,11 +185,36 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 26 -> context?.startActivity<AlarmRemindActivity>()
                 27 -> context?.startActivity<ContextProviderActivity>()
                 28 -> context?.startActivity<PlayerActivity>()
+                29 -> {
+                    toggleOverlayService()
+                    requireActivity().finish()
+                }
+
 
                 else -> ThreadPool.execute {
                     Log.i("zzz", "ThreadName:" + Thread.currentThread().name)
                 }
             }
+        }
+    }
+
+
+    private fun toggleOverlayService() {
+        if (Settings.canDrawOverlays(requireContext())) {
+            val intent = Intent(requireContext(), MemoryMonitorOverlayService::class.java)
+            if (requireContext().isServiceRunning(MemoryMonitorOverlayService::class.java)) {
+                requireContext().stopService(intent)
+                Toast.makeText(requireContext(), "已停止内存监控悬浮窗", Toast.LENGTH_SHORT).show()
+            } else {
+                requireContext().startService(intent)
+                Toast.makeText(requireContext(), "已启动内存监控悬浮窗", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                "package:${requireContext().packageName}".toUri())
+            startActivity(intent)
+            Toast.makeText(requireContext(), "请授予悬浮窗权限以使用内存监控功能",
+                Toast.LENGTH_LONG).show()
         }
     }
 

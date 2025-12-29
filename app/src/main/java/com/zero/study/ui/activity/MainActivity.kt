@@ -43,17 +43,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun initView() {
         StorageUtils.putBoolean(SplashActivity.TIME_START, false)
-        
-        // 启动内存监控悬浮窗服务
-        startMemoryMonitorOverlayService()
     }
     
-    private fun startMemoryMonitorOverlayService() {
-        if (Settings.canDrawOverlays(this)) {
-            val intent = Intent(this, MemoryMonitorOverlayService::class.java)
-            startService(intent)
-        }
-    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

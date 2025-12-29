@@ -3,6 +3,7 @@ package com.zero.base.ext
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
 import android.content.ContextWrapper
 import android.util.Log
 import android.view.Gravity
@@ -42,5 +43,13 @@ fun Context.getActivity(): Activity? {
     return null
 }
 
-
+fun <T> Context.isServiceRunning(serviceClass: Class<T>): Boolean {
+    val manager = getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager
+    for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+        if (serviceClass.name == service.service.className) {
+            return true
+        }
+    }
+    return false
+}
 
