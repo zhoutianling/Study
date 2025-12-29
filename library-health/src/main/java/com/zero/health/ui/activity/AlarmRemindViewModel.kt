@@ -1,6 +1,5 @@
 package com.zero.health.ui.activity
 
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zero.health.state.UiState

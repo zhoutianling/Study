@@ -1,11 +1,16 @@
 package com.zero.study.ui.activity
 
 import android.animation.ValueAnimator
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.animation.addListener
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.core.os.BundleCompat
 import androidx.core.view.drawToBitmap
 import com.google.android.material.tabs.TabLayoutMediator
@@ -26,6 +31,7 @@ import com.zero.study.ui.adapter.ViewPagerAdapter
 import com.zero.study.ui.fragment.FourFragment
 import com.zero.study.ui.fragment.HomeFragment
 import com.zero.study.ui.fragment.SecondFragment
+import com.zero.health.service.MemoryMonitorOverlayService
 import com.zero.study.ui.fragment.ThirdFragment
 import kotlin.math.hypot
 
@@ -37,6 +43,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     override fun initView() {
         StorageUtils.putBoolean(SplashActivity.TIME_START, false)
+        
+        // 启动内存监控悬浮窗服务
+        startMemoryMonitorOverlayService()
+    }
+    
+    private fun startMemoryMonitorOverlayService() {
+        if (Settings.canDrawOverlays(this)) {
+            val intent = Intent(this, MemoryMonitorOverlayService::class.java)
+            startService(intent)
+        }
     }
 
 
@@ -46,6 +62,39 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             recreateTransitionData = BundleCompat.getParcelable(savedInstanceState,
                 TRANSITION_DATA_KEY, TransitionData::class.java)
             recreateTransitionData?.let { transitionAnimation(it) }
+        }
+        if (!checkNotificationListener(this)) {
+            startNotificationListener(this)
+        }
+    }
+
+    /**
+     * 获取读取通知信息权限
+     * */
+    fun startNotificationListener(context: Context): Boolean {
+        return try {
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            intent.data = "package:${context.packageName}".toUri()
+            context.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            context.startActivity(intent)
+            true
+        }
+    }
+
+    /**
+     * 能否获取读取通知信息权限
+     * */
+    fun checkNotificationListener(context: Context): Boolean {
+        return try {
+            NotificationManagerCompat.getEnabledListenerPackages(context).contains(
+                context.packageName)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 
