@@ -1,5 +1,7 @@
 package com.zero.health.ui.activity
 
+import android.content.Context
+import com.zero.health.provider.HealthContextProvider
 
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -40,6 +42,13 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
 
     private val running = AtomicBoolean(false)
     private var workerThread: Thread? = null
+    private val prefs by lazy {
+        HealthContextProvider.appContext.getSharedPreferences("process_restart_counts", Context.MODE_PRIVATE)
+    }
+    private fun normalizePackageName(raw: String): String {
+        val idx = raw.indexOf(':')
+        return if (idx > 0) raw.substring(0, idx) else raw
+    }
 
     // =========================
     // Public API
@@ -48,6 +57,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     fun start() {
         if (running.get()) return
         running.set(true)
+        loadPersistedRestartCounts()
 
         workerThread = Thread {
             while (running.get()) {
@@ -105,11 +115,13 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
 
                 // 检查是否为重启的进程
                 var restartCount = 0
-                val existingCount = processHistory[proc.cmdline]
+                val key = normalizePackageName(proc.cmdline)
+                val existingCount = processHistory[key]
                 if (existingCount != null) {
                     restartCount = existingCount + 1
                 }
-                processHistory[proc.cmdline] = restartCount
+                processHistory[key] = restartCount
+                persistRestartCount(key, restartCount)
 
                 active[proc.pid] = Timeline(pid = proc.pid, packageName = proc.cmdline,
                     startUptimeSec = startUptime, restartCount = restartCount)
@@ -234,25 +246,56 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
 
     fun swipeAwayAll(): Boolean {
         try {
-            val myPid = android.os.Process.myPid() // 获取自身进程ID
-            val currentActive = active.toMap() // 快照
-
-            // 1. 收集 PID，并过滤掉自己
-            val pidsToKill = currentActive.keys.filter { it != myPid } // 千万别杀自己
-                .joinToString(separator = " ") // 拼接成 "123 456 789" 的格式
-
+            val myPid = android.os.Process.myPid()
+            val currentActive = active.toMap()
+            val pidsToKill = currentActive.keys.filter { it != myPid }.joinToString(separator = " ")
             if (pidsToKill.isBlank()) {
-                return false // 没有可杀的进程
+                return false
             }
-
-            // 2. 批量执行 (只申请一次 Root 权限，效率极高)
-            // Linux kill 命令支持多个参数: kill -9 pid1 pid2 pid3
             runSu("kill -9 $pidsToKill")
-
             return true
         } catch (e: Exception) {
             e.printStackTrace()
             return false
+        }
+    }
+
+    private fun loadPersistedRestartCounts() {
+        try {
+            val all = prefs.all
+            for ((pkg, value) in all) {
+                val count = when (value) {
+                    is Int -> value
+                    is Long -> value.toInt()
+                    is String -> value.toIntOrNull() ?: 0
+                    else -> 0
+                }
+                if (count > 0) {
+                    processHistory[normalizePackageName(pkg)] = count
+                }
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
+    private fun persistRestartCount(packageName: String, count: Int) {
+        try {
+            prefs.edit().putInt(packageName, count).apply()
+        } catch (_: Throwable) {
+        }
+    }
+
+    fun clearRestartCounts(): Boolean {
+        return try {
+            prefs.edit().clear().apply()
+            processHistory.clear()
+            for (timeline in active.values) {
+                timeline.restartCount = 0
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 

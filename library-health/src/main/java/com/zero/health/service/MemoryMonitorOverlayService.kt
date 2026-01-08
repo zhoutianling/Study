@@ -36,6 +36,7 @@ class MemoryMonitorOverlayService : Service() {
     private var swipeAwayBtn: TextView? = null
     private var clearBtn: TextView? = null
     private var pressureBtn: TextView? = null
+    private var resetBtn: TextView? = null
     private var scrollView: ScrollView? = null
     private val updateHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
@@ -44,10 +45,11 @@ class MemoryMonitorOverlayService : Service() {
 
     // 进程监控器 - 使用与AlarmRemindViewModel相同的包名列表
     private val monitor = ProcessMonitor(1000,
-        setOf("com.example.appwidget", "com.a.oomtest",
-            "a.page.launcher.test", "a.notification.listener.test", "a.no.page.launcher.text",
-            "com.opencv.accessibilitykeepalive", "com.me.wm", "com.me.battery","com.hq.recorder",
-            "com.test.keekalivetest","com.me.fs","com.opencv.datasynckeeyalive","com.opencv.accuratealarmclockdemo"))
+        setOf("com.example.appwidget", "com.a.oomtest", "a.page.launcher.test",
+            "a.notification.listener.test", "a.no.page.launcher.text",
+            "com.opencv.accessibilitykeepalive", "com.me.wm", "com.me.battery", "com.hq.recorder",
+            "com.test.keekalivetest", "com.me.fs", "com.opencv.datasynckeeyalive",
+            "com.opencv.accuratealarmclockdemo"))
 
     // 用于控制更新的协程
     private var updateJob: kotlinx.coroutines.Job? = null
@@ -84,6 +86,7 @@ class MemoryMonitorOverlayService : Service() {
         swipeAwayBtn = overlayView?.findViewById(R.id.tvSwipeAway)
         clearBtn = overlayView?.findViewById(R.id.tvClear)
         pressureBtn = overlayView?.findViewById(R.id.tvPressure)
+        resetBtn = overlayView?.findViewById(R.id.tvResetCounts)
         scrollView = overlayView?.findViewById(R.id.scrollView)
 
         // 设置关闭按钮点击事件
@@ -115,6 +118,16 @@ class MemoryMonitorOverlayService : Service() {
         pressureBtn?.setOnClickListener {
             // 内存压力测试
             startMemoryStressTest()
+        }
+
+        resetBtn?.setOnClickListener {
+            val ok = monitor.clearRestartCounts()
+            android.widget.Toast.makeText(this,
+                if (ok) "已清零重启次数" else "清零失败",
+                android.widget.Toast.LENGTH_SHORT).show()
+            val list = monitor.buildUiList()
+            this.currentProcessList = list
+            updateProcessList()
         }
 
         val params = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -150,14 +163,6 @@ class MemoryMonitorOverlayService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY // 确保服务被杀死后会重启
-    }
-
-    // 用于外部更新进程列表
-    fun updateProcessListData(processList: List<ProcessUiModel>) {
-        this.currentProcessList = processList
-        if (processContainer != null) {
-            updateProcessList()
-        }
     }
 
     private fun startProcessMonitoring() {
@@ -267,10 +272,9 @@ class MemoryMonitorOverlayService : Service() {
     private fun startMemoryStressTest() {
         try {
             // 发送开始压力测试的命令
-            val intent = Intent(this,
-                com.zero.health.service.MemoryStressService::class.java).apply {
-                action = com.zero.health.service.MemoryStressService.ACTION_START_STRESS_TEST
-                putExtra(com.zero.health.service.MemoryStressService.EXTRA_AGGRESSIVE_MODE, false)
+            val intent = Intent(this, MemoryStressService::class.java).apply {
+                action = MemoryStressService.ACTION_START_STRESS_TEST
+                putExtra(MemoryStressService.EXTRA_AGGRESSIVE_MODE, false)
             }
             startService(intent)
 
@@ -340,13 +344,13 @@ class MemoryMonitorOverlayService : Service() {
                 val alive = formatTime(process.aliveSeconds.toInt())
                 text = "存活：$alive   状态：$status"
                 setTextColor(android.graphics.Color.LTGRAY)
-                setTextSize(10f)
+                textSize = 10f
             }
 
             val processRestartCount = TextView(this).apply {
                 text = "重启次数：${process.restartCount}"
                 setTextColor(android.graphics.Color.YELLOW)
-                setTextSize(10f)
+                textSize = 10f
             }
 
             processInfo.addView(processTitle)
@@ -360,7 +364,7 @@ class MemoryMonitorOverlayService : Service() {
             val emptyTextView = TextView(this).apply {
                 text = "无进程"
                 setTextColor(android.graphics.Color.GRAY)
-                setTextSize(12f)
+                textSize = 12f
                 setPadding(8, 4, 8, 4)
             }
             processContainer?.addView(emptyTextView)

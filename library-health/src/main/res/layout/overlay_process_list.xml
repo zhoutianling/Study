@@ -121,6 +121,19 @@
             android:textColor="#000000"
             android:textSize="10sp" />
 
+        <TextView
+            android:id="@+id/tvResetCounts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_weight="1"
+            android:background="#4DFF00FF"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="清零"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp" />
+
     </LinearLayout>
 
 </LinearLayout>
