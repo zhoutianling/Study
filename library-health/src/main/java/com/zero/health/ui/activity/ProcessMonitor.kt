@@ -1,10 +1,9 @@
 package com.zero.health.ui.activity
 
 import android.content.Context
-import com.zero.health.provider.HealthContextProvider
-
-import java.util.concurrent.atomic.AtomicBoolean
 import androidx.core.content.edit
+import com.zero.health.provider.HealthContextProvider
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 基于 su 的进程监控器
@@ -229,7 +228,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     fun killProcess(pid: Int): Boolean {
         try {
             // 尝试使用强制杀死命令
-            val result = runSu("kill -9 $pid")
+            runSu("kill -9 $pid")
             // 为了更彻底地杀死进程，也可以尝试使用 am 命令强制停止应用
             // 获取进程对应的包名
             val timeline = active[pid]
@@ -281,7 +280,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
 
     private fun persistRestartCount(packageName: String, count: Int) {
         try {
-            prefs.edit().putInt(packageName, count).apply()
+            prefs.edit { putInt(packageName, count) }
         } catch (_: Throwable) {
         }
     }
