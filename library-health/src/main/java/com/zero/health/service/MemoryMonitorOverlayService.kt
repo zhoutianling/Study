@@ -1,5 +1,6 @@
 package com.zero.health.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -122,8 +123,7 @@ class MemoryMonitorOverlayService : Service() {
 
         resetBtn?.setOnClickListener {
             val ok = monitor.clearRestartCounts()
-            android.widget.Toast.makeText(this,
-                if (ok) "已清零重启次数" else "清零失败",
+            android.widget.Toast.makeText(this, if (ok) "已清零重启次数" else "清零失败",
                 android.widget.Toast.LENGTH_SHORT).show()
             val list = monitor.buildUiList()
             this.currentProcessList = list
@@ -147,7 +147,36 @@ class MemoryMonitorOverlayService : Service() {
         params.gravity = Gravity.TOP or Gravity.START
         params.x = 100
         params.y = 100
+        // 设置触摸监听以支持拖动
+        overlayView?.setOnTouchListener(object : View.OnTouchListener {
+            private var initialX = 0
+            private var initialY = 0
+            private var initialTouchX = 0f
+            private var initialTouchY = 0f
 
+            @SuppressLint("ClickableViewAccessibility")
+            override fun onTouch(v: View, event: android.view.MotionEvent): Boolean {
+                when (event.action) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        initialX = params.x
+                        initialY = params.y
+                        initialTouchX = event.rawX
+                        initialTouchY = event.rawY
+                        return true
+                    }
+
+                    android.view.MotionEvent.ACTION_MOVE -> {
+                        val dx = (event.rawX - initialTouchX).toInt()
+                        val dy = (event.rawY - initialTouchY).toInt()
+                        params.x = initialX + dx
+                        params.y = initialY + dy
+                        windowManager?.updateViewLayout(overlayView, params)
+                        return true
+                    }
+                }
+                return false
+            }
+        })
         windowManager?.addView(overlayView, params)
     }
 
@@ -217,7 +246,7 @@ class MemoryMonitorOverlayService : Service() {
     private fun killAllProcesses() {
         try {
             val results = monitor.killAllTargetProcesses()
-            val successCount = results.count { it.value }
+            results.count { it.value }
             val totalCount = results.size
 
             android.widget.Toast.makeText(this,
