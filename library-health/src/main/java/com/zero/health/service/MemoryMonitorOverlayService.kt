@@ -351,59 +351,106 @@ class MemoryMonitorOverlayService : Service() {
     }
 
     private fun updateProcessList() {
-        processContainer?.removeAllViews()
+        val container = processContainer ?: return
+        val newList = currentProcessList.take(10)
 
-        // 显示进程列表
-        for (process in currentProcessList.take(10)) { // 只显示前10个进程
-            val processInfo = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(8, 4, 8, 4)
-            }
-
-            val processTitle = TextView(this).apply {
-                text = "PID ${process.pid}  包名：${
-                    process.packageName.substring(0, minOf(process.packageName.length, 30))
-                }"
-                setTextColor(android.graphics.Color.WHITE)
-                textSize = 11f
-            }
-
-            val processSubtitle = TextView(this).apply {
-                val status = if (process.isRunning) "RUNNING" else "ENDED"
-                val alive = formatTime(process.aliveSeconds.toInt())
-                text = "存活：$alive   状态：$status"
-                setTextColor(android.graphics.Color.LTGRAY)
-                textSize = 10f
-            }
-
-            val processRestartCount = TextView(this).apply {
-                text = "重启次数：${process.restartCount}"
-                setTextColor(android.graphics.Color.YELLOW)
-                textSize = 10f
-            }
-
-            processInfo.addView(processTitle)
-            processInfo.addView(processSubtitle)
-            processInfo.addView(processRestartCount)
-
-            processContainer?.addView(processInfo)
-        }
-
-        if (currentProcessList.isEmpty()) {
+        if (newList.isEmpty()) {
+            container.removeAllViews()
             val emptyTextView = TextView(this).apply {
                 text = "无进程"
                 setTextColor(android.graphics.Color.GRAY)
                 textSize = 12f
                 setPadding(8, 4, 8, 4)
             }
-            processContainer?.addView(emptyTextView)
+            emptyTextView.tag = "empty"
+            container.addView(emptyTextView)
+            return
+        } else {
+            // 移除占位视图
+            for (i in container.childCount - 1 downTo 0) {
+                val v = container.getChildAt(i)
+                if (v.tag == "empty") {
+                    container.removeViewAt(i)
+                }
+            }
+        }
+
+        val newPids = newList.map { it.pid }.toSet()
+
+        // 删除旧的视图（不在新列表中的）
+        for (i in container.childCount - 1 downTo 0) {
+            val v = container.getChildAt(i)
+            val pidTag = v.tag as? Int
+            if (pidTag != null && !newPids.contains(pidTag)) {
+                container.removeViewAt(i)
+            }
+        }
+
+        // 逐项更新或插入，确保顺序与新列表一致
+        for ((index, process) in newList.withIndex()) {
+            val existingIndex = (0 until container.childCount).firstOrNull { idx ->
+                (container.getChildAt(idx).tag as? Int) == process.pid
+            }
+
+            val view: LinearLayout = if (existingIndex == null) {
+                // 创建新视图
+                val processInfo = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(8, 4, 8, 4)
+                }
+                processInfo.tag = process.pid
+
+                val processTitle = TextView(this)
+                val processSubtitle = TextView(this)
+                val processRestartCount = TextView(this)
+
+                processTitle.setTextColor(android.graphics.Color.WHITE)
+                processTitle.textSize = 11f
+
+                processSubtitle.setTextColor(android.graphics.Color.LTGRAY)
+                processSubtitle.textSize = 10f
+
+                processRestartCount.setTextColor(android.graphics.Color.YELLOW)
+                processRestartCount.textSize = 10f
+
+                processInfo.addView(processTitle)
+                processInfo.addView(processSubtitle)
+                processInfo.addView(processRestartCount)
+
+                // 插入到指定位置
+                val safeIndex = index.coerceAtMost(container.childCount)
+                container.addView(processInfo, safeIndex)
+                processInfo
+            } else {
+                // 将视图移动到正确位置
+                if (existingIndex != index) {
+                    val v = container.getChildAt(existingIndex)
+                    container.removeViewAt(existingIndex)
+                    val safeIndex = index.coerceAtMost(container.childCount)
+                    container.addView(v, safeIndex)
+                }
+                container.getChildAt(index) as LinearLayout
+            }
+
+            // 更新文本内容
+            val title = view.getChildAt(0) as TextView
+            val subtitle = view.getChildAt(1) as TextView
+            val restart = view.getChildAt(2) as TextView
+
+            title.text = "PID ${process.pid}  包名：" +
+                process.packageName.substring(0, minOf(process.packageName.length, 30))
+            val status = if (process.isRunning) "RUNNING" else "ENDED"
+            val alive = formatTime(process.aliveSeconds.toInt())
+            subtitle.text = "存活：$alive   状态：$status"
+            restart.text = "重启次数：${process.restartCount}"
         }
     }
 
     private fun formatTime(seconds: Int): String {
-        val hours = seconds / 3600
-        val minutes = (seconds % 3600) / 60
-        val secs = seconds % 60
+        val s = if (seconds < 0) 0 else seconds
+        val hours = s / 3600
+        val minutes = (s % 3600) / 60
+        val secs = s % 60
 
         return if (hours > 0) {
             "%02d:%02d:%02d".format(hours, minutes, secs)

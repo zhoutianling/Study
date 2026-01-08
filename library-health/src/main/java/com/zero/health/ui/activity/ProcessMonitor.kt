@@ -44,6 +44,11 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
 
     private val running = AtomicBoolean(false)
     private var workerThread: Thread? = null
+    private var hzCache: Int = 100
+    private var minScanIntervalMs: Long = 800L
+    private var maxScanIntervalMs: Long = 3000L
+    private var adaptiveIntervalMs: Long = 800L
+    private var stableTicks: Int = 0
     private val prefs by lazy {
         HealthContextProvider.appContext.getSharedPreferences("process_restart_counts", Context.MODE_PRIVATE)
     }
@@ -61,13 +66,18 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
         running.set(true)
         isFirstTick = true
         activePackageNames.clear()
+        hzCache = readHzBySu()
+        minScanIntervalMs = scanIntervalMs.coerceAtMost(1000L)
+        maxScanIntervalMs = (scanIntervalMs * 3).coerceAtMost(5000L)
+        adaptiveIntervalMs = minScanIntervalMs
+        stableTicks = 0
         loadPersistedRestartCounts()
 
         workerThread = Thread {
             while (running.get()) {
                 try {
                     tick()
-                    Thread.sleep(scanIntervalMs)
+                    Thread.sleep(adaptiveIntervalMs)
                 } catch (_: InterruptedException) {
                 } catch (_: Throwable) {
                     // 防止单次异常导致线程退出
@@ -86,7 +96,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
      * 构建给 RecyclerView 使用的数据
      */
     fun buildUiList(): List<ProcessUiModel> {
-        val now = readUptimeBySu()
+        val now = readUptimeNoSu()
 
         val runningList = active.values.map {
             ProcessUiModel(pid = it.pid, packageName = it.packageName,
@@ -102,11 +112,9 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     // =========================
 
     private fun tick() {
-        val now = readUptimeBySu()
-        val hz = readHzBySu()
+        val now = readUptimeNoSu()
         val scannedRaw = scanProcessesBySu()
 
-        // 1. 提取当前所有目标进程，并归一化包名
         val currentScannedMap = HashMap<Int, RawProc>()
         val currentPackageSet = HashSet<String>()
 
@@ -116,19 +124,15 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
             currentPackageSet.add(normalizePackageName(proc.cmdline))
         }
 
-        // 2. 基于包名变化检测重启 (Package Level Detection)
-        // 遍历当前扫描到的所有包名
+        val packagesChanged = !isFirstTick && (currentPackageSet != activePackageNames)
+
         for (pkg in currentPackageSet) {
-            // 如果该包名之前不在 activePackageNames 中 -> 说明是新出现的（重启或首次启动）
             if (!activePackageNames.contains(pkg)) {
-                // 只有当不是首次扫描时，才增加计数
-                // (首次扫描视为“发现初始状态”，不算重启)
                 if (!isFirstTick) {
                     val newCount = (processHistory[pkg] ?: 0) + 1
                     processHistory[pkg] = newCount
                     persistRestartCount(pkg, newCount)
                 } else {
-                    // 首次扫描，确保 history 里有值
                     if (!processHistory.containsKey(pkg)) {
                         processHistory[pkg] = 0
                     }
@@ -136,32 +140,28 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
             }
         }
 
-        // 更新 activePackageNames 为最新状态
         activePackageNames.clear()
         activePackageNames.addAll(currentPackageSet)
         isFirstTick = false
+        adjustInterval(packagesChanged)
 
-        // 3. 维护 PID 级别的 Timeline (用于 UI 显示)
-        // 处理新进程
         for (proc in currentScannedMap.values) {
             if (!active.containsKey(proc.pid)) {
                 val startJiffies = parseStartJiffies(proc.stat)
                 if (startJiffies <= 0) continue
 
-                val startUptime = startJiffies.toDouble() / hz
+                val startUptime = startJiffies.toDouble() / hzCache
                 val pkg = normalizePackageName(proc.cmdline)
                 val count = processHistory[pkg] ?: 0
 
                 active[proc.pid] = Timeline(pid = proc.pid, packageName = proc.cmdline,
                     startUptimeSec = startUptime, restartCount = count)
             } else {
-                // 更新已存在进程的 restartCount
                 val pkg = normalizePackageName(proc.cmdline)
                 active[proc.pid]?.restartCount = processHistory[pkg] ?: 0
             }
         }
 
-        // 处理已结束进程
         val it = active.iterator()
         while (it.hasNext()) {
             val entry = it.next()
@@ -226,13 +226,29 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     // su 工具方法
     // =========================
 
-    private fun readUptimeBySu(): Double {
-        return runSu("cat /proc/uptime").firstOrNull()?.substringBefore(" ")?.toDoubleOrNull()
-            ?: 0.0
+    private fun readUptimeNoSu(): Double {
+        return android.os.SystemClock.elapsedRealtime().toDouble() / 1000.0
     }
 
     private fun readHzBySu(): Int {
         return runSu("getconf CLK_TCK").firstOrNull()?.toIntOrNull() ?: 100
+    }
+
+    private fun adjustInterval(changed: Boolean) {
+        if (isFirstTick) {
+            adaptiveIntervalMs = minScanIntervalMs
+            stableTicks = 0
+            return
+        }
+        if (changed) {
+            adaptiveIntervalMs = minScanIntervalMs
+            stableTicks = 0
+        } else {
+            stableTicks++
+            if (stableTicks % 3 == 0) {
+                adaptiveIntervalMs = (adaptiveIntervalMs + 200L).coerceAtMost(maxScanIntervalMs)
+            }
+        }
     }
 
     private fun runSu(cmd: String): List<String> {
