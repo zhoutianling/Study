@@ -4,6 +4,7 @@ import android.content.Context
 import com.zero.health.provider.HealthContextProvider
 
 import java.util.concurrent.atomic.AtomicBoolean
+import androidx.core.content.edit
 
 /**
  * 基于 su 的进程监控器
@@ -287,7 +288,7 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
 
     fun clearRestartCounts(): Boolean {
         return try {
-            prefs.edit().clear().apply()
+            prefs.edit { clear() }
             processHistory.clear()
             for (timeline in active.values) {
                 timeline.restartCount = 0
