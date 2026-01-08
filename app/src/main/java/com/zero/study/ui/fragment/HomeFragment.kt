@@ -45,7 +45,7 @@ import com.zero.study.R
 import com.zero.study.databinding.FragmentHomeBinding
 import com.zero.study.provider.HookSwitchProvider.Companion.PATH_SWITCH
 import com.zero.study.ui.activity.AccessPerActivity
-import com.zero.study.ui.activity.AnimationActivity
+import com.zero.study.ui.activity.WidgetActivity
 import com.zero.study.ui.activity.ContextProviderActivity
 import com.zero.study.ui.activity.GuideActivity
 import com.zero.study.ui.activity.InterstitialActivity
@@ -95,7 +95,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
                 2 -> context?.startActivity<GuideActivity>()
                 3 -> context?.startActivity<RecyclerViewActivity>()
-                4 -> context?.startActivity<AnimationActivity>()
+                4 -> context?.startActivity<WidgetActivity>()
                 5 -> activityResult.launch(Intent(requireContext(), SecondActivity::class.java))
                 6 -> checkPermissionThenLauncher()
                 7 -> {

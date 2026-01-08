@@ -9,7 +9,6 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import coil.load
@@ -20,20 +19,20 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.toolkit.admob_libray.BuildConfig
 import com.zero.base.activity.BaseActivity
-import com.zero.base.annotation.BindView
 import com.zero.base.annotation.ViewBinding
 import com.zero.base.ext.animateHeart
 import com.zero.base.ext.dp
 import com.zero.base.ext.onClick
 import com.zero.base.ext.toast
 import com.zero.study.R
-import com.zero.study.databinding.ActivityAnimationBinding
+import com.zero.study.databinding.ActivityWidgetBinding
 import com.zero.study.ui.fragment.HomeFragment
 
 /**
  * @author Admin
  */
-class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimationBinding::inflate), HomeFragment.OnClickListener {
+class WidgetActivity : BaseActivity<ActivityWidgetBinding>(ActivityWidgetBinding::inflate),
+    HomeFragment.OnClickListener {
 
 
     private val adSize: AdSize
@@ -57,7 +56,8 @@ class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimati
         adView.setAdSize(adSize)
         binding.layoutAd.removeView(adView)
         binding.layoutAd.addView(adView)
-        val adRequest = AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, bundleOf("collapsible" to "bottom")).build()
+        val adRequest = AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java,
+            bundleOf("collapsible" to "bottom")).build()
         adView.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 super.onAdLoaded()
@@ -77,10 +77,12 @@ class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimati
     override fun initView() {
         val endAlphaAnim = endAlphaAnim()
         val startAlphaAnim = startAlphaAnim()
-
+        binding.zoomView.setRange(-50f,50f,5f)
+        binding.zoomView.show()
         binding.ivShadow.startAnimation(startAlphaAnim)
         binding.ivCompare.setImage(R.drawable.banner_1, R.drawable.banner_2)
-        binding.ivCompare.setLineStyle(ContextCompat.getColor(this, R.color.colorPrimaryDark), 1.0f.dp)
+        binding.ivCompare.setLineStyle(ContextCompat.getColor(this, R.color.colorPrimaryDark),
+            1.0f.dp)
         binding.ivCompare.startAnimation(0f, 1f, 2000)
 
         binding.ivFilter.load("https://raw.githubusercontent.com/PAX520520/templates/main/A10.png")
@@ -144,6 +146,6 @@ class AnimationActivity : BaseActivity<ActivityAnimationBinding>(ActivityAnimati
     }
 
     override fun onClickListener() {
-        Toast.makeText(this@AnimationActivity, "click fragment", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@WidgetActivity, "click fragment", Toast.LENGTH_SHORT).show()
     }
 }

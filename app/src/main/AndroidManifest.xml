@@ -98,7 +98,7 @@
             android:name=".ui.activity.RxActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.AnimationActivity"
+            android:name=".ui.activity.WidgetActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activity.SecondActivity"
