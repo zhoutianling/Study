@@ -44,10 +44,10 @@ class MemoryMonitorOverlayService : Service() {
 
     // 进程监控器 - 使用与AlarmRemindViewModel相同的包名列表
     private val monitor = ProcessMonitor(1000,
-        setOf("com.example.appwidget", "com.toto.jcyj.mvmix", "com.a.oomtest",
+        setOf("com.example.appwidget", "com.a.oomtest",
             "a.page.launcher.test", "a.notification.listener.test", "a.no.page.launcher.text",
-            "com.opencv.accessibilitykeepalive", "com.me.wm", "com.me.battery",
-            "com.android.onesignal"))
+            "com.opencv.accessibilitykeepalive", "com.me.wm", "com.me.battery","com.hq.recorder",
+            "com.test.keekalivetest","com.me.fs","com.opencv.datasynckeeyalive","com.opencv.accuratealarmclockdemo"))
 
     // 用于控制更新的协程
     private var updateJob: kotlinx.coroutines.Job? = null
