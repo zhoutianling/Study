@@ -34,7 +34,7 @@ class CameraZoomWheel @JvmOverloads constructor(
     // --- 视觉参数配置 ---
     private val mRadius = 750f
     private val mLineSpacing = 55f
-    private val mBottomPadding = 600f
+    private val mBottomPadding = 300f
     private val mIndicatorOffset = 20f
 
     // --- 背景与间距配置 ---
