@@ -39,6 +39,8 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     private val active = HashMap<Int, Timeline>()
     private val finished = ArrayList<Timeline>()
     private val processHistory = HashMap<String, Int>() // 记录每个包名的重启次数
+    private val activePackageNames = HashSet<String>() // 记录当前存活的包名（归一化后）
+    private var isFirstTick = true
 
     private val running = AtomicBoolean(false)
     private var workerThread: Thread? = null
@@ -57,6 +59,8 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     fun start() {
         if (running.get()) return
         running.set(true)
+        isFirstTick = true
+        activePackageNames.clear()
         loadPersistedRestartCounts()
 
         workerThread = Thread {
@@ -100,39 +104,68 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
     private fun tick() {
         val now = readUptimeBySu()
         val hz = readHzBySu()
-        val scanned = scanProcessesBySu().associateBy { it.pid }
+        val scannedRaw = scanProcessesBySu()
 
-        // 新进程
-        for (proc in scanned.values) {
+        // 1. 提取当前所有目标进程，并归一化包名
+        val currentScannedMap = HashMap<Int, RawProc>()
+        val currentPackageSet = HashSet<String>()
+
+        for (proc in scannedRaw) {
+            if (!isTargetPackage(proc.cmdline)) continue
+            currentScannedMap[proc.pid] = proc
+            currentPackageSet.add(normalizePackageName(proc.cmdline))
+        }
+
+        // 2. 基于包名变化检测重启 (Package Level Detection)
+        // 遍历当前扫描到的所有包名
+        for (pkg in currentPackageSet) {
+            // 如果该包名之前不在 activePackageNames 中 -> 说明是新出现的（重启或首次启动）
+            if (!activePackageNames.contains(pkg)) {
+                // 只有当不是首次扫描时，才增加计数
+                // (首次扫描视为“发现初始状态”，不算重启)
+                if (!isFirstTick) {
+                    val newCount = (processHistory[pkg] ?: 0) + 1
+                    processHistory[pkg] = newCount
+                    persistRestartCount(pkg, newCount)
+                } else {
+                    // 首次扫描，确保 history 里有值
+                    if (!processHistory.containsKey(pkg)) {
+                        processHistory[pkg] = 0
+                    }
+                }
+            }
+        }
+
+        // 更新 activePackageNames 为最新状态
+        activePackageNames.clear()
+        activePackageNames.addAll(currentPackageSet)
+        isFirstTick = false
+
+        // 3. 维护 PID 级别的 Timeline (用于 UI 显示)
+        // 处理新进程
+        for (proc in currentScannedMap.values) {
             if (!active.containsKey(proc.pid)) {
                 val startJiffies = parseStartJiffies(proc.stat)
                 if (startJiffies <= 0) continue
 
-                // 过滤非目标包名的进程
-                if (!isTargetPackage(proc.cmdline)) continue
-
                 val startUptime = startJiffies.toDouble() / hz
-
-                // 检查是否为重启的进程
-                var restartCount = 0
-                val key = normalizePackageName(proc.cmdline)
-                val existingCount = processHistory[key]
-                if (existingCount != null) {
-                    restartCount = existingCount + 1
-                }
-                processHistory[key] = restartCount
-                persistRestartCount(key, restartCount)
+                val pkg = normalizePackageName(proc.cmdline)
+                val count = processHistory[pkg] ?: 0
 
                 active[proc.pid] = Timeline(pid = proc.pid, packageName = proc.cmdline,
-                    startUptimeSec = startUptime, restartCount = restartCount)
+                    startUptimeSec = startUptime, restartCount = count)
+            } else {
+                // 更新已存在进程的 restartCount
+                val pkg = normalizePackageName(proc.cmdline)
+                active[proc.pid]?.restartCount = processHistory[pkg] ?: 0
             }
         }
 
-        // 已结束进程
+        // 处理已结束进程
         val it = active.iterator()
         while (it.hasNext()) {
             val entry = it.next()
-            if (!scanned.containsKey(entry.key)) {
+            if (!currentScannedMap.containsKey(entry.key)) {
                 entry.value.endUptimeSec = now
                 finished.add(entry.value)
                 it.remove()
@@ -274,6 +307,13 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
                     processHistory[normalizePackageName(pkg)] = count
                 }
             }
+            // 确保所有 targetPackages 都有记录
+            targetPackages?.forEach { pkg ->
+                val key = normalizePackageName(pkg)
+                if (!processHistory.containsKey(key)) {
+                    processHistory[key] = 0
+                }
+            }
         } catch (_: Throwable) {
         }
     }
@@ -289,6 +329,14 @@ class ProcessMonitor(private val scanIntervalMs: Long = 2000L,
         return try {
             prefs.edit { clear() }
             processHistory.clear()
+            
+            // 重置当前活跃包名的计数为 0
+            for (pkg in activePackageNames) {
+                processHistory[pkg] = 0
+                persistRestartCount(pkg, 0)
+            }
+            
+            // 更新 UI 模型
             for (timeline in active.values) {
                 timeline.restartCount = 0
             }
