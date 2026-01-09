@@ -14,8 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.SeekBar
-import androidx.core.content.ContextCompat
-import com.zero.library_base.R
+import androidx.core.graphics.toColorInt
 import kotlin.math.roundToInt
 
 /**
@@ -28,15 +27,16 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
 
     /* ---------------- 颜色配置 ---------------- */
 
-    private val colorBg = ContextCompat.getColor(context, R.color.baseColorWhite)
-    private val colorProgress = ContextCompat.getColor(context, R.color.baseColorAccent)
-    private val colorTextLabel = ContextCompat.getColor(context, R.color.baseThemeColor)
+    var isDarkNight = false
+    private val colorBg = if (isDarkNight) "#232425".toColorInt() else "#D9D9D9".toColorInt()
+    private val colorProgress = if (isDarkNight) "#2D2D2D".toColorInt() else "#F4F5F7".toColorInt()
+    private val colorTextLabel = if (isDarkNight) "#D5D5D5".toColorInt() else "#333333".toColorInt()
 
     /* ---------------- 尺寸配置 ---------------- */
 
-    private val thumbSize = 30.dp()
-    private val trackHeight = 38.dp()
-    private val gap = 2.dp()
+    private val thumbSize = 40.dp()
+    private val trackHeight = 50.dp()
+    private val gap = 3.dp()
 
     /* ---------------- 画笔 ---------------- */
 
@@ -56,7 +56,7 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
 
     private var minProgress = 0
     private var maxProgress = 100
-    private var _progress = 22f // 当前进度值
+    private var _progress = 6f // 当前进度值
 
     /**
      * 当前进度数值
@@ -71,6 +71,7 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
                 invalidate()
             }
         }
+
 
     /* ---------------- 核心方法 ---------------- */
 
@@ -88,6 +89,15 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
         invalidate()
     }
 
+    /**
+     * 是否展示小数点
+     */
+    var showDecimal = true
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     /* ---------------- 回调 ---------------- */
 
     interface OnProgressChangeListener {
@@ -98,6 +108,7 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
 
     /* ---------------- 绘制逻辑 ---------------- */
 
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -150,8 +161,17 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
         /* 5. 绘制滑块内部数字 */
         textPaint.color = colorTextLabel
         textPaint.textAlign = Paint.Align.CENTER
-        canvas.drawText(_progress.roundToInt().toString(), thumbX, centerY + baseline(textPaint),
-            textPaint)
+
+        // 根据 showDecimal 决定显示整数还是保留一位小数的浮点数
+        // 逻辑：如果是最小值、最大值，或者未开启 showDecimal，则显示整数
+        // 只有在区间中间且开启 showDecimal 时才显示一位小数
+        val isAtBoundary = _progress <= minProgress || _progress >= maxProgress
+        val textToShow = if (showDecimal && !isAtBoundary) {
+            "%.1f".format(_progress)
+        } else {
+            _progress.roundToInt().toString()
+        }
+        canvas.drawText(textToShow, thumbX, centerY + baseline(textPaint), textPaint)
     }
 
     /* ---------------- 触摸事件 ---------------- */
@@ -188,14 +208,23 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
         val ratio = (clampedX - startX) / usableWidth
 
         val range = (maxProgress - minProgress).toFloat()
-        val calculatedValue = minProgress + (ratio * range)
-        val finalInt = calculatedValue.roundToInt().coerceIn(minProgress, maxProgress)
 
-        if (_progress.roundToInt() != finalInt) {
-            _progress = finalInt.toFloat()
-            onProgressChangeListener?.onProgressChanged(this, finalInt, true)
-            invalidate()
+        // 1. 记录旧的整数值，用于判断回调触发
+        val oldInt = _progress.roundToInt()
+
+        // 2. 关键优化：直接保存浮点数，不取整。
+        // 这样 onDraw 中的 thumbX 会随像素平滑移动，解决“一节一节”的问题
+        _progress = minProgress + (ratio * range)
+
+        val newInt = _progress.roundToInt()
+
+        // 3. 只有当四舍五入后的“整数部分”发生变化时，才触发外部监听
+        if (oldInt != newInt) {
+            onProgressChangeListener?.onProgressChanged(this, newInt, true)
         }
+
+        // 每一帧都重绘，保证滑块移动平滑
+        invalidate()
     }
 
     override fun performClick(): Boolean {
@@ -211,6 +240,7 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
             putFloat("current_progress", _progress)
             putInt("min_val", minProgress)
             putInt("max_val", maxProgress)
+            putBoolean("show_decimal", showDecimal) // 保存状态
         }
     }
 
@@ -219,6 +249,7 @@ class TextThumbSlider @JvmOverloads constructor(context: Context, attrs: Attribu
             minProgress = state.getInt("min_val")
             maxProgress = state.getInt("max_val")
             _progress = state.getFloat("current_progress")
+            showDecimal = state.getBoolean("show_decimal") // 恢复状态
             super.onRestoreInstanceState(state.getParcelable("super_state"))
         } else {
             super.onRestoreInstanceState(state)

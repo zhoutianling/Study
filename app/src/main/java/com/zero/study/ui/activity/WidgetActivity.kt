@@ -70,7 +70,7 @@ class WidgetActivity : BaseActivity<ActivityWidgetBinding>(ActivityWidgetBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ViewBinding.bind(this)
-//        loadBanner()
+        loadBanner()
     }
 
 
@@ -79,13 +79,16 @@ class WidgetActivity : BaseActivity<ActivityWidgetBinding>(ActivityWidgetBinding
         val startAlphaAnim = startAlphaAnim()
         binding.zoomView.setRange(-50f,50f,5f)
         binding.zoomView.show()
+
+
+        binding.segmentSlide.setLabels(arrayOf("1","2","3","4","5"))
+
         binding.ivShadow.startAnimation(startAlphaAnim)
         binding.ivCompare.setImage(R.drawable.banner_1, R.drawable.banner_2)
         binding.ivCompare.setLineStyle(ContextCompat.getColor(this, R.color.colorPrimaryDark),
             1.0f.dp)
         binding.ivCompare.startAnimation(0f, 1f, 2000)
 
-        binding.ivFilter.load("https://raw.githubusercontent.com/PAX520520/templates/main/A10.png")
         binding.layoutRight.animateHeart()
         startAlphaAnim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {
@@ -115,7 +118,7 @@ class WidgetActivity : BaseActivity<ActivityWidgetBinding>(ActivityWidgetBinding
     }
 
     override fun addListener() {
-        binding.btnDownload.onClick {
+        binding.btn03.onClick {
             Log.d("zzz", "setOnClickListener:${System.currentTimeMillis()} ")
             this.toast("500后可点击")
         }
